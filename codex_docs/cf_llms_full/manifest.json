@@ -4,5 +4,11 @@
     "fetched_at": "2025-11-07T17:41:49Z",
     "bytes": 72756,
     "sha256": "d8ab0462c343bafe3cec5e143ca80c1dc5c34ce9b98a771e4b90fbced3c130ec"
+  },
+  "secrets-store": {
+    "available": true,
+    "fetched_at": "2025-11-07T18:28:55Z",
+    "bytes": 21853,
+    "sha256": "fe3c1c91f4a4c238ade4c7015ef28e702216645db1169c766b98b413bc4c535b"
   }
 }
