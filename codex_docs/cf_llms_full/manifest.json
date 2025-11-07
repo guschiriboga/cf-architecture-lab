@@ -52,5 +52,41 @@
     "fetched_at": "2025-11-07T18:27:44Z",
     "bytes": 425134,
     "sha256": "1f32eca16057ac78899594b13069b7fc7b7496a9571472ef75b14d842299e04a"
+  },
+  "gateway": {
+    "available": true,
+    "fetched_at": "2025-11-07T19:24:22Z",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "load_balancing": {
+    "available": true,
+    "fetched_at": "2025-11-07T19:24:22Z",
+    "bytes": 290825,
+    "sha256": "f6954f797488f1fa554d3110e427b9a777fb27c2a90c859cb376cc1089d1920b"
+  },
+  "magic_cloud_networking": {
+    "available": true,
+    "fetched_at": "2025-11-07T19:24:22Z",
+    "bytes": 42013,
+    "sha256": "213218f0b3f988ae0b14143f58c7e8919892514dcdb82bc3577deb2664b80e89"
+  },
+  "ssl_tls": {
+    "available": true,
+    "fetched_at": "2025-11-07T19:24:22Z",
+    "bytes": 546220,
+    "sha256": "935d2a13a186a30a5b3f3485a12a5290d3cb3c401f294779e219f8c044676d1d"
+  },
+  "waf": {
+    "available": true,
+    "fetched_at": "2025-11-07T19:24:22Z",
+    "bytes": 883727,
+    "sha256": "27dc270c850eb42d022e37f7478afc382dc2c5dd7746ebaac4535167bbb54cf1"
+  },
+  "dns": {
+    "available": true,
+    "fetched_at": "2025-11-07T19:24:22Z",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   }
 }

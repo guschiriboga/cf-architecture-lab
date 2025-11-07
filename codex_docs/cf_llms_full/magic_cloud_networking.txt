@@ -1,0 +1,782 @@
+<page>
+---
+title: Magic Cloud Networking · Cloudflare Magic Cloud Networking docs
+description: Magic Cloud Networking (beta) simplifies the process of connecting
+  to your public cloud infrastructure, like Amazon Web Services, Google Cloud
+  Platform, or Azure. With Magic Cloud Networking you can automatically discover
+  your cloud resources through Cloudflare's dashboard, and effortlessly combine
+  your cloud networks with your office and data center networks.
+lastUpdated: 2025-02-19T10:11:06.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/magic-cloud-networking/
+  md: https://developers.cloudflare.com/magic-cloud-networking/index.md
+---
+
+Automate resource discovery, and reduce management burden when connecting to your public cloud.
+
+Enterprise-only
+
+Magic Cloud Networking (beta) simplifies the process of connecting to your public cloud infrastructure, like Amazon Web Services, Google Cloud Platform, or Azure. With Magic Cloud Networking you can automatically discover your cloud resources through Cloudflare's dashboard, and effortlessly combine your cloud networks with your office and data center networks.
+
+Magic Cloud Networking allows you to connect, accelerate, and manage your virtual private clouds securely through Cloudflare. Grow your multi-cloud network architecture in a consistent and scalable manner, centered on Cloudflare's connectivity cloud services.
+
+Magic Cloud Networking is currently in closed beta. If you would like to be among the first customers to try it out, [fill out this form](https://www.cloudflare.com/lp/cloud-networking/).
+
+Learn how to [get started](https://developers.cloudflare.com/magic-cloud-networking/get-started/).
+
+***
+
+## Features
+
+### Discover your cloud resources automatically
+
+Discover your cloud resources like virtual private clouds (VPCs), subnets, virtual machines (VMs), route tables, and routes automatically, and easily set up your integrations.
+
+[Use cloud resource discovery](https://developers.cloudflare.com/magic-cloud-networking/get-started/)
+
+### Automatically connect a cloud network
+
+Automatically build VPN tunnels between cloud networks and Magic WAN.
+
+[Create cloud on-ramps](https://developers.cloudflare.com/magic-cloud-networking/cloud-on-ramps/)
+
+***
+
+## Related products
+
+**[Cloudflare Magic WAN](https://developers.cloudflare.com/magic-wan/)**
+
+Secure your network from incoming Internet traffic, and improve performance at Cloudflare scale.
+
+</page>
+
+<page>
+---
+title: 404 - Page Not Found · Cloudflare Magic Cloud Networking docs
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/magic-cloud-networking/404/
+  md: https://developers.cloudflare.com/magic-cloud-networking/404/index.md
+---
+
+# 404
+
+Check the URL, try using our [search](https://developers.cloudflare.com/search/) or try our LLM-friendly [llms.txt directory](https://developers.cloudflare.com/llms.txt).
+
+</page>
+
+<page>
+---
+title: Changelog · Cloudflare Magic Cloud Networking docs
+description: Review recent changes to Magic Cloud Networking (beta).
+lastUpdated: 2025-04-24T15:57:22.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/magic-cloud-networking/changelog/
+  md: https://developers.cloudflare.com/magic-cloud-networking/changelog/index.md
+---
+
+[Subscribe to RSS](https://developers.cloudflare.com/changelog/rss/magic-cloud-networking.xml)
+
+## 2024-12-05
+
+**Generate customized terraform files for building cloud network on-ramps**
+
+You can now generate customized terraform files for building cloud network on-ramps to [Magic WAN](https://developers.cloudflare.com/magic-wan/).
+
+[Magic Cloud](https://developers.cloudflare.com/magic-cloud-networking/) can scan and discover existing network resources and generate the required terraform files to automate cloud resource deployment using their existing infrastructure-as-code workflows for cloud automation.
+
+You might want to do this to:
+
+* Review the proposed configuration for an on-ramp before deploying it with Cloudflare.
+* Deploy the on-ramp using your own infrastructure-as-code pipeline instead of deploying it with Cloudflare.
+
+For more details, refer to [Set up with Terraform](https://developers.cloudflare.com/magic-cloud-networking/cloud-on-ramps/#set-up-with-terraform).
+
+## 2024-11-21
+
+**Import cloud resources for VMs and LBs**
+
+Cloud network discovery now includes cloud native virtual machine (VM) and load-balancer (LB) resources.
+
+## 2024-11-21
+
+**Export resource catalog**
+
+Customers can export their resource catalog including all discovered resource metadata to a downloadable JSON file, suitable for offline analysis.
+
+## 2024-10-01
+
+**Cost visibility for managed cloud configuration**
+
+Customers can now see the cloud provider list price of discovered network resources and will be informed of total cost and delta cost when deploying managed configuration.
+
+## 2024-08-14
+
+**GCP on-ramps**
+
+Magic Cloud Networking supports Google Cloud Platform.
+
+## 2024-07-01
+
+**Closed beta launch**
+
+The Magic Cloud Networking closed beta release is available, with the managed cloud on-ramps feature.
+
+</page>
+
+<page>
+---
+title: Cloud on-ramps · Cloudflare Magic Cloud Networking docs
+description: Magic Cloud Networking (beta) allows you to create on-ramps from
+  your cloud networks to Magic WAN. Cloudflare will create virtual private
+  network (VPN) tunnels between Magic WAN and your cloud provider, configuring
+  both sides of the connection on your behalf. Cloudflare orchestrates the cloud
+  provider's native VPN functionality, without requiring deployment of any
+  additional compute virtual machines (VMs).
+lastUpdated: 2025-03-27T12:39:57.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/magic-cloud-networking/cloud-on-ramps/
+  md: https://developers.cloudflare.com/magic-cloud-networking/cloud-on-ramps/index.md
+---
+
+Magic Cloud Networking (beta) allows you to create on-ramps from your cloud networks to Magic WAN. Cloudflare will create virtual private network (VPN) tunnels between Magic WAN and your cloud provider, configuring both sides of the connection on your behalf. Cloudflare orchestrates the cloud provider's native VPN functionality, without requiring deployment of any additional compute virtual machines (VMs).
+
+There are two types of on-ramps: single virtual private cloud (VPC) and hubs.
+
+## Prerequisites
+
+Before creating on-ramps from your cloud networks to Magic WAN, make sure you:
+
+* Have a Magic WAN account. Contact your account team to learn more.
+* Went through process of [setting up your cloud provider](https://developers.cloudflare.com/magic-cloud-networking/get-started/).
+* Have the correct cloud resources. Refer to [Reference](https://developers.cloudflare.com/magic-cloud-networking/reference/) to check resource by cloud provider.
+
+## Available on-ramps
+
+Magic Cloud Networking has the following cloud on-ramps integrations:
+
+* AWS (single VPC and hubs)
+* Azure (single VPC)
+* GCP (single VPC)
+
+Refer to [Reference](https://developers.cloudflare.com/magic-cloud-networking/reference/) to learn more about how Cloudflare orchestrates VPN connectivity to your cloud networks.
+
+***
+
+## Set up on-ramps
+
+### Single virtual private cloud
+
+Choose this option if you have a single virtual private cloud (VPC) in your cloud to connect to Magic WAN. To set up a single-VPC on-ramp:
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+
+2. Select **Magic WAN** > **Cloud on-ramps**.
+
+3. Select **Add new on-ramp**.
+
+4. Go to **Connect an existing VPC to Cloudflare** > **Select**.
+
+5. Give your new on-ramp a name and a description (optional), then select **Continue**.
+
+6. From the drop-down menu, choose your cloud provider. You can choose between AWS, GCP and Azure. Then, select **Continue**.
+
+7. Select the network that you want to connect to. This list comes from the [cloud integrations](https://developers.cloudflare.com/magic-cloud-networking/get-started/) you have already set up. When you are done, select **Continue**.
+
+8. **Configure route propagation** shows where Cloudflare will install the new routes. Installing these routes is required to correctly configure both Magic WAN and your cloud provider, and ensure successful communication between them:
+
+   * **Add routes for your Magic WAN address space to your cloud network**: Select this option to install routes for reaching Magic WAN in your cloud network's route tables (refer to [Magic WAN Address Space](#magic-wan-address-space) to learn what routes are installed and how to customize them). If you prefer to do this manually, unselect this option.
+
+     Warning
+
+     Cloudflare recommends that you leave this option selected. If you unselect **Add routes for your Magic WAN address space to your cloud network**, you will need to manually create all the required configurations to allow Magic WAN to connect to your cloud, such as routing tables, transit gateways, and VPNs. Refer to the [Magic WAN How to](https://developers.cloudflare.com/magic-wan/configuration/manually/how-to/) section, or consult the documentation for your cloud provider for more information.
+
+   * **Add routes for your cloud network to Magic WAN**: Select this option to create routes for reaching your cloud network in Magic WAN.
+
+9. Select **Continue**. Applying your settings might take a few seconds to complete.
+
+10. Review the changes in your cloud environment, and select **Approve changes**.
+
+You have successfully created your Magic WAN on-ramp. However, on-ramp creation can take up to an hour before you can use it.
+
+### Hubs
+
+If you want to connect multiple VPCs to Magic WAN, the best way to connect them is using a hub. A hub is a cloud VPN gateway that peers with multiple VPCs, allowing them to share a VPN tunnel to Magic WAN. Each cloud provider has their own term for hubs, so refer to your cloud provider for more information.
+
+Depending on how you have set up your cloud provider, you can:
+
+* **Connect to an existing hub**: Choose this option if you already have a VPN hub in your cloud and you want to connect it to Magic WAN.
+* **Create a new hub**: Choose this option if you want to create a new hub and connect it to Magic WAN.
+
+When you configure a hub on-ramp, Cloudflare always manages the VPN tunnel between Magic WAN and the hub. Optionally, you can also choose to have Cloudflare manage peering with VPCs and/or with other hubs:
+
+* **Manage VPC peering:** If you enable this option, Cloudflare will attach your chosen VPCs to the hub.
+* **Manage hub peering:** Hubs are regional, so in order to connect VPCs attached to hubs in different regions, those hubs need to be peered. If you enable this option, Cloudflare will peer your chosen hubs to this hub.
+
+#### Connect to an existing hub
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+
+2. Select **Magic WAN** > **Cloud on-ramps**.
+
+3. Select **Add new on-ramp**.
+
+4. Go to **Connect an existing hub to Cloudflare** > **Select**.
+
+5. Give your new on-ramp a name and a description (optional), then select **Continue**.
+
+6. From the drop-down menu, choose your cloud provider. You can choose between AWS, GCP, and Azure. Then, select **Continue**.
+
+7. Choose an existing hub. This list comes from the [cloud integrations](https://developers.cloudflare.com/magic-cloud-networking/get-started/) you have already set up. When you are done, select **Continue**.
+
+8. (*Optional*) In **VPC peering configuration**, you can enable **Manage VPC peering**. This allows Cloudflare to attach your chosen VPCs to the hub:
+
+   1. Select **Manage VPC peering** to enable this feature.
+   2. Choose the VPCs you want Cloudflare to attach to the hub.
+
+9. Select **Continue**.
+
+10. (*Optional*) In **Configure hub peering**, you can enable **Manage hub peering**. Enabling this option allows Cloudflare to attach remote hubs you have chosen to this hub (establishing connectivity between VPCs attached to any of the peered hubs):
+
+    1. Select **Manage hub peering** to enable this feature.
+    2. Select the remote hubs you want Cloudflare to attach to this hub.
+
+11. Select **Continue**.
+
+12. **Configure route propagation** shows where Cloudflare will install the new routes. Installing these routes is required to correctly configure both Magic WAN and your cloud provider, and ensure successful communication between them:
+
+    1. **Add routes for your Magic WAN address space to your cloud network**: Select this option to install routes for reaching Magic WAN in your cloud network's route tables (refer to [Magic WAN Address Space](#magic-wan-address-space) to learn what routes are installed and how to customize them). If you prefer to do this manually, unselect this option.
+
+       Warning
+
+       Cloudflare recommends that you leave this option selected. If you unselect **Add routes for your Magic WAN address space to your cloud network**, you will need to manually create all the required configurations to allow Magic WAN to connect to your cloud, such as routing tables, transit gateways, and VPNs. Refer to the [Magic WAN How to](https://developers.cloudflare.com/magic-wan/configuration/manually/how-to/) section, or consult the documentation for your cloud provider for more information.
+
+    2. **Add routes for your cloud network to Magic WAN**: Select this option to create routes for reaching your cloud network in Magic WAN.
+
+13. Select **Continue**. Applying your settings might take a few seconds to complete.
+
+14. Review the changes in your cloud environment, and select **Approve changes**.
+
+You have successfully created your Magic WAN on-ramp. However, on-ramp creation can take up to an hour before you can use it.
+
+#### Create a new hub
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+
+2. Select **Magic WAN** > **Cloud on-ramps**.
+
+3. Select **Add new on-ramp**.
+
+4. Go to **Create a new hub & connect it to Cloudflare** > **Select**.
+
+5. Give your new on-ramp a name and a description (optional), then select **Continue**.
+
+6. Configure your cloud in **Select your cloud details**:
+
+   1. From the drop-down menu, choose your cloud provider. You can choose between AWS, GCP, and Azure.
+   2. Choose an existing integration. This list comes from the [cloud integrations](https://developers.cloudflare.com/magic-cloud-networking/get-started/) you have already set up.
+   3. Choose a region in which to create the new hub.
+   4. Select **Continue**.
+
+7. (*Optional*) In **VPC peering configuration**, you can enable **Manage VPC peering**. This allows Cloudflare to attach your chosen VPCs to the hub:
+
+   1. Select **Manage VPC peering** to enable this feature.
+   2. Choose the VPCs you want Cloudflare to attach to the hub.
+
+8. Select **Continue**.
+
+9. (*Optional*) In **Configure hub peering**, you can enable **Manage hub peering**. Enabling this option allows Cloudflare to attach remote hubs you have chosen to this hub (establishing connectivity between VPCs attached to any of the peered hubs):
+
+   1. Select **Manage hub peering** to enable this feature.
+   2. Select the remote hubs you want Cloudflare to attach to this hub.
+
+10. Select **Continue**.
+
+11. **Configure route propagation** shows where Cloudflare will install the new routes. Installing these routes is required to correctly configure both Magic WAN and your cloud provider, and ensure successful communication between them:
+
+    1. **Add routes for your Magic WAN address space to your cloud network**: Select this option to install routes for reaching Magic WAN in your cloud network's route tables (refer to [Magic WAN Address Space](#magic-wan-address-space) to learn what routes are installed and how to customize them). If you prefer to do this manually, unselect this option.
+
+       Warning
+
+       Cloudflare recommends that you leave this option selected. If you unselect **Add routes for your Magic WAN address space to your cloud network**, you will need to manually create all the required configurations to allow Magic WAN to connect to your cloud, such as routing tables, transit gateways, and VPNs. Refer to the [Magic WAN How to](https://developers.cloudflare.com/magic-wan/configuration/manually/how-to/) section, or consult the documentation for your cloud provider for more information.
+
+    2. **Add routes for your cloud network to Magic WAN**: Select this option to create routes for reaching your cloud network in Magic WAN.
+
+12. Select **Continue**. Applying your settings might take a few seconds to complete.
+
+13. Review the changes in your cloud environment, and select **Approve changes**.
+
+You have successfully created your Magic WAN on-ramp. However, on-ramp creation can take up to an hour before you can use it.
+
+### Set up with Terraform
+
+You can download a Terraform configuration for a cloud on-ramp.
+
+You might want to do this to:
+
+* Review the proposed configuration for an on-ramp before deploying it with Cloudflare.
+* Deploy the on-ramp using your own infrastructure-as-code pipeline instead of deploying it with Cloudflare.
+
+The download will contain two files:
+
+* `main.tf`: Terraform configuration for the new resources needed to create the on-ramp.
+* `instructions.txt`: Instructions for modifying resources that already exist in your cloud environment.
+
+If you intend to plan and apply the downloaded configuration using Terraform, you will need to use the [Cloudflare Terraform provider](https://developers.cloudflare.com/terraform/) (in addition to the Terraform provider for the on-ramp's cloud service provider). Use your Cloudflare [Global API Key](https://developers.cloudflare.com/fundamentals/api/get-started/keys/), not an API Token.
+
+Warning
+
+Do not deploy the on-ramp using both Cloudflare and Terraform. If you plan to deploy your on-ramp with Cloudflare (meaning you are both planning to create an on-ramp and applying an on-ramp), Cloudflare creates resources that will result in conflicts when you run Terraform (and vice versa). The Cloudflare dashboard will warn you if it detects you might encounter a conflict.
+
+#### Download Terraform configuration for a new on-ramp
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+
+2. Select **Magic WAN** > **Cloud on-ramps**.
+
+3. Select **Add new on-ramp** and begin the **Create a Magic WAN cloud on-ramp** workflow as normal.
+
+4. After the **Configure route propagation** step, select **View download options** instead of selecting **Continue**.
+
+5. Select a download option:
+
+   1. Choose **Download file and continue** to download the Terraform configuration, review the configuration, and then continue deploying the on-ramp with Cloudflare.
+   2. Choose **Download file and exit** to download the Terraform configuration that you will apply yourself.
+
+#### Download Terraform configuration for an existing on-ramp
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+2. Select **Magic WAN** > **Cloud on-ramps**.
+3. Select the three dots for the on-ramp you want to download > **Download as Terraform**.
+
+## Update security groups
+
+After setting up your on-ramps, you need to update your network security groups in your cloud provider to allow traffic to/from Magic WAN. Refer to the [Cloud on-ramps](https://developers.cloudflare.com/magic-cloud-networking/reference/) reference page for more information.
+
+***
+
+## Edit on-ramps
+
+### Edit a Magic WAN cloud on-ramp
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+
+2. Select **Magic WAN** > **Cloud on-ramps**.
+
+3. Select the on-ramp you want to edit.
+
+4. Select **Edit** in the side panel.
+
+5. In **Basic information**, you can change the name and description of your on-ramp. Select **Save** when you are finished.
+
+6. In **Configurations**, you can modify where the required routes are installed. Select **Continue**.
+
+   1. Select **Save and review** after making changes.
+
+   2. Review your settings, and select **Approve changes**.
+
+      Warning
+
+      If you uncheck any of the Propagation settings, you will have to manually configure Magic WAN or your cloud provider to ensure successful communication between them. Refer to the [How to](https://developers.cloudflare.com/magic-wan/configuration/manually/how-to/) section of Magic WAN, or consult the documentation for your cloud provider for more information.
+
+### Delete a Magic WAN cloud on-ramp
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+2. Select **Magic WAN** > **Cloud on-ramps**.
+3. Select the on-ramp you want to delete.
+4. Select **Edit** in the side panel.
+5. Choose **Detach** to proceed. Cloudflare will stop managing the cloud resources that were created to build this on-ramp, but will leave them in place. On-ramp connectivity will not be impacted.
+
+***
+
+## Magic WAN Address Space
+
+By default, Cloudflare installs the following summarized routes in your cloud route tables to direct traffic to Magic WAN:
+
+```txt
+10.0.0.0/8
+172.16.0.0./12
+192.168.0.0/16
+100.64.0.0./10
+```
+
+To override the defaults with custom prefixes:
+
+1. Log in to the Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+2. Select **Magic WAN** > **Configuration**.
+3. Select **Magic WAN Address Space**.
+4. Delete the prefixes, and enter your custom ones.
+5. When you are finished, select **Save changes**.
+
+To install a default route to send all traffic to Magic WAN, enter `0.0.0.0/0` (on Azure, enter `0.0.0.0/1` and `128.0.0.0/1`).
+
+***
+
+## Cost estimates
+
+You can view estimated costs associated with your cloud resources in the Cloudflare dashboard.
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+2. Select **Magic WAN** > **Cloud on-ramps**.
+3. Find the cloud on-ramp for which you want to check the estimated costs.
+4. Select the three dots > **Associated Resources**.
+5. In the **Associated Resources** page, you can view the estimated monthly costs for all the resources associated with the on-ramp you chose. You can also search for a specific resource using the search box.
+
+</page>
+
+<page>
+---
+title: Get started · Cloudflare Magic Cloud Networking docs
+description: To get started with Magic Cloud Networking (beta) you need to give
+  Cloudflare permission to interact with cloud providers on your behalf. You
+  might have multiple provider accounts for the same cloud provider — for
+  example, you might want Cloudflare to manage virtual private clouds (VPCs)
+  belonging to two different AWS accounts.
+lastUpdated: 2025-04-28T10:10:25.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/magic-cloud-networking/get-started/
+  md: https://developers.cloudflare.com/magic-cloud-networking/get-started/index.md
+---
+
+To get started with Magic Cloud Networking (beta) you need to give Cloudflare permission to interact with cloud providers on your behalf. You might have multiple provider accounts for the same cloud provider — for example, you might want Cloudflare to manage virtual private clouds (VPCs) belonging to two different AWS accounts.
+
+Once Cloudflare has the credentials required to access your cloud environments, Magic Cloud Networking will automatically begin discovering your cloud resources — like routing tables and virtual private networks. Discovered resources appear in your [Cloud resource catalog](https://developers.cloudflare.com/magic-cloud-networking/manage-resources/#cloud-resource-catalog).
+
+## Set up Amazon AWS
+
+### 1. Create integration
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+2. Select **Manage Account** > **Cloud integrations**.
+3. Go to **Integrations** and select **Connect integration**.
+4. Select **AWS integration**.
+5. Give a descriptive name to your integration. Optionally, you can also add a description for it.
+6. Select **Create integration**.
+7. Select **Authorize access** to start the process of connecting your Cloudflare account to Amazon AWS.
+
+### 2. Create IAM policy
+
+1. Create a [custom access policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_create-console.html) in your AWS account, and take note of the name you entered. Then, paste the following [JSON code](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_version.html) in the JSON tab:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AcceptTransitGatewayPeeringAttachment",
+                "ec2:CreateTransitGatewayPeeringAttachment",
+                "ec2:DeleteTransitGatewayPeeringAttachment",
+                "ec2:DescribeRegions",
+                "ec2:DescribeTransitGatewayPeeringAttachments",
+                "ec2:RejectTransitGatewayPeeringAttachment",
+                "ec2:GetManagedPrefixListEntries",
+                "ec2:CreateManagedPrefixList",
+                "ec2:ModifyManagedPrefixList",
+                "ec2:DeleteManagedPrefixList",
+                "ec2:CreateTransitGatewayPrefixListReference",
+                "ec2:DeleteTransitGatewayPrefixListReference",
+                "ec2:GetTransitGatewayPrefixListReferences",
+                "ec2:ModifyTransitGatewayPrefixListReference"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+### 3. Authorize access to your AWS account
+
+1. Create a [custom access policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_create-console.html) in your AWS account, and take note of the name you entered.
+
+2. Create an [AWS role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-custom.html) with the following settings:
+
+   * **Trusted entity type**: Select **Custom trust policy**, and paste the custom trust policy returned by the Cloudflare dashboard.
+
+   * **Permissions**: Add the IAM policy created in step 1, along with these AWS-managed policies:
+
+     * `NetworkAdministrator`
+     * `AmazonEC2ReadOnlyAccess`
+     * `AmazonVPCReadOnlyAccess`
+     * `IAMReadOnlyAccess`
+
+   * **ARN**: Copy the ARN for your newly created user.
+
+   Note
+
+   The trust policy may take several minutes to propagate to all regions. It usually takes less than four minutes, but can sometimes take longer. You may have to retry the **Authorize** button while the propagation takes effect.
+
+3. Select **I authorize Cloudflare to access my AWS account.**
+
+4. Select **Authorize**.
+
+The first discovery of resources may not succeed in all regions, while the IAM policy is propagating. If you do not see all resources after creating your cloud integration, please try re-discovering.
+
+## Set up Microsoft Azure
+
+### 1. Create integration
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+2. Select **Manage Account** > **Cloud integrations**.
+3. Go to **Integrations** and select **Connect integration**.
+4. Select **Azure integration**.
+5. Give a descriptive name to your integration. Optionally, you can also add a description for it.
+6. Select **Create integration**.
+7. Select **Authorize access** to start the process of connecting your Cloudflare account to Microsoft Azure.
+
+### 2. Authorize access to your Azure account
+
+Warning
+
+Magic Cloud does not support personal Microsoft accounts. Please sign in using a work or school account that is part of an Azure Entra Tenant.
+
+1. Select **Create service principal**. You will be redirected to Microsoft's login page.
+
+2. Enter your Azure credentials. If your account does not have administrator privileges, you may need to pass this link to an account that has administrator privileges.
+
+3. The next screen lists Cloudflare required permissions to access your account. Select **Accept**.
+
+4. [Add a role assignment](https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal). The purpose of this step is to give the app that you registered in step 1 permission to access your Azure Subscription.
+
+   * In step 3 of the linked document, select the **Contributor** role from the **Privileged administrator roles** tab.
+   * In step 4 of the linked document, search for `mcn-provider-integrations-bot-prod` when selecting members.
+
+5. In **Provide account information**, enter the **Tenant ID** and **Subscription ID** you copied from step 4.
+
+6. In **Verify account ownership**, [add the tags displayed in the Cloudflare dashboard](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources-portal).
+
+   Note
+
+   The tags may take several minutes to propagate and become readable to Cloudflare. It usually takes less than four minutes, but can sometimes take longer. You may have to retry the **Authorize** button while the propagation takes effect.
+
+7. Select **I authorize Cloudflare to access my AWS account.** If your account does not have administrator privileges, you may need to pass this link to an account that has administrator privileges.
+
+8. Select **Authorize**.
+
+The first discovery of resources may not succeed in all regions, while the IAM policy is propagating. If you do not see all resources after creating your cloud integration, please try re-discovering.
+
+## Set up Google Cloud
+
+### 1. Create integration
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+2. Select **Manage Account** > **Cloud integrations**.
+3. Go to **Integrations** and select **Connect integration**.
+4. Select **Google integration**.
+5. Give a descriptive name to your integration. Optionally, you can also add a description for it.
+6. Select **Create integration**.
+7. Select **Authorize access** to start the process of connecting your Cloudflare account to Google Cloud.
+
+### 2. Authorize access to your Google account
+
+1. Create a new [GCP service account](https://cloud.google.com/iam/docs/service-accounts-create) in your **Google account** > **GCP Console** > **IAM & Admin** > **Service Accounts**.
+
+2. Grant the new service account these roles:
+
+   * `Compute Network Admin`
+   * `Compute Viewer`
+
+3. Under **IAM & Admin** > **Service Accounts**, select the service account you just created, and navigate to the **Permissions** tab.
+
+4. Grant the **Service Account Token Creator** role to our bot account to allow it to impersonate this service account. Learn how to grant a specific role [in Google's documentation](https://cloud.google.com/iam/docs/manage-access-service-accounts#grant-single-role):
+   * `mcn-integrations-bot-prod@mcn-gcp-01.iam.gserviceaccount.com`
+
+5. In the **service account email field**, enter the email account that you used to create the GCP service account.
+
+6. In the **Project ID field**, enter the [project ID](https://support.google.com/googleapi/answer/7014113?hl=en) associated with your project.
+
+7. [Add the label](https://cloud.google.com/resource-manager/docs/creating-managing-labels#create-labels) displayed on the dash to your project.
+
+8. Select **I authorize Cloudflare to access my GCP account.** If your account does not have administrator privileges, you may need to pass this link to an account that has administrator privileges.
+
+9. Select **Authorize**.
+
+You have successfully connected your cloud provider to Magic Cloud Networking. Cloud resources found by Magic Cloud Networking are available in the [Cloud resource catalog](https://developers.cloudflare.com/magic-cloud-networking/manage-resources/#cloud-resource-catalog).
+
+The first discovery of resources may not succeed in all regions, while the IAM policy is propagating. If you do not see all resources after creating your cloud integration, please try re-discovering.
+
+## Next steps
+
+* [Set up Magic WAN](https://developers.cloudflare.com/magic-cloud-networking/cloud-on-ramps/) as an on-ramp to your cloud.
+* [Manage resources](https://developers.cloudflare.com/magic-cloud-networking/manage-resources/) found by Magic Cloud Networking.
+* [Edit](https://developers.cloudflare.com/magic-cloud-networking/manage-resources/#edit-cloud-integrations) cloud integrations.
+
+</page>
+
+<page>
+---
+title: Manage resources · Cloudflare Magic Cloud Networking docs
+description: Your cloud environment is built from individual cloud resources,
+  like virtual private clouds (VPCs), subnets, virtual machines (VMs), route
+  tables, and routes. Magic Cloud Networking (beta) discovers all of your cloud
+  resources and stores their configuration and status in the Cloud resource
+  catalog, a read-only snapshot of your cloud environment. Discovery runs
+  regularly in the background, keeping your catalog up to date as your
+  environment changes.
+lastUpdated: 2025-02-19T10:11:06.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/magic-cloud-networking/manage-resources/
+  md: https://developers.cloudflare.com/magic-cloud-networking/manage-resources/index.md
+---
+
+## Cloud resource catalog
+
+Your cloud environment is built from individual cloud resources, like virtual private clouds (VPCs), subnets, virtual machines (VMs), route tables, and routes. Magic Cloud Networking (beta) discovers all of your cloud resources and stores their configuration and status in the Cloud resource catalog, a read-only snapshot of your cloud environment. Discovery runs regularly in the background, keeping your catalog up to date as your environment changes.
+
+When Magic Cloud Networking creates or modifies configurations in the cloud provider - for example, to deploy a managed IPsec on-ramp for Magic WAN - the created resources will be labeled as **Managed** in the resource catalog.
+
+To browse the resources in your catalog:
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+2. Select **Manage Account** > **Cloud integrations**.
+3. Go to **Resource catalog**.
+4. Select a resource to inspect its details.
+
+## Edit Cloud integrations
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+2. Select **Manage Account** > **Cloud integrations**.
+3. Select the integration you want to edit > **Edit**.
+4. In **Credentials**, select **I would like to update my credentials**, and make the required changes to your credentials.
+5. Select **Save** when you are finished.
+6. (Optional) You can also select **Delete** to delete your cloud integration.
+
+## Download cloud resource catalog
+
+You can download a JSON file containing metadata and configuration for all your cloud resources:
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/), and select your account.
+2. Select **Manage Account** > **Cloud integrations**.
+3. Go to **Resource catalog**.
+4. Select **Download catalog**.
+
+After your browser finishes downloading the ZIP file, expand it to access the JSON with the information about your cloud resources.
+
+</page>
+
+<page>
+---
+title: Reference · Cloudflare Magic Cloud Networking docs
+description: Refer to this page for details about how Cloudflare orchestrates
+  VPN connectivity to your cloud networks.
+lastUpdated: 2025-02-19T10:11:06.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/magic-cloud-networking/reference/
+  md: https://developers.cloudflare.com/magic-cloud-networking/reference/index.md
+---
+
+Refer to this page for details about how Cloudflare orchestrates VPN connectivity to your cloud networks.
+
+## Cloud on-ramps
+
+### AWS
+
+![Diagram showing how Cloudflare creates on-ramps to AWS](https://developers.cloudflare.com/_astro/aws.CgJf-X-H_ZpqttO.webp)
+
+When using Magic Cloud Networking (beta) to automatically create on-ramps to your AWS account, you should be aware of the following configuration changes Cloudflare will make on your behalf:
+
+* Cloudflare will create a new customer-managed prefix list named **Magic WAN and Cloudflare Edge** populated with your [Magic WAN Address Space](https://developers.cloudflare.com/magic-cloud-networking/cloud-on-ramps/#magic-wan-address-space) prefixes and the IPv4 address ranges for Cloudflare's global network servers (the latter prefixes are necessary if you use any Cloudflare L7 processing features). You must create rules in your Network Security Groups (NSGs) allowing traffic to/from this prefix list in order to have connectivity with Magic WAN. (The prefix list will contain around 15 to 25 entries, which each count against the rules-per-security-group quota for NSGs in your AWS account.)
+* Cloudflare will create a Virtual Private Gateway and attach it to your Virtual Private Cloud (VPC). If an existing Virtual Private Gateway is already attached to the VPC, on-ramp creation will fail.
+* Cloudflare will enable route propagation from the Virtual Private Gateway into all route tables in your VPC. This will result in a route for each prefix in your [Magic WAN Address Space](https://developers.cloudflare.com/magic-cloud-networking/cloud-on-ramps/#magic-wan-address-space) targeting the gateway.
+* Cloudflare will add a route in Magic WAN for each IPv4 CIDR block in your VPC.
+
+### Azure
+
+![Diagram showing how Cloudflare creates on-ramps to AWS](https://developers.cloudflare.com/_astro/azure.DonEYaVC_Z1l9SuN.webp)
+
+When using Magic Cloud Networking to automatically create on-ramps to your Azure account, you should be aware of the following configuration changes Cloudflare will make on your behalf:
+
+* Cloudflare will create a Virtual Network Gateway in your Virtual Network (VNet). Virtual Network Gateways in Azure require a subnet named `GatewaySubnet`. Cloudflare will create a `GatewaySubnet` if one does not already exist in your VNet. If there is not enough unused address space left in your VNet to create a `/27` subnet for the`GatewaySubnet`, or if a `GatewaySubnet` exists but does not have enough address space left for a Virtual Network Gateway, on-ramp creation will fail.
+* Cloudflare will enable gateway route propagation on all route tables in your VNet. This will result in a route for each prefix in your [Magic WAN Address Space](https://developers.cloudflare.com/magic-cloud-networking/cloud-on-ramps/#magic-wan-address-space) pointing to the gateway. If your VNet has other Virtual Network Gateways, their routes will also propagate to your route tables. If you delete the on-ramp, route propagation will not be disabled.
+* By default, Network Security Groups in Azure contain Allow rules for outbound/inbound traffic to/from the `VirtualNetwork` service tag, which includes Virtual Network Gateway address space (and therefore your Magic WAN Address Space). If you do not want all resources in your VNet to be accessible from Magic WAN, add the appropriate Deny rules to your Network Security Groups (NSGs).
+* Cloudflare will add a route in Magic WAN for each IPv4 address range in your VNet.
+
+### GCP
+
+![Diagram showing how Cloudflare creates on-ramps to GCP](https://developers.cloudflare.com/_astro/gcp.CxVSVz5f_1Oi1p4.webp)
+
+When using Magic Cloud Networking to automatically create on-ramps to your Google Cloud Platform (GCP) account, you should be aware of the following configuration changes Cloudflare will make on your behalf:
+
+* Cloudflare will reserve a public Internet routable IP address from GCP.
+* Cloudflare will create a VPN Gateway and two VPN Tunnels in the region you specify.
+* Cloudflare will create routes for each prefix in your [Magic WAN Address Space](https://developers.cloudflare.com/magic-cloud-networking/cloud-on-ramps/#magic-wan-address-space) within your VPC pointing to the VPN Tunnels.
+* Cloudflare will add routes in Magic WAN for all subnet CIDR prefixes in your VPC. This includes all regions within the VPC. Traffic bound for a region other than the VPN Gateway's region will be subject to GCP's [Inter-region Pricing](https://cloud.google.com/vpc/network-pricing#inter-region-data-transfer).
+* Traffic sent to and from your VM instances through the VPN Tunnels is still subject to VPC firewall rules, and may [require further configuration](https://cloud.google.com/network-connectivity/docs/vpn/how-to/configuring-firewall-rules#firewall_rules).
+
+## Supported resources
+
+Magic Cloud Networking discovers the following resource types.
+
+### AWS
+
+* AWS Customer Gateway
+* AWS EC2 Managed Prefix List
+* AWS EC2 Transit Gateway
+* AWS EC2 Transit Gateway Prefix List
+* AWS EC2 Transit Gateway VPC Attachment
+* AWS Egress Only Internet Gateway
+* AWS Internet Gateway
+* AWS Instance
+* AWS Network Interface
+* AWS Route Table
+* AWS Route Table Association
+* AWS Security Group
+* AWS Subnet
+* AWS VPC
+* AWS VPC IPv4 CIDR Block Association
+* AWS VPC Security Group Egress Rule
+* AWS VPC Security Group Ingress Rule
+* AWS VPN Connection
+* AWS VPN Connection Route
+* AWS VPN Gateway
+
+### Azure
+
+* Azure Application Security Group
+* Azure Load Balancer
+* Azure Load Balancer Backend Address Pool
+* Azure Load Balancer NAT Pool
+* Azure Load Balancer NAT Rule
+* Azure Load Balancer Rule
+* Azure Local Network Gateway
+* Azure Network Interface
+* Azure Network Interface Application Security Group Association
+* Azure Network Interface Backend Address Pool Association
+* Azure Network Interface Security Group Association
+* Azure Network Security Group
+* Azure Public IP
+* Azure Route
+* Azure Route Table
+* Azure Subnet
+* Azure Subnet Route Table Association
+* Azure Virtual Machine
+* Azure Virtual Machine Gateway Connection
+* Azure Virtual Network
+* Azure Virtual Network Gateway
+* Azure Virtual Network Gateway Connection
+
+### GCP
+
+* Google Compute Address
+* Google Compute Forwarding Rule
+* Google Compute Global Address
+* Google Compute HA VPN Gateway
+* Google Compute Interconnect Attachment
+* Google Compute Network
+* Google Compute Network Firewall Policy
+* Google Compute Network Firewall Policy Rule
+* Google Compute Route
+* Google Compute Router
+* Google Compute Subnetwork
+* Google Compute VPN Gateway
+* Google Compute VPN Tunnel
+
+</page>
+
