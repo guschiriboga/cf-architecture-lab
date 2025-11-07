@@ -1,3 +1,3 @@
 # Template: Worker + R2 API
 
-> Placeholder. To be filled after R2 limits are pinned.
+> Starter to be expanded with bindings once limits are finalized.

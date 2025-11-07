@@ -1,28 +1,28 @@
 # cf-architecture-lab
 
-A lightweight, versioned handbook for **Cloudflare compute, storage, and database services**, curated for designing **free‑tier friendly architectures**.
+A versioned handbook for **Cloudflare compute, storage, and database services**, curated for designing **free‑tier‑friendly architectures**.
 
-> **Status:** Repository skeleton initialized. Facts, limits, and citations to official Cloudflare docs will be added in the next pass.
+## What this is
+- A structured, always‑cited reference for Cloudflare services.
+- Machine‑readable limits in `data/services.yaml` to generate tables and guardrails.
+- Minimal templates and architecture patterns to kick off projects quickly.
 
-## Goals
-- Keep a **single source of truth** for service limits and free tiers in `data/services.yaml`.
-- Provide **quick-start architecture patterns** and **minimal templates** for Workers + R2, D1, KV, and Vectorize.
-- Offer a ** Free Tier Matrix** for fast design-time decisions.
-
-## How to use
-1. Clone this repo to your machine.
-2. Read `00-overview.md` to understand the structure and conventions.
-3. Browse `10-compute`, `20-storage`, `30-databases` for focused notes.
-4. Check `50-free-tiers/matrix.md` for at-a-glance quotas.
-5. Explore `40-templates` and `60-architectures` for practical starters.
+## Structure
+- `10-compute/` – Workers, Pages, Durable Objects, Containers, Workflows.
+- `20-storage/` – R2, Workers KV, Images.
+- `30-databases/` – D1, Vectorize, Hyperdrive, R2 SQL.
+- `40-templates/` – Minimal starter projects (Wrangler, code skeletons).
+- `50-free-tiers/` – Free tier comparison matrix.
+- `60-architectures/` – Opinionated patterns.
+- `70-platform/` – Cross‑cutting: Secrets Store (and more as needed).
+- `90-links/` – Official docs links (add access dates when pinning facts).
 
 ## Branch
 Use **Main** as your default branch name.
 
 ## License
-Private repository. No open-source license added.
+Private repository. No open‑source license added.
 
 ## Next steps
-- Populate `data/services.yaml` with verified limits from official docs.
-- Fill each service page with **sources + access dates**.
-- Generate the first architecture: **Edge API + R2 (Free Tier)**.
+- Keep `data/services.yaml` as the single source of truth for quotas.
+- Expand the free‑tier matrix and templates as we validate more services.

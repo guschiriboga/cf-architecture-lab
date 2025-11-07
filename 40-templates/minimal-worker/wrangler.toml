@@ -1,11 +1,3 @@
 name = "minimal-worker"
 main = "src/index.js"
 compatibility_date = "2025-01-01"
-
-# Fill these when ready:
-# account_id = ""
-# routes = []
-# kv_namespaces = []
-# d1_databases = []
-# r2_buckets = []
-# vectors = []

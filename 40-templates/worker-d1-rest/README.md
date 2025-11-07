@@ -1,3 +1,3 @@
 # Template: Worker + D1 CRUD
 
-> Placeholder. To be filled after D1 limits are pinned.
+> Starter to be expanded with schema and migrations.

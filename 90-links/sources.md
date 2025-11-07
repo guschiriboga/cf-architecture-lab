@@ -1,14 +1,13 @@
 # Sources (official docs)
 
-- Workers limits: https://developers.cloudflare.com/workers/platform/limits/
-- R2 pricing: https://developers.cloudflare.com/r2/pricing/
-- R2 limits: https://developers.cloudflare.com/r2/platform/limits/
-- KV pricing: https://developers.cloudflare.com/kv/platform/pricing/
-- KV limits: https://developers.cloudflare.com/kv/platform/limits/
-- D1 pricing: https://developers.cloudflare.com/d1/platform/pricing/
-- D1 limits: https://developers.cloudflare.com/d1/platform/limits/
-- D1 release notes: https://developers.cloudflare.com/d1/platform/release-notes/
-- Vectorize limits: https://developers.cloudflare.com/vectorize/platform/limits/
-- Vectorize pricing FAQ: https://developers.cloudflare.com/vectorize/platform/pricing/
-- Hyperdrive pricing: https://developers.cloudflare.com/hyperdrive/platform/pricing/
-- Hyperdrive limits: https://developers.cloudflare.com/hyperdrive/platform/limits/
+- Containers: https://developers.cloudflare.com/containers/
+- D1: https://developers.cloudflare.com/d1/
+- Durable Objects: https://developers.cloudflare.com/durable-objects/
+- Images: https://developers.cloudflare.com/images/
+- KV: https://developers.cloudflare.com/kv/
+- Pages: https://developers.cloudflare.com/pages/
+- R2: https://developers.cloudflare.com/r2/
+- R2 SQL: https://developers.cloudflare.com/r2-sql/
+- Secrets Store: https://developers.cloudflare.com/secrets-store/
+- Workers: https://developers.cloudflare.com/workers/
+- Workflows: https://developers.cloudflare.com/workflows/
