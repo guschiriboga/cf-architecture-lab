@@ -1,0 +1,257 @@
+id: d1
+name: Cloudflare D1
+category: database
+summary: Managed serverless SQL databases with SQLite semantics that you query directly from Workers and Pages projects.
+docs:
+  homepage: https://developers.cloudflare.com/d1/
+  key_pages:
+    - title: Getting started
+      url: https://developers.cloudflare.com/d1/get-started/
+    - title: Limits
+      url: https://developers.cloudflare.com/d1/platform/limits/
+    - title: Workers Binding API
+      url: https://developers.cloudflare.com/d1/worker-api/
+capabilities:
+  - Provision fully managed SQLite-compatible databases that scale horizontally across many small databases.
+  - Execute SQL queries from Workers or Pages via bindings and prepared statements with language-specific tooling.
+  - Restore data using Time Travel backups and import or export datasets through Wrangler commands or dashboard tools.
+how_it_works:
+  model: D1 exposes SQLite-compatible databases that bind into Workers and Pages so serverless code executes SQL over Cloudflare's network.
+  architecture:
+    - You create databases with Wrangler or the dashboard and bind them in wrangler.toml under d1_databases to expose them as env variables.
+    - Applications issue prepared statements via env.<binding>.prepare and bind values securely before running queries.
+    - Projects can create thousands of small databases to isolate tenants or workloads while Cloudflare manages replication and durability.
+  execution:
+    - Workers invoke D1 prepared statements through methods like run, raw, first, batch, exec, or withSession to perform reads and writes.
+    - Wrangler commands such as npx wrangler d1 execute run schema migrations locally or remotely and verify results before deployment.
+    - Pages Functions can access the same bindings, enabling full-stack apps to query D1 over HTTP or Worker runtimes.
+  consistency:
+    - Built-in Time Travel provides point-in-time recovery windows so you can restore a database to any minute within the retention period.
+    - Prepared statements with parameter binding prevent SQL injection and ensure deterministic query execution against stored data.
+supported_languages:
+  runtimes:
+    - Workers JavaScript and TypeScript via the D1 binding API.
+    - Workers Python bindings through the workers Python runtime.
+    - HTTP API clients using SQL statements executed by Cloudflare-managed endpoints.
+  sdks: []
+  notes:
+    - Wrangler installs the D1 client API when you create a database so local tooling and TypeScript types are available.
+usage_patterns:
+  webpages:
+    - pattern: Query D1 from Cloudflare Pages Functions for dynamic content.
+      steps:
+        - Create a D1 database and add a binding in wrangler.toml or the dashboard.
+        - Deploy a Pages Function that reads from env.<binding>.prepare to fetch data.
+        - Return JSON or rendered HTML with the query results.
+  one_tier_apps:
+    - pattern: Build Workers that serve APIs backed by D1 using prepared statements.
+      steps:
+        - Initialize a Worker project with npm create cloudflare and select a Worker template.
+        - Bind the D1 database and populate schema.sql using wrangler d1 execute --local.
+        - Handle routes like /api/beverages that run env.<binding>.prepare().bind().run() and return Response.json results.
+  multi_tier_apps:
+    - pattern: Use multiple D1 databases to isolate tenants while Workers orchestrate access.
+      steps:
+        - Design per-tenant or per-entity databases up to the 10 GB size limit to shard workloads.
+        - Use Wrangler migrations to create and manage bindings for each database in configuration.
+        - Implement Worker routing that selects the correct binding and enforces per-tenant isolation with prepared queries.
+interactions:
+  produces_bindings:
+    - d1_databases
+  consumes_bindings:
+    - workers
+    - pages
+  best_with:
+    - product_id: workers
+      reason: Workers call the D1 binding API to prepare, bind, and run SQL statements.
+    - product_id: pages
+      reason: Pages Functions can bind to D1 databases to power dynamic front ends.
+    - product_id: durable_objects
+      reason: D1 complements Durable Objects for stateful coordination and provides persistent SQL storage alongside object state.
+  anti_patterns:
+    - Expecting a single database to exceed the documented 10 GB storage cap instead of sharding into multiple databases.
+limits:
+  quotas:
+    - name: Databases per account
+      value: 50,000 (Workers Paid) / 10 (Free)
+      scope: Account
+      plan: Workers Paid and Free
+    - name: Maximum database size
+      value: 10 GB (Workers Paid) / 500 MB (Free)
+      scope: Per database
+      plan: Workers Paid and Free
+    - name: Maximum storage per account
+      value: 1 TB (Workers Paid) / 5 GB (Free)
+      scope: Account
+      plan: Workers Paid and Free
+    - name: Time Travel restore operations
+      value: 10 restores per 10 minutes per database
+      scope: Per database
+      plan: All
+  performance:
+    - name: SQL statement length limit
+      value: 100 KB
+      scope: Per statement
+      note: Applies to each statement including those inside batches.
+    - name: Maximum simultaneous Worker connections
+      value: 6 per invocation
+      scope: Per Worker invocation
+      note: Each Worker can open up to six concurrent D1 connections.
+  constraints:
+    - name: Maximum bound parameters per query
+      value: 100
+      note: Parameterized statements cannot exceed 100 bound values.
+    - name: Maximum table columns
+      value: 100
+      note: Tables cannot define more than 100 columns each.
+    - name: Maximum SQL query duration
+      value: 30 seconds
+      note: Matches Cloudflare API request timeout for batch operations.
+free_tier:
+  items:
+    - name: Included databases
+      value: 10 databases
+      reset_window: N/A
+      scope: Workers Free plan
+    - name: Database storage allotment
+      value: 500 MB per database
+      reset_window: N/A
+      scope: Workers Free plan
+  notes:
+    - Free plan databases have smaller storage caps and shorter Time Travel retention compared to Workers Paid plans.
+security_compliance:
+  authz:
+    - Access is controlled through Wrangler or dashboard bindings, limiting database usage to authorized Workers or Pages Functions.
+  isolation:
+    - Applications can create thousands of small databases to isolate tenant data per account without extra cost.
+  data_residency:
+    - Optional location hints let you influence where D1 stores data when creating databases.
+  secrets:
+    uses:
+      - Binding configuration stores database credentials so code references env variables without hard-coding secrets.
+configuration:
+  wrangler:
+    bindings:
+      - type: d1
+        key: prod_d1_tutorial
+        note: Bind a named database with database_id and database_name values for Workers to access.
+    example: |
+      {
+        "d1_databases": [
+          {
+            "binding": "prod_d1_tutorial",
+            "database_name": "prod-d1-tutorial",
+            "database_id": "<unique-ID-for-your-database>"
+          }
+        ]
+      }
+  cli:
+    commands:
+      - npm create cloudflare@latest -- d1-tutorial
+      - npx wrangler d1 create prod-d1-tutorial
+      - npx wrangler d1 execute prod-d1-tutorial --local --file=./schema.sql
+      - npx wrangler d1 execute prod-d1-tutorial --remote --file=./schema.sql
+      - npx wrangler deploy
+  api:
+    endpoints: []
+dev_experience:
+  local_dev:
+    - Bootstrap schemas locally with wrangler d1 execute --local before pushing data to the remote database.
+  testing:
+    - Use wrangler d1 execute --command queries to validate data and schema changes against local or remote environments.
+  ci_cd:
+    - Include schema.sql migrations in deployment pipelines so remote databases are updated before running wrangler deploy.
+migration_versioning:
+  versioning:
+    - Track database schema files in version control and rerun wrangler d1 execute to promote changes between environments.
+  migrations:
+    - Repeat local initialization with --local and apply production updates with --remote to synchronize D1 schema changes.
+cost_awareness:
+  metering:
+    - Pricing is based on storage and query consumption, with limits that can be raised for enterprise workloads.
+  design_tips:
+    - Shard workloads across multiple databases to stay within the 10 GB per database limit and leverage horizontal scaling.
+examples:
+  minimal:
+    description: Worker route querying a D1 database with a prepared statement and returning JSON results.
+    files:
+      - path: index.js
+        lang: javascript
+        code: |
+          export default {
+            async fetch(request, env) {
+              const { pathname } = new URL(request.url);
+              if (pathname === "/api/beverages") {
+                const { results } = await env.prod_d1_tutorial
+                  .prepare("SELECT * FROM Customers WHERE CompanyName = ?")
+                  .bind("Bs Beverages")
+                  .run();
+                return Response.json(results);
+              }
+              return new Response(
+                "Call /api/beverages to see everyone who works at Bs Beverages",
+              );
+            },
+          };
+  advanced:
+    - description: Worker playground routes demonstrating run, raw, first, batch, exec, and withSession APIs.
+      files:
+        - path: index.js
+          lang: javascript
+          code: |
+            export default {
+              async fetch(request, env) {
+                const { pathname } = new URL(request.url);
+                const companyName1 = `Bs Beverages`;
+                const companyName2 = `Around the Horn`;
+                const stmt = env.DB.prepare(`SELECT * FROM Customers WHERE CompanyName = ?`);
+                const stmtMulti = env.DB.prepare(`SELECT * FROM Customers; SELECT * FROM Customers WHERE CompanyName = ?`);
+                const session = env.DB.withSession("first-primary");
+                const sessionStmt = session.prepare(`SELECT * FROM Customers WHERE CompanyName = ?`);
+                if (pathname === `/RUN`) {
+                  return Response.json(await stmt.bind(companyName1).run());
+                } else if (pathname === `/RAW`) {
+                  return Response.json(await stmt.bind(companyName1).raw());
+                } else if (pathname === `/FIRST`) {
+                  return Response.json(await stmt.bind(companyName1).first());
+                } else if (pathname === `/BATCH`) {
+                  return Response.json(
+                    await env.DB.batch([
+                      stmt.bind(companyName1),
+                      stmt.bind(companyName2),
+                    ]),
+                  );
+                } else if (pathname === `/EXEC`) {
+                  return Response.json(
+                    await env.DB.exec(`SELECT * FROM Customers WHERE CompanyName = "Bs Beverages"`),
+                  );
+                } else if (pathname === `/WITHSESSION`) {
+                  const result = await sessionStmt.bind(companyName1).run();
+                  console.log("You're now using D1 Sessions!");
+                  return Response.json(result);
+                }
+                return new Response(
+                  `Welcome to the D1 API Playground!\nChange the URL to test the various methods inside your index.js file.`,
+                );
+              },
+            };
+glossary_refs: []
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/d1/
+    title: Overview · Cloudflare D1 docs
+    accessed: "2025-11-07"
+    note: Summary, capabilities, horizontal scaling guidance, Time Travel, and related products.
+  - url: https://developers.cloudflare.com/d1/get-started/
+    title: Getting started · Cloudflare D1 docs
+    accessed: "2025-11-07"
+    note: Wrangler configuration, bindings, CLI workflow, schema initialization, and prepared statement examples.
+  - url: https://developers.cloudflare.com/d1/platform/limits/
+    title: Limits · Cloudflare D1 docs
+    accessed: "2025-11-07"
+    note: Database quotas, storage caps, statement limits, and connection limits.
+  - url: https://developers.cloudflare.com/d1/worker-api/
+    title: Workers Binding API · Cloudflare D1 docs
+    accessed: "2025-11-07"
+    note: Worker API methods, TypeScript support, API playground example, and multi-method routes.

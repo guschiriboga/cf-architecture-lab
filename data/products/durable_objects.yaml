@@ -1,0 +1,250 @@
+id: durable_objects
+name: Cloudflare Durable Objects
+category: compute
+summary: Stateful serverless primitives that pair compute with strongly consistent storage for coordinating global applications.
+docs:
+  homepage: https://developers.cloudflare.com/durable-objects/
+  key_pages:
+    - title: Getting started
+      url: https://developers.cloudflare.com/durable-objects/get-started/
+    - title: Limits
+      url: https://developers.cloudflare.com/durable-objects/platform/limits/
+    - title: SQLite Storage API
+      url: https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/
+capabilities:
+  - Provide globally addressable objects with unique names so Workers can coordinate stateful workflows.
+  - Attach durable, strongly consistent SQLite storage to each object for transactional data access.
+  - Support in-memory coordination, WebSocket hibernation, and alarms for real-time and scheduled workloads.
+how_it_works:
+  model: Durable Objects extend the Worker runtime with classes that own both compute and storage, addressed through RPC from Workers or other Durable Objects.
+  architecture:
+    - Each Durable Object class is defined in code and registered via Wrangler migrations, creating instances with dedicated storage.
+    - Workers obtain stubs from env.<binding>.getByName to communicate with specific object instances over RPC.
+    - Storage APIs let objects execute sql.exec queries directly against private SQLite databases colocated with the object.
+  execution:
+    - Worker fetch handlers construct Durable Object stubs and invoke exported methods that run inside the object's isolate.
+    - Objects can handle HTTP-like requests, WebSocket events, and alarms while persisting data through ctx.storage methods.
+    - Wrangler deploy orchestrates binding configuration and migrations so new classes become available globally.
+  consistency:
+    - Durable Object storage operations are strongly consistent because compute and storage execute in the same location.
+    - Objects process requests sequentially, enabling deterministic coordination without additional locking primitives.
+supported_languages:
+  runtimes:
+    - Workers JavaScript and TypeScript classes that extend DurableObject.
+    - Workers Python DurableObject subclasses using the workers Python runtime.
+  sdks: []
+  notes:
+    - RPC communication is implemented through Workers runtime bindings and generated stubs using getByName or id-based helpers.
+usage_patterns:
+  webpages:
+    - pattern: Serve collaborative pages that call Durable Objects for shared session state.
+      steps:
+        - Define a Durable Object class that stores shared data via ctx.storage.sql APIs.
+        - Bind the object in wrangler.toml and expose RPC methods for clients to mutate state.
+        - Call the object from a Worker-backed route that returns updated shared state to web clients.
+  one_tier_apps:
+    - pattern: Build chat or notification services with Durable Objects managing connections.
+      steps:
+        - Implement Durable Object methods to register users and push updates through WebSocket hibernation.
+        - Use Worker fetch handlers to create or retrieve the object for each room or channel.
+        - Persist messages or metadata in the object's SQLite storage to ensure durability across restarts.
+  multi_tier_apps:
+    - pattern: Orchestrate multi-service workflows by coordinating data and calls through Durable Objects.
+      steps:
+        - Use Durable Objects to sequence operations and share state among related Worker invocations.
+        - Persist workflow metadata or queue state in the object's SQLite storage for consistency.
+        - Call related services like D1 or R2 from RPC methods while updating progress in object storage.
+interactions:
+  produces_bindings:
+    - durable_objects
+  consumes_bindings:
+    - workers
+    - d1
+  best_with:
+    - product_id: workers
+      reason: Workers invoke Durable Objects through bindings to handle requests and routing.
+    - product_id: d1
+      reason: Durable Objects pair with D1 for structured persistence beyond per-object storage.
+    - product_id: r2
+      reason: R2 complements Durable Objects for storing large unstructured assets referenced by object state.
+  anti_patterns:
+    - Attempting to expose Durable Objects directly to the public Internet instead of routing through a Worker binding.
+limits:
+  quotas:
+    - name: Maximum Durable Object classes
+      value: 500 (Workers Paid) / 100 (Free)
+      scope: Account
+      plan: Workers Paid and Free
+    - name: Storage per Durable Object
+      value: 10 GB
+      scope: Per object
+      plan: Workers Paid
+    - name: Storage per account (Free plan)
+      value: 5 GB
+      scope: Account
+      plan: Workers Free
+    - name: Storage per account (Paid plan)
+      value: Unlimited (billed by usage)
+      scope: Account
+      plan: Workers Paid
+  performance:
+    - name: CPU per request
+      value: 30 seconds default, configurable to 5 minutes of active CPU
+      scope: Per invocation
+      note: CPU time resets with each incoming request or message and can be increased via wrangler limits.
+    - name: WebSocket message size
+      value: 32 MiB
+      scope: Per received message
+      note: Applies to incoming WebSocket payloads handled by Durable Objects.
+  constraints:
+    - name: Key and value size limit
+      value: 2 MB combined
+      note: Applies to entries stored via key-value APIs within Durable Objects.
+    - name: Maximum SQL statement length
+      value: 100 KB
+      note: Mirrors SQLite-backed Durable Object SQL limits.
+    - name: Maximum bound parameters per query
+      value: 100
+      note: Parameterized SQL statements cannot exceed 100 bound values.
+free_tier:
+  items:
+    - name: Durable Object classes
+      value: 100 classes
+      reset_window: N/A
+      scope: Workers Free plan
+    - name: Durable Object storage allocation
+      value: 5 GB account storage
+      reset_window: N/A
+      scope: Workers Free plan
+  notes:
+    - Workers Free plan access is limited to SQLite-backed Durable Objects with capped storage.
+security_compliance:
+  authz:
+    - Only Workers with configured bindings can invoke Durable Objects, enforcing controlled access per class.
+  isolation:
+    - Each Durable Object instance processes requests sequentially, isolating state per object and preventing cross-tenant interference.
+  data_residency:
+    - Objects deploy near the first requesting region and run alongside their storage to minimize latency.
+  secrets:
+    uses:
+      - Environment bindings pass configuration into object constructors without hard-coding credentials.
+configuration:
+  wrangler:
+    bindings:
+      - type: durable_object
+        key: MY_DURABLE_OBJECT
+        note: Bind the Durable Object class name to expose getByName stubs inside Workers.
+    example: |
+      {
+        "durable_objects": {
+          "bindings": [
+            {
+              "name": "MY_DURABLE_OBJECT",
+              "class_name": "MyDurableObject"
+            }
+          ]
+        },
+        "migrations": [
+          {
+            "tag": "v1",
+            "new_sqlite_classes": ["MyDurableObject"]
+          }
+        ]
+      }
+  cli:
+    commands:
+      - npm create cloudflare@latest -- durable-object-starter
+      - npx wrangler dev
+      - npx wrangler deploy
+  api:
+    endpoints: []
+dev_experience:
+  local_dev:
+    - Run npx wrangler dev to test Durable Object behavior locally and inspect responses.
+  testing:
+    - Use Miniflare or wrangler dev sessions to simulate RPC interactions before deploying globally.
+  ci_cd:
+    - Include Wrangler migrations in version control so deployments consistently register new or updated Durable Object classes.
+migration_versioning:
+  versioning:
+    - Track migration tags in wrangler.toml using incremental tag values for each Durable Object change.
+  migrations:
+    - Use new_sqlite_classes entries when creating SQLite-backed classes and update migrations for renames or deletions.
+cost_awareness:
+  metering:
+    - Durable Objects measure storage in gigabytes and share Workers CPU limits per invocation.
+  design_tips:
+    - Distribute workloads across many objects to avoid overload errors and stay within per-object CPU windows.
+examples:
+  minimal:
+    description: Durable Object that returns a greeting from its SQLite storage via a Worker route.
+    files:
+      - path: worker.js
+        lang: javascript
+        code: |
+          import { DurableObject } from "cloudflare:workers";
+
+          export class MyDurableObject extends DurableObject {
+            constructor(ctx, env) {
+              super(ctx, env);
+            }
+
+            async sayHello() {
+              const result = this.ctx.storage.sql
+                .exec("SELECT 'Hello, World!' as greeting")
+                .one();
+              return result.greeting;
+            }
+          }
+
+          export default {
+            async fetch(request, env) {
+              const stub = env.MY_DURABLE_OBJECT.getByName(new URL(request.url).pathname);
+              const greeting = await stub.sayHello();
+              return new Response(greeting);
+            },
+          };
+  advanced:
+    - description: TypeScript Durable Object example showing RPC method invocation from a Worker.
+      files:
+        - path: index.ts
+          lang: typescript
+          code: |
+            import { DurableObject } from "cloudflare:workers";
+
+            export class MyDurableObject extends DurableObject<Env> {
+              constructor(ctx: DurableObjectState, env: Env) {
+                super(ctx, env);
+              }
+
+              async sayHello(): Promise<string> {
+                let result = this.ctx.storage.sql
+                  .exec("SELECT 'Hello, World!' as greeting")
+                  .one();
+                return result.greeting;
+              }
+            }
+
+            export default {
+              async fetch(request: Request, env: Env): Promise<Response> {
+                const stub = env.MY_DURABLE_OBJECT.getByName(new URL(request.url).pathname);
+                const greeting = await stub.sayHello();
+                return new Response(greeting);
+              },
+            } satisfies ExportedHandler<Env>;
+glossary_refs: []
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/durable-objects/
+    title: Overview · Cloudflare Durable Objects docs
+    accessed: "2025-11-07"
+    note: Summary, capabilities, related products, and availability of SQLite storage on Free plans.
+  - url: https://developers.cloudflare.com/durable-objects/get-started/
+    title: Getting started · Cloudflare Durable Objects docs
+    accessed: "2025-11-07"
+    note: Durable Object class definitions, bindings, migrations, CLI commands, and Worker integration examples.
+  - url: https://developers.cloudflare.com/durable-objects/platform/limits/
+    title: Limits · Cloudflare Durable Objects docs
+    accessed: "2025-11-07"
+    note: Class quotas, storage limits, CPU allowances, WebSocket sizes, and SQL constraints for Durable Objects.
