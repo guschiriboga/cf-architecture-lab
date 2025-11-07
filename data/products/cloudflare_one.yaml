@@ -1,0 +1,230 @@
+id: cloudflare_one
+name: Cloudflare One
+category: network_security
+summary: Cloudflare One unifies Zero Trust access, network security, and connectivity controls across Access, Gateway, Tunnel, DLP, CASB, RBI, and device clients on Cloudflare's global network.
+docs:
+  homepage: https://developers.cloudflare.com/cloudflare-one/
+  key_pages:
+    - title: Access policies
+      url: https://developers.cloudflare.com/cloudflare-one/access-controls/policies/
+    - title: Traffic policies
+      url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/
+    - title: Create a tunnel (dashboard)
+      url: https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/get-started/create-remote-tunnel/
+capabilities:
+  - Provide Zero Trust access, secure web gateway filtering, remote browser isolation, CASB, DLP, and email security from a unified Cloudflare One dashboard.
+  - Connect self-hosted applications and private networks through Cloudflare Tunnel with outbound-only `cloudflared` connectors that keep origins off the public Internet.
+  - Protect managed and unmanaged devices with the Cloudflare WARP client to enforce Gateway policies, device posture, and contextual access checks anywhere users work.
+how_it_works:
+  model: Cloudflare One delivers a secure access service edge built on Cloudflare's globally distributed connectivity cloud so traffic is connected, inspected, and filtered near every user.
+  architecture:
+    - Outbound-only Cloudflare Tunnel connections run `cloudflared` processes that maintain multiple encrypted links to Cloudflare data centers and route traffic to published hostnames or private networks.
+    - Secure Web Gateway policies inspect DNS, network, HTTP, and egress traffic with a single policy engine, while Access evaluates layered rules for identity, device posture, mTLS, and service tokens.
+    - Device clients connect through WARP using WireGuard or MASQUE tunnels and DNS-over-HTTPS proxies so Zero Trust policies apply consistently across operating systems.
+  execution:
+    - Administrators create remote tunnels in Cloudflare One, install the suggested `cloudflared` command on connectors, and publish application hostnames or CIDR ranges to route private traffic.
+    - Teams define Access policies with allow, block, bypass, or service-auth actions plus include, require, and exclude rules to govern who reaches protected applications.
+    - Users enroll devices with the WARP GUI or `warp-cli`, authenticate with their team name, and connect to apply Gateway traffic policies and Access posture checks.
+  consistency:
+    - Access evaluates bypass and service-auth policies before allow and block rules, stopping once a decision is made to keep enforcement deterministic.
+    - Gateway policy updates propagate globally within about a minute, ensuring filtering remains in sync across Cloudflare data centers.
+    - Scoped API tokens and optional read-only dashboard mode keep configuration changes centralized through automation.
+supported_languages:
+  runtimes:
+    - Cloudflare WARP clients for Windows, macOS, Linux, iOS, Android, and ChromeOS send device traffic through Zero Trust controls.
+    - The `cloudflared` connector runs on Linux, macOS, Windows, and Docker containers to maintain outbound tunnels.
+  sdks:
+    - name: Cloudflare Terraform Provider
+      url: https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs
+  notes:
+    - Use `warp-cli` on desktop platforms to script device enrollment, token-based registration, and connections for automation.
+usage_patterns:
+  webpages:
+    - pattern: Publish a self-hosted web app through Cloudflare Tunnel and Access.
+      steps:
+        - Create a remotely managed tunnel, install the provided `cloudflared` command, and register the connector.
+        - Define a published hostname or path that maps to the internal service origin.
+        - Attach Access allow policies that require approved identities or service tokens before granting entry.
+  one_tier_apps:
+    - pattern: Enforce SaaS and Internet browsing controls with Gateway and WARP.
+      steps:
+        - Deploy the WARP client to devices and require users to authenticate with the team name.
+        - Configure DNS, HTTP, network, and egress policies that match acceptable use and threat intelligence.
+        - Monitor detections and adjust policy order or resolver settings as needed.
+  multi_tier_apps:
+    - pattern: Secure hybrid networks and private services with Tunnel plus Zero Trust policies.
+      steps:
+        - Install `cloudflared` near each private segment and publish CIDR ranges for remote access.
+        - Require devices to connect through WARP so Gateway traffic inspection and Access posture checks apply to private routes.
+        - Use DEX tests and remote captures to verify application reachability and troubleshoot segmented networks.
+interactions:
+  produces_bindings: []
+  consumes_bindings: []
+  best_with: []
+  anti_patterns:
+    - Allowing Access bypass policies for Everyone leaves applications unprotected and should be avoided outside targeted exceptions.
+limits:
+  quotas:
+    - name: Access applications per account
+      value: "500"
+      scope: Per account
+      plan: All plans
+    - name: Gateway DNS policies per account
+      value: "500"
+      scope: Per account
+      plan: All plans
+    - name: Data Loss Prevention custom entries
+      value: "25"
+      scope: Per account
+      plan: Zero Trust Enterprise add-on
+    - name: Cloudflared tunnels per account
+      value: "1000"
+      scope: Per account
+      plan: All plans
+  performance:
+    - name: Concurrent HTTP/2 streams
+      value: "256"
+      scope: Gateway proxy endpoint
+      note: Gateway limits concurrent HTTP/2 streams per connection.
+  constraints:
+    - name: DLP file size
+      value: 100 MB per file (ZIP content <= 200 MB, 10 nested levels)
+      note: DLP only scans files within documented size and compression limits.
+free_tier:
+  items:
+    - name: Digital Experience Monitoring tests
+      value: "10"
+      reset_window: Continuous
+      scope: Zero Trust Free account
+    - name: DEX remote captures per day
+      value: "100"
+      reset_window: Daily
+      scope: Zero Trust Free account
+  notes:
+    - Zero Trust Free and Pay-as-you-go plans include predefined financial and identifier DLP profiles along with payload logging and false positive reporting.
+security_compliance:
+  authz:
+    - Access actions can require specific identity providers, device posture checks, mTLS certificates, or service tokens before granting application access.
+    - Scoped API tokens let teams automate Zero Trust configuration without over-privileging other Cloudflare services.
+  isolation:
+    - WARP keeps device traffic inside authenticated tunnels so Gateway and Access policies follow users regardless of network location.
+  data_residency:
+    - Cloudflare's connectivity cloud operates within ~50 ms of most Internet users, inspecting traffic near its source across hundreds of cities.
+  secrets:
+    uses:
+      - Device and connector enrollments rely on short-lived tokens, team names, and API credentials managed through the dashboard or Terraform automations.
+configuration:
+  wrangler:
+    bindings: []
+    example: Configuration changes can be centralized through API or Terraform workflows with the dashboard set to read-only for Zero Trust accounts.
+  cli:
+    commands:
+      - warp-cli registration new <TEAM_NAME>
+      - warp-cli connect
+      - brew install cloudflared
+      - winget install --id Cloudflare.cloudflared
+  api:
+    endpoints: []
+dev_experience:
+  local_dev:
+    - Use WARP connectivity status messages to confirm enrollment progress during manual device setup.
+  testing:
+    - Run DEX tests and remote captures to validate application reachability through Access, Gateway, and Tunnel configurations.
+  ci_cd:
+    - Enforce read-only dashboards and apply scoped API tokens so Zero Trust policy updates flow through Terraform or scripted API pipelines.
+migration_versioning:
+  versioning:
+    - Enable read-only mode in the dashboard to ensure all Zero Trust changes are versioned through infrastructure-as-code workflows.
+  migrations:
+    - Deploy multiple `cloudflared` connectors per environment so tunnels fail over automatically while migrating applications or networks.
+cost_awareness:
+  metering:
+    - Track application, policy, tunnel, and Logpush quotas to stay within documented account limits before requesting increases.
+  design_tips:
+    - Layer DNS, network, HTTP, and egress policies carefully instead of relying on broad bypass rules to avoid accidental exposure and inspection gaps.
+examples:
+  minimal:
+    description: Register and connect a desktop device to Cloudflare One with warp-cli.
+    files:
+      - path: enroll.sh
+        lang: bash
+        code: |
+          warp-cli registration new $TEAM_NAME
+          warp-cli connect
+  advanced:
+    - description: Generate a mobile enrollment link and automate CLI token recovery for manual deployments.
+      files:
+        - path: enrollment-tools.sh
+          lang: bash
+          code: |
+            printf 'cf1app://oneapp.cloudflare.com/team?name=%s\n' "$TEAM_NAME"
+            warp-cli registration token "com.cloudflare.warp://$TEAM_NAME.cloudflareaccess.com/auth?token=$TOKEN"
+            warp-cli connect
+        - path: install-cloudflared.sh
+          lang: bash
+          code: |
+            brew install cloudflared
+            winget install --id Cloudflare.cloudflared
+            echo "Install cloudflared on remote connectors and run the dashboard-provided command to join your tunnel."
+glossary_refs:
+  - SASE
+  - Zero Trust
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/cloudflare-one/
+    title: Overview · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: Platform summary, product list, and links to plans and limits.
+  - url: https://developers.cloudflare.com/reference-architecture/architectures/sase/
+    title: Evolving to a SASE architecture with Cloudflare · Cloudflare Reference Architecture docs
+    accessed: "2025-11-07"
+    note: SASE overview, global network coverage, connector deployment guidance, and migration strategy.
+  - url: https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/
+    title: Cloudflare Tunnel · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: Outbound-only model, connector behavior, and supported protocols.
+  - url: https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/get-started/create-remote-tunnel/
+    title: Create a tunnel (dashboard) · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: Step-by-step remote tunnel workflow and publishing guidance.
+  - url: https://developers.cloudflare.com/cloudflare-one/account-limits/
+    title: Account limits · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: Access, Gateway, DLP, Tunnel, DEX, and WARP quotas and performance limits.
+  - url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/
+    title: Traffic policies · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: Policy engine overview, filtering types, best practices, and propagation timing.
+  - url: https://developers.cloudflare.com/cloudflare-one/access-controls/policies/
+    title: Access policies · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: Actions, rule types, selectors, evaluation order, and API/Terraform references.
+  - url: https://developers.cloudflare.com/cloudflare-one/team-and-resources/devices/warp/
+    title: About Cloudflare WARP · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: WARP architecture, operating modes, benefits, and integration with Gateway and Access.
+  - url: https://developers.cloudflare.com/cloudflare-one/team-and-resources/devices/warp/deployment/manual-deployment/
+    title: Manual deployment · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: GUI and CLI enrollment steps, token recovery, mobile URL format, and connectivity status references.
+  - url: https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/
+    title: Downloads · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: Installation methods for cloudflared across platforms and package managers.
+  - url: https://developers.cloudflare.com/cloudflare-one/data-loss-prevention/
+    title: Data loss prevention · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: Availability, supported profiles, scanning scope, and file size limitations.
+  - url: https://developers.cloudflare.com/cloudflare-one/insights/dex/
+    title: Digital experience · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: DEX capabilities, tests, remote captures, and troubleshooting workflows.
+  - url: https://developers.cloudflare.com/cloudflare-one/email-security/
+    title: Email security · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: Email protection capabilities, deployment options, and dashboard overview.
+  - url: https://developers.cloudflare.com/cloudflare-one/api-terraform/
+    title: API and Terraform · Cloudflare One docs
+    accessed: "2025-11-07"
+    note: Guidance for managing Zero Trust via API, Terraform, read-only dashboards, and scoped API tokens.
