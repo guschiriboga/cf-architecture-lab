@@ -1,59 +1,119 @@
-version: 0
-updated_at: TBD
-services:
-  workers:
-    category: compute
-    docs: "TBD"
-    free_tier:
-      requests_per_day: TBD
-      cpu_time_per_invocation_ms: TBD
-      memory_mb: TBD
-      concurrent_requests: TBD
-    limits_notes:
-      - "TBD"
-  r2:
-    category: storage
-    docs: "TBD"
-    free_tier:
-      storage_gb_month: TBD
-      class_a_ops: TBD
-      class_b_ops: TBD
-      egress_gb: "Zero egress to Internet (verify exact policy)"
-    limits_notes:
-      - "TBD"
-  d1:
-    category: database
-    docs: "TBD"
-    free_tier:
-      db_count: TBD
-      per_db_size_gb: TBD
-      reads_writes_daily: TBD
-    limits_notes:
-      - "TBD"
-  kv:
-    category: storage
-    docs: "TBD"
-    free_tier:
-      reads_per_day: TBD
-      writes_per_day: TBD
-      list_per_day: TBD
-      max_value_size_kb: TBD
-    limits_notes:
-      - "Eventual consistency characteristics; TTL constraints on Free (verify)"
-  vectorize:
-    category: database
-    docs: "TBD"
-    free_tier:
-      indexes: TBD
-      vectors_total: TBD
-      dims_supported: TBD
-    limits_notes:
-      - "TBD"
-  hyperdrive:
-    category: database
-    docs: "TBD"
-    free_tier:
-      connections: TBD
-      traffic_gb: TBD
-    limits_notes:
-      - "Postgres acceleration layer; pricing/limits tied to Workers (verify)"
+{
+  "version": 1,
+  "updated_at": "2025-11-06",
+  "services": {
+    "workers": {
+      "category": "compute",
+      "docs": "https://developers.cloudflare.com/workers/platform/limits/",
+      "free_tier": {
+        "requests_per_day": 100000,
+        "cpu_time_per_invocation_ms": null,
+        "memory_mb": null,
+        "concurrent_requests": null
+      },
+      "limits_notes": [
+        "Daily request cap resets 00:00 UTC (Free). See limits page for runtime/CPU semantics.",
+        "Toggle route behavior on limit exceed (fail open/closed)."
+      ],
+      "sources": [
+        "https://developers.cloudflare.com/workers/platform/limits/"
+      ]
+    },
+    "r2": {
+      "category": "storage",
+      "docs": "https://developers.cloudflare.com/r2/pricing/",
+      "free_tier": {
+        "storage_gb_month": 10,
+        "class_a_ops_per_month": 1000000,
+        "class_b_ops_per_month": 10000000,
+        "egress_internet": "Free (Standard storage tier only)"
+      },
+      "limits_notes": [
+        "Free tier applies to Standard storage, not Infrequent Access.",
+        "Object size up to ~4.995 TiB; max single-part upload ~4.995 GiB."
+      ],
+      "sources": [
+        "https://developers.cloudflare.com/r2/pricing/",
+        "https://developers.cloudflare.com/r2/platform/limits/"
+      ]
+    },
+    "d1": {
+      "category": "database",
+      "docs": "https://developers.cloudflare.com/d1/platform/limits/",
+      "free_tier": {
+        "db_count": 10,
+        "per_db_size_mb": 500,
+        "account_storage_gb": 5,
+        "rows_read_per_day": 5000000,
+        "rows_written_per_day": 100000,
+        "time_travel_days": 7
+      },
+      "limits_notes": [
+        "Free limits reset daily at 00:00 UTC.",
+        "No egress fees from D1.",
+        "Queries per Worker invocation: 50 (Free)."
+      ],
+      "sources": [
+        "https://developers.cloudflare.com/d1/platform/limits/",
+        "https://developers.cloudflare.com/d1/platform/pricing/",
+        "https://developers.cloudflare.com/d1/platform/release-notes/"
+      ]
+    },
+    "kv": {
+      "category": "storage",
+      "docs": "https://developers.cloudflare.com/kv/platform/pricing/",
+      "free_tier": {
+        "reads_per_day": 100000,
+        "writes_per_day": 1000,
+        "deletes_per_day": 1000,
+        "list_per_day": 1000,
+        "stored_data_gb": 1,
+        "max_value_size_mib": 25,
+        "min_cache_ttl_seconds": 260
+      },
+      "limits_notes": [
+        "Eventual consistency; 1 write/sec per same key.",
+        "1 GB per account and per namespace on Free."
+      ],
+      "sources": [
+        "https://developers.cloudflare.com/kv/platform/pricing/",
+        "https://developers.cloudflare.com/kv/platform/limits/"
+      ]
+    },
+    "vectorize": {
+      "category": "database",
+      "docs": "https://developers.cloudflare.com/vectorize/platform/limits/",
+      "free_tier": {
+        "indexes_per_account": 100,
+        "vectors_per_index": 5000000,
+        "max_dimensions": 1536,
+        "namespaces_per_index": 1000
+      },
+      "limits_notes": [
+        "Upsert batch size: 1000 via Workers; 5000 via HTTP API.",
+        "topK up to 20 when returning values/metadata; 100 without."
+      ],
+      "sources": [
+        "https://developers.cloudflare.com/vectorize/platform/limits/",
+        "https://developers.cloudflare.com/vectorize/platform/pricing/"
+      ]
+    },
+    "hyperdrive": {
+      "category": "database",
+      "docs": "https://developers.cloudflare.com/hyperdrive/platform/pricing/",
+      "free_tier": {
+        "database_queries_per_day": 100000,
+        "max_configured_databases": 10
+      },
+      "limits_notes": [
+        "Available on Free and Paid plans.",
+        "Various connection limits; cached response size 50 MB."
+      ],
+      "sources": [
+        "https://developers.cloudflare.com/hyperdrive/platform/pricing/",
+        "https://developers.cloudflare.com/hyperdrive/platform/limits/",
+        "https://developers.cloudflare.com/hyperdrive/"
+      ]
+    }
+  }
+}

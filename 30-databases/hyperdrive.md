@@ -1,17 +1,15 @@
-# Hyperdrive (Postgres Acceleration)
+# Hyperdrive (Postgres/MySQL acceleration)
 
-> **Status:** Outline ready. Populate with verified figures and citations.
+**Free plan headline (daily):** 100,000 database queries/day; up to **10 configured databases** per account on Free.  
+Sources:
+- Pricing: https://developers.cloudflare.com/hyperdrive/platform/pricing/
+- Limits: https://developers.cloudflare.com/hyperdrive/platform/limits/
+- Overview: https://developers.cloudflare.com/hyperdrive/
 
 ## Summary
-A caching/acceleration layer for Postgres that reduces latency from Workers. Useful when you already have a managed Postgres and want edge performance.
+A caching/acceleration layer for Postgres/MySQL that reduces global latency from Workers.
 
-## Free Tier (to be verified)
-- Connections: **TBD**
-- Traffic: **TBD**
-
-## Notes / Gotchas
-- Connection reuse & transaction boundaries.
-- Works best when queries are cacheable or hot.
-
-## Sources (to be added)
-- Hyperdrive docs & pricing
+## Free Tier (selected limits)
+- **DB queries/day:** 100,000
+- **Configured databases:** up to 10 (per account)
+- **Cached response size:** 50 MB

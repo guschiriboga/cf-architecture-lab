@@ -1,21 +1,16 @@
 # Workers (Compute)
 
-> **Status:** Outline ready. Populate with verified figures and citations.
+**Free plan headline:** 100,000 requests/day (resets 00:00 UTC). See runtime limits page for execution semantics and caps.  
+Sources: 
+- Workers limits: https://developers.cloudflare.com/workers/platform/limits/
 
 ## Summary
-Cloudflare Workers is a serverless edge runtime. Use it for APIs, request/response transforms, scheduled jobs, and as glue for R2, D1, KV, Vectorize, and Hyperdrive.
+Cloudflare Workers is a serverless edge runtime used for APIs, transforms, scheduled jobs, and glue for R2, D1, KV, Vectorize, Hyperdrive.
 
-## Free Tier (to be verified)
-- Daily requests: **TBD**
-- CPU time per invocation: **TBD**
-- Memory: **TBD**
-- Concurrency: **TBD**
+## Free Tier
+- **Requests/day:** 100,000
+- **Reset time:** 00:00 UTC
+- **Notes:** Route behavior can be set to fail open/closed on limit exceed.
 
 ## Notes / Gotchas
-- Cold starts & CPU time semantics.
-- Limits differ between Free and Paid.
-- Consider Durable Objects for coordination/state.
-
-## Sources (to be added)
-- Official pricing & limits page
-- Runtime limits page
+- CPU/runtime semantics and other per-invocation behaviors change over time—always check the limits page before locking SLOs.

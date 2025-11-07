@@ -1,14 +1,10 @@
-# Free Tier Matrix
+# Free Tier Matrix (verified)
 
-> Generated from `data/services.yaml` (manual placeholder for now).
-
-| Service   | Category | Free Tier (high level) | Notes |
-|-----------|----------|------------------------|-------|
-| Workers   | Compute  | requests/day: TBD; CPU: TBD | Verify runtime limits |
-| R2        | Storage  | GB-month: TBD; Class A/B: TBD; Egress: TBD | Zero egress policy to confirm |
-| D1        | Database | DB count: TBD; size: TBD; ops/day: TBD | Time Travel/backup behavior |
-| KV        | Storage  | reads/day: TBD; writes/day: TBD | Eventual consistency |
-| Vectorize | Database | indexes: TBD; vectors: TBD | Dimensions & namespaces |
-| Hyperdrive| Database | connections: TBD; traffic: TBD | Workers tie-in |
-
-Once `data/services.yaml` is populated, this table should be programmatically rendered.
+| Service    | Category | Free Tier (headline) | Sources |
+|------------|----------|----------------------|---------|
+| Workers    | Compute  | 100,000 requests/day (reset 00:00 UTC) | https://developers.cloudflare.com/workers/platform/limits/ |
+| R2         | Storage  | 10 GB-month; 1M Class A; 10M Class B; egress to Internet free (Standard) | https://developers.cloudflare.com/r2/pricing/ |
+| D1         | Database | 10 DBs; 500 MB/DB; 5 GB account; 5M rows read/day; 100k rows written/day; 7-day Time Travel | https://developers.cloudflare.com/d1/platform/pricing/ |
+| KV         | Storage  | 100k reads/day; 1k writes/day; 1k deletes/day; 1k list/day; 1 GB stored; 25 MiB value | https://developers.cloudflare.com/kv/platform/pricing/ |
+| Vectorize  | Database | 100 indexes/account; 5,000,000 vectors/index; 1536 dims; 1000 namespaces/index | https://developers.cloudflare.com/vectorize/platform/limits/ |
+| Hyperdrive | Database | 100,000 DB queries/day; 10 configured DBs (account) | https://developers.cloudflare.com/hyperdrive/platform/pricing/ |
