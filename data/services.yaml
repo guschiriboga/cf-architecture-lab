@@ -1,0 +1,59 @@
+version: 0
+updated_at: TBD
+services:
+  workers:
+    category: compute
+    docs: "TBD"
+    free_tier:
+      requests_per_day: TBD
+      cpu_time_per_invocation_ms: TBD
+      memory_mb: TBD
+      concurrent_requests: TBD
+    limits_notes:
+      - "TBD"
+  r2:
+    category: storage
+    docs: "TBD"
+    free_tier:
+      storage_gb_month: TBD
+      class_a_ops: TBD
+      class_b_ops: TBD
+      egress_gb: "Zero egress to Internet (verify exact policy)"
+    limits_notes:
+      - "TBD"
+  d1:
+    category: database
+    docs: "TBD"
+    free_tier:
+      db_count: TBD
+      per_db_size_gb: TBD
+      reads_writes_daily: TBD
+    limits_notes:
+      - "TBD"
+  kv:
+    category: storage
+    docs: "TBD"
+    free_tier:
+      reads_per_day: TBD
+      writes_per_day: TBD
+      list_per_day: TBD
+      max_value_size_kb: TBD
+    limits_notes:
+      - "Eventual consistency characteristics; TTL constraints on Free (verify)"
+  vectorize:
+    category: database
+    docs: "TBD"
+    free_tier:
+      indexes: TBD
+      vectors_total: TBD
+      dims_supported: TBD
+    limits_notes:
+      - "TBD"
+  hyperdrive:
+    category: database
+    docs: "TBD"
+    free_tier:
+      connections: TBD
+      traffic_gb: TBD
+    limits_notes:
+      - "Postgres acceleration layer; pricing/limits tied to Workers (verify)"
