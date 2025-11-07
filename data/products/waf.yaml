@@ -1,0 +1,138 @@
+id: waf
+name: Cloudflare Web Application Firewall
+category: network_security
+summary: Cloudflare WAF inspects incoming HTTP and API requests, applying managed and custom rules to block malicious traffic while exposing analytics to tune protections.
+docs:
+  homepage: https://developers.cloudflare.com/waf/
+  key_pages:
+    - title: Managed Rules
+      url: https://developers.cloudflare.com/waf/managed-rulesets/
+    - title: Custom rules
+      url: https://developers.cloudflare.com/waf/custom-rules/
+    - title: Security analytics overview
+      url: https://developers.cloudflare.com/waf/
+capabilities:
+  - Enable regularly updated managed rulesets that protect against zero-day vulnerabilities and common attack techniques.
+  - Create custom rules that filter traffic with the Rules language and actions like Block, Managed Challenge, or Skip.
+  - Apply rate limiting rules to cap abusive request patterns and tune response actions.
+  - Review Security Events and Security Analytics to understand mitigated requests and overall HTTP traffic trends.
+how_it_works:
+  model: The WAF evaluates incoming requests against Cloudflare's ruleset engine, executing managed and user-defined rules before traffic reaches the origin.
+  architecture:
+    - Managed rulesets maintained by Cloudflare include OWASP and exposed credential checks that update frequently.
+    - Custom rules run within the security dashboard ruleset engine, matching expressions and performing configured actions.
+    - Account-level configuration allows Enterprise customers to deploy rulesets across multiple zones.
+  execution:
+    - Administrators enable managed rules and customize actions for specific tags or rules within the dashboard.
+    - Custom rules are ordered expressions evaluated sequentially; blocking actions stop further evaluation.
+    - Security teams monitor events and analytics to adjust rules or rate limits based on observed traffic.
+  consistency:
+    - Managed rulesets are regularly updated by Cloudflare to incorporate new protections with minimal manual work.
+    - Custom rule availability and limits scale by plan, from 5 rules on Free to 1,000 on Enterprise.
+    - Enterprise add-ons allow account-level rule deployment for consistent policies across zones.
+supported_languages:
+  runtimes: []
+  sdks: []
+  notes:
+    - Rules use the Cloudflare Rules language, which is configured in the dashboard or via API.
+usage_patterns:
+  webpages:
+    - pattern: Deploy baseline managed protections for a public site.
+      steps:
+        - Enable the Cloudflare Managed Ruleset to cover common vulnerabilities.
+        - Review rule tags to adjust actions for application-specific traffic.
+        - Monitor Security Events to confirm threats are mitigated without false positives.
+  one_tier_apps:
+    - pattern: Block abusive requests with custom expressions.
+      steps:
+        - Create a custom rule targeting suspicious request patterns using the Rules language.
+        - Choose an action such as Managed Challenge or Block based on severity.
+        - Validate the rule by inspecting sampled events to ensure legitimate traffic passes.
+  multi_tier_apps:
+    - pattern: Share consistent protections across multiple zones.
+      steps:
+        - For Enterprise accounts, enable account-level configuration to manage rulesets centrally.
+        - Apply managed and custom rulesets to each zone from the shared configuration.
+        - Use Security Analytics to compare traffic trends across applications.
+interactions:
+  produces_bindings:
+    - security_rulesets
+  consumes_bindings: []
+  best_with:
+    - product_id: ddos_protection
+      reason: DDoS protection mitigates volumetric attacks while the WAF handles application layer threats.
+    - product_id: bots
+      reason: Bot management complements WAF policies by detecting automated traffic before application rules execute.
+  anti_patterns: []
+limits:
+  quotas:
+    - name: Custom rule capacity
+      value: 5 / 20 / 100 / 1,000
+      scope: Per zone by plan
+      plan: Free, Pro, Business, Enterprise
+  performance: []
+  constraints:
+    - name: Regex availability
+      value: Included on Business and Enterprise plans
+      note: Regex support is not available on Free or Pro custom rules.
+free_tier:
+  items:
+    - name: Managed ruleset access
+      value: Cloudflare Free Managed Ruleset
+      reset_window: N/A
+      scope: All plans
+  notes:
+    - Core WAF features, including custom rules and managed rules, are available across every plan with varying limits.
+security_compliance:
+  authz: []
+  isolation: []
+  data_residency: []
+  secrets: []
+configuration:
+  wrangler:
+    bindings: []
+    example: ''
+  cli:
+    commands: []
+  api:
+    endpoints: []
+dev_experience:
+  local_dev: []
+  testing:
+    - Use sampled Security Events to confirm that rule matches reflect expected traffic patterns.
+  ci_cd:
+    - Version custom rule expressions in source control and deploy via API for repeatable security policies.
+migration_versioning:
+  versioning: []
+  migrations: []
+cost_awareness:
+  metering: []
+  design_tips: []
+examples:
+  minimal:
+    description: Define a custom rule that blocks requests with a suspicious user agent.
+    files:
+      - path: block-user-agent.json
+        lang: json
+        code: |
+          {
+            "expression": "http.user_agent contains \"BadBot\"",
+            "action": "block"
+          }
+  advanced: []
+glossary_refs: []
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/waf/
+    title: Cloudflare Web Application Firewall
+    accessed: 2025-11-07
+    note: Product overview, features, and analytics descriptions.
+  - url: https://developers.cloudflare.com/waf/managed-rulesets/
+    title: Managed Rules
+    accessed: 2025-11-07
+    note: Managed ruleset scope, update cadence, and available protections.
+  - url: https://developers.cloudflare.com/waf/custom-rules/
+    title: Custom rules
+    accessed: 2025-11-07
+    note: Rules engine parameters, actions, plan limits, and regex support.
