@@ -1,0 +1,204 @@
+id: r2_sql
+name: Cloudflare R2 SQL
+category: database
+summary: Cloudflare's serverless, distributed SQL engine for querying Apache Iceberg tables managed by R2 Data Catalog using Cloudflare compute and file pruning for efficient analytics at scale.
+docs:
+  homepage: https://developers.cloudflare.com/r2-sql/
+  key_pages:
+    - title: Getting started
+      url: https://developers.cloudflare.com/r2-sql/get-started/
+    - title: Query data
+      url: https://developers.cloudflare.com/r2-sql/query-data/
+    - title: Limitations and best practices
+      url: https://developers.cloudflare.com/r2-sql/reference/limitations-best-practices/
+capabilities:
+  - Query Apache Iceberg tables registered in R2 Data Catalog with SQL to explore large datasets stored in R2 object storage.
+  - Leverage Cloudflare's distributed compute and automatic file pruning to scan data efficiently without managing infrastructure.
+  - Run analytics workloads through both Wrangler CLI commands and a REST API so pipelines and automation can execute the same queries.
+how_it_works:
+  model: R2 SQL is a serverless analytics query service that executes distributed SQL against partitioned Iceberg tables in an account's R2 Data Catalog.
+  architecture:
+    - Catalog-enabled R2 buckets expose Apache Iceberg tables that R2 SQL targets for queries.
+    - The service prunes files and uses Cloudflare's distributed compute along with R2 object storage to optimize data scans.
+    - Authentication relies on Cloudflare API tokens that grant R2 SQL, R2 Data Catalog, and R2 storage permissions before a query can run.
+  execution:
+    - Developers call `npx wrangler r2 sql query <WAREHOUSE> "SELECT * FROM namespace.table_name limit 10;"` after setting the warehouse name and authentication token.
+    - REST clients send POST requests to the R2 SQL endpoint with a JSON body containing the SQL query and an Authorization bearer token.
+    - Wrangler and automation read the `WRANGLER_R2_SQL_AUTH_TOKEN` environment variable so credentials are not embedded in command arguments.
+  consistency:
+    - R2 SQL currently supports SELECT, FROM, WHERE, ORDER BY, and LIMIT clauses against a single table per query.
+    - JOINs, aggregations, JSON field access, and other advanced SQL features are disabled, so clients compute rollups outside the service.
+    - The platform treats Iceberg datasets as immutable during querying, disallowing schema evolution or data mutation commands.
+supported_languages:
+  runtimes:
+    - Wrangler CLI (Node.js environment)
+    - HTTP clients invoking the R2 SQL REST API
+  sdks: []
+  notes:
+    - Set the WRANGLER_R2_SQL_AUTH_TOKEN environment variable so Wrangler can authenticate to R2 SQL.
+    - API tokens must include R2 SQL read, R2 Data Catalog, and R2 storage permissions to succeed.
+usage_patterns:
+  webpages:
+    - pattern: Enable catalog-backed analytics from the Cloudflare dashboard before issuing R2 SQL queries.
+      steps:
+        - In the R2 dashboard, create or select a bucket and enable R2 Data Catalog from the Settings tab.
+        - Record the catalog URI and warehouse name that the dashboard displays after enabling the catalog.
+        - Use those identifiers when authenticating and running Wrangler or API-based R2 SQL queries.
+  one_tier_apps:
+    - pattern: Run ad-hoc analytics from the command line with Wrangler.
+      steps:
+        - Retrieve the warehouse name with `npx wrangler r2 bucket catalog get <BUCKET_NAME>` or from the dashboard.
+        - Export WRANGLER_R2_SQL_AUTH_TOKEN with an API token that includes R2 SQL, catalog, and storage permissions.
+        - Execute `npx wrangler r2 sql query` with the warehouse and SQL statement to stream results to the terminal.
+  multi_tier_apps:
+    - pattern: Build a streaming pipeline that ingests events into Iceberg tables and validates them with R2 SQL.
+      steps:
+        - Create an R2 bucket, enable its data catalog, and provision an API token using the documented permissions.
+        - Use `npx wrangler pipelines setup` with a schema file so events land in a catalog-backed Iceberg table.
+        - Send sample events to the pipeline endpoint and query the resulting table with R2 SQL to validate the dataset.
+interactions:
+  produces_bindings: []
+  consumes_bindings:
+    - r2
+  best_with:
+    - product_id: r2
+      reason: R2 SQL reads Apache Iceberg tables stored in R2 Data Catalog, so it pairs naturally with R2 buckets.
+  anti_patterns:
+    - Attempting to run JOINs, aggregations, or multi-table queries that R2 SQL explicitly does not support.
+limits:
+  quotas:
+    - name: Result limit range
+      value: 1–10,000 rows per query
+      scope: Per query
+      plan: All plans
+  performance:
+    - name: Default LIMIT when omitted
+      value: 500 rows
+      scope: Per query
+      note: Queries without an explicit LIMIT default to returning 500 rows.
+  constraints:
+    - name: SQL feature support
+      value: Only SELECT, FROM, WHERE, ORDER BY, LIMIT
+      note: Other SQL clauses such as GROUP BY, UNION, and window functions are unavailable.
+    - name: JOIN availability
+      value: JOIN operations unsupported
+      note: Queries must target a single table without joins or subqueries.
+    - name: Aggregation support
+      value: Aggregate functions unavailable
+      note: COUNT, AVG, MAX, and similar functions are not implemented in R2 SQL.
+    - name: Ordering rules
+      value: ORDER BY restricted to partition keys
+      note: Sorting can only reference columns that are part of the table's partition key.
+    - name: Pagination
+      value: OFFSET syntax unsupported
+      note: LIMIT accepts a single integer without pagination parameters.
+free_tier:
+  items:
+    - name: R2 SQL usage
+      value: No additional charges during open beta
+      reset_window: N/A
+      scope: Accounts with an R2 subscription
+  notes:
+    - Standard R2 storage and operations charges still apply to data that queries access.
+security_compliance:
+  authz:
+    - Queries require API tokens that explicitly grant R2 SQL, R2 Data Catalog, and R2 storage permissions.
+  isolation:
+    - Access policies scope tokens to specific buckets and warehouses so queries only touch authorized catalog resources.
+  data_residency:
+    - R2 SQL reads metadata from the R2 Data Catalog and streams the associated R2 object data within the requesting account.
+  secrets:
+    uses:
+      - Store the WRANGLER_R2_SQL_AUTH_TOKEN or Bearer token outside code and pass it via environment variables or headers.
+configuration:
+  wrangler:
+    bindings:
+      - type: env
+        key: WRANGLER_R2_SQL_AUTH_TOKEN
+        note: Provide an API token that includes R2 SQL read, R2 Data Catalog, and R2 storage permissions.
+    example: |
+      WRANGLER_R2_SQL_AUTH_TOKEN=YOUR_API_TOKEN
+  cli:
+    commands:
+      - npx wrangler r2 bucket catalog get <BUCKET_NAME>
+      - npx wrangler r2 sql query <WAREHOUSE> "SELECT * FROM namespace.table_name limit 10;"
+  api:
+    endpoints:
+      - method: POST
+        path: /api/v1/accounts/{ACCOUNT_ID}/r2-sql/query/{BUCKET_NAME}
+        note: Submit a JSON body with the SQL query and include the API token as a Bearer authorization header.
+dev_experience:
+  local_dev:
+    - Install Node.js 16.17.0 or later and Wrangler before running the CLI workflow for R2 SQL.
+  testing:
+    - Issue limited SELECT queries with Wrangler or the REST API to validate that new Iceberg data is available before automation relies on it.
+  ci_cd:
+    - Inject WRANGLER_R2_SQL_AUTH_TOKEN as an environment secret in automation so scripted queries can run in pipelines.
+migration_versioning:
+  versioning:
+    - Schema evolution and ALTER TABLE operations are not supported, so version changes require rebuilding Iceberg tables outside R2 SQL.
+  migrations:
+    - Define schemas up front when creating pipelines so catalog tables remain compatible with R2 SQL's immutable query model.
+cost_awareness:
+  metering:
+    - R2 SQL will bill based on the volume of data queried once pricing activates, though open beta usage is currently unbilled.
+  design_tips:
+    - Monitor standard R2 storage and operations costs because queries still read data from R2 even while SQL execution is free.
+examples:
+  minimal:
+    description: Run a simple SELECT query against a catalog warehouse with Wrangler.
+    files:
+      - path: scripts/query.sh
+        lang: bash
+        code: |
+          npx wrangler r2 sql query <WAREHOUSE> "SELECT * FROM namespace.table_name limit 10;"
+  advanced:
+    - description: Call the R2 SQL REST API with a Bearer token to fetch rows programmatically.
+      files:
+        - path: scripts/api-query.sh
+          lang: bash
+          code: |
+            curl -X POST \
+              "https://api.sql.cloudflarestorage.com/api/v1/accounts/{ACCOUNT_ID}/r2-sql/query/{BUCKET_NAME}" \
+              -H "Authorization: Bearer ${WRANGLER_R2_SQL_AUTH_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d '{
+                "query": "SELECT * FROM namespace.table_name limit 10;"
+              }'
+glossary_refs:
+  - Apache Iceberg
+status: open_beta
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/r2-sql/
+    title: R2 SQL · R2 SQL docs
+    accessed: "2025-11-07"
+    note: Overview, architecture summary, open beta status, and CLI example query.
+  - url: https://developers.cloudflare.com/r2-sql/get-started/
+    title: Getting started · R2 SQL docs
+    accessed: "2025-11-07"
+    note: Pipeline workflow, Node.js prerequisites, dashboard enablement, and Wrangler setup steps.
+  - url: https://developers.cloudflare.com/r2-sql/query-data/
+    title: Query data · R2 SQL docs
+    accessed: "2025-11-07"
+    note: Warehouse discovery, CLI usage, REST endpoint, authentication requirements, and access policy example.
+  - url: https://developers.cloudflare.com/r2-sql/reference/limitations-best-practices/
+    title: Limitations and best practices · R2 SQL docs
+    accessed: "2025-11-07"
+    note: Supported SQL clauses, LIMIT ranges, unsupported features, and single-table restrictions.
+  - url: https://developers.cloudflare.com/r2-sql/sql-reference/
+    title: SQL reference · R2 SQL docs
+    accessed: "2025-11-07"
+    note: Formal grammar, default limit behavior, and clause syntax references for R2 SQL.
+  - url: https://developers.cloudflare.com/r2-sql/platform/pricing/
+    title: R2 SQL - Pricing · R2 SQL docs
+    accessed: "2025-11-07"
+    note: Open beta pricing statement, R2 storage billing reminder, and future metering guidance.
+  - url: https://developers.cloudflare.com/r2-sql/platform/wrangler-commands/
+    title: Wrangler commands · R2 SQL docs
+    accessed: "2025-11-07"
+    note: CLI command syntax and environment variable requirements for R2 SQL queries.
+  - url: https://developers.cloudflare.com/r2-sql/troubleshooting/
+    title: Troubleshooting guide · R2 SQL docs
+    accessed: "2025-11-07"
+    note: Error scenarios reinforcing unsupported JOINs, aggregations, and JSON filtering behaviors.
