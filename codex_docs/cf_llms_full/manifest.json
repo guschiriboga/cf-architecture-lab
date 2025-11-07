@@ -112,5 +112,11 @@
     "bytes": 178477,
     "fetched_at": "2025-11-07T19:52:59Z",
     "sha256": "e2f60e771492df60658babbf5be0932bfe307b9592eaf0887450abb3a2777597"
+  },
+  "network": {
+    "available": true,
+    "fetched_at": "2025-11-07T20:00:41Z",
+    "bytes": 24627,
+    "sha256": "98a3c5aecee807c10d83cf87fe03a525cf1e736759c318280262a728493233f5"
   }
 }
