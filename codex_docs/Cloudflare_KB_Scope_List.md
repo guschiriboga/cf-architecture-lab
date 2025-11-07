@@ -1,0 +1,23 @@
+# Cloudflare KB Scope List
+
+- **Containers** — https://developers.cloudflare.com/containers/
+- **D1** — https://developers.cloudflare.com/d1/
+- **Durable Objects** — https://developers.cloudflare.com/durable-objects/
+- **Images** — https://developers.cloudflare.com/images/
+- **KV** — https://developers.cloudflare.com/kv/
+- **Pages** — https://developers.cloudflare.com/pages/
+- **R2** — https://developers.cloudflare.com/r2/
+- **R2 SQL** — https://developers.cloudflare.com/r2-sql/
+- **Secrets Store** — https://developers.cloudflare.com/secrets-store/
+- **Workers** — https://developers.cloudflare.com/workers/
+- **Workflows** — https://developers.cloudflare.com/workflows/
+- **Log Explorer** — https://developers.cloudflare.com/log-explorer/
+- **Logs** — https://developers.cloudflare.com/logs/
+- **Network** — https://developers.cloudflare.com/network/
+- **Cloudflare One** — https://developers.cloudflare.com/cloudflare-one/
+- **Gateway** — https://developers.cloudflare.com/cloudflare-one/traffic-policies/
+- **Load Balancing** — https://developers.cloudflare.com/load-balancing/
+- **Magic Cloud Networking** — https://developers.cloudflare.com/magic-cloud-networking/
+- **SSL/TLS** — https://developers.cloudflare.com/ssl/
+- **WAF** — https://developers.cloudflare.com/waf/
+- **DNS** — https://developers.cloudflare.com/dns/dns/
