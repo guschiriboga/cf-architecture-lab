@@ -1,0 +1,187 @@
+id: logs
+name: Cloudflare Logs
+category: logging
+summary: Comprehensive log delivery services that stream Cloudflare request and security metadata to native tools, APIs, or external destinations for analysis.
+docs:
+  homepage: https://developers.cloudflare.com/logs/
+  key_pages:
+    - title: Logpush
+      url: https://developers.cloudflare.com/logs/logpush/
+    - title: Instant Logs
+      url: https://developers.cloudflare.com/logs/instant-logs/
+    - title: Logpull
+      url: https://developers.cloudflare.com/logs/logpull/
+capabilities:
+  - Deliver batched logs near real time to storage services, SIEMs, or analytics platforms using Logpush APIs and dashboard flows.
+  - Stream live HTTP events through Instant Logs in the dashboard or CLI to troubleshoot incidents in real time.
+  - Retrieve historical HTTP request data via Logpull REST API for Enterprise accounts needing legacy access patterns.
+how_it_works:
+  model: Cloudflare Logs expose multiple delivery mechanisms—push, pull, and streaming—that export product datasets from Cloudflare’s network to customer tooling.
+  architecture:
+    - Logpush jobs run per dataset and destination, batching records without a minimum size and delivering files as frequently as once per minute.
+    - Instant Logs opens a WebSocket session that forwards sampled edge events directly to the dashboard or CLI with optional filters.
+    - Logpull provides paginated HTTPS endpoints returning JSON or CSV slices of historical request logs for Enterprise customers.
+  execution:
+    - Administrators configure Logpush destinations in the dashboard or via API, specifying datasets, fields, and filters for each job.
+    - Instant Logs users start sessions in the dashboard or create CLI jobs, then connect to the provided WebSocket URL to consume live traffic samples.
+    - Logpull clients authenticate with API tokens and issue range-based requests to fetch stored logs, honoring plan availability and data localization constraints.
+  consistency:
+    - Logpush enforces a maximum of four jobs per zone; exceeding the limit triggers API errors until a job is removed.
+    - Instant Logs supports only one active session per zone and automatically stops after 60 minutes or five minutes of inactivity.
+supported_languages:
+  runtimes: []
+  sdks: []
+  notes:
+    - Integrations are performed through HTTP APIs, dashboard workflows, or CLI tools rather than language runtimes.
+usage_patterns:
+  webpages:
+    - pattern: Export HTTP request logs to cloud storage for analytics.
+      steps:
+        - Identify the dataset and destination bucket, then create a Logpush job via dashboard or API.
+        - Configure filters and batch parameters to align with downstream processing expectations.
+        - Monitor destination storage for new files and validate integrity before building analytics pipelines.
+  one_tier_apps:
+    - pattern: Live-debug production incidents with Instant Logs.
+      steps:
+        - Launch Instant Logs from the dashboard or create an Instant Logs job via API specifying desired fields and filters.
+        - Connect to the provided WebSocket and observe line-delimited JSON events in near real time.
+        - Apply CLI tools like Angle Grinder to aggregate or filter the live stream during investigation.
+  multi_tier_apps:
+    - pattern: Combine Logpush and Log Explorer for layered observability.
+      steps:
+        - Use Logpush to forward long-term archives to external storage or SIEM platforms.
+        - Enable Log Explorer datasets for immediate search and dashboards while Logpush handles retention elsewhere.
+        - Automate data reconciliation with Workers or external jobs that compare push deliveries against stored query results.
+interactions:
+  produces_bindings: []
+  consumes_bindings: []
+  best_with:
+    - product_id: log_explorer
+      reason: Log Explorer provides native search on the same datasets while Logpush handles long-term exports.
+    - product_id: workers
+      reason: Workers can invoke Logpush and Instant Logs APIs to automate log delivery, filtering, or downstream processing.
+  anti_patterns:
+    - Relying on Logpull for high-volume exports instead of Logpush, since Logpull is legacy and limited to Enterprise accounts.
+limits:
+  quotas:
+    - name: Logpush jobs per zone
+      value: 4
+      scope: Zone
+      plan: Enterprise
+  performance:
+    - name: Logpush delivery cadence
+      value: As fast as once per minute
+      scope: Per job
+      note: Batches have no minimum size, delivering logs quickly to destinations.
+  constraints:
+    - name: Instant Logs session limit
+      value: One active session per zone, 60-minute duration, five-minute idle timeout
+      note: Streams end automatically when limits are reached.
+    - name: Instant Logs availability
+      value: Business and Enterprise plans
+      note: Instant Logs is unavailable on Free or Pro plans.
+    - name: Logpull availability
+      value: Enterprise plan only
+      note: Logpull does not operate when Customer Metadata Boundary is set to EU-only.
+free_tier:
+  items: []
+  notes:
+    - Logpush is an Enterprise feature; Instant Logs require at least Business plan access.
+security_compliance:
+  authz:
+    - Log operations require API tokens or keys with Logs Read or Write scopes, and dashboard roles govern who can manage jobs.
+  isolation:
+    - Delivered datasets contain only customer-specific traffic and can be further filtered before export to limit sensitive data exposure.
+  data_residency:
+    - Logpull is unavailable when the Customer Metadata Boundary restricts data to non-US regions, reflecting localization controls.
+  secrets:
+    uses:
+      - Destination credentials for Logpush are stored in job configurations and must be managed securely through the API or dashboard.
+configuration:
+  wrangler:
+    bindings: []
+    example: ''
+  cli:
+    commands:
+      - curl https://api.cloudflare.com/client/v4/zones/{zone_id}/logpush/jobs --json '{"dataset":"http_requests","destination_conf":"s3://bucket/path"}'
+      - curl https://api.cloudflare.com/client/v4/zones/{zone_id}/logpush/edge/jobs --json '{"fields":"ClientIP,EdgeResponseStatus","kind":"instant-logs"}'
+      - curl https://api.cloudflare.com/client/v4/zones/{zone_id}/logs/received --url-query start="2025-01-01T00:00:00Z"
+  api:
+    endpoints:
+      - method: POST
+        path: /client/v4/zones/{zone_id}/logpush/jobs
+        note: Create or update Logpush jobs for zone datasets.
+      - method: POST
+        path: /client/v4/zones/{zone_id}/logpush/edge/jobs
+        note: Start Instant Logs jobs that return WebSocket session URLs.
+      - method: GET
+        path: /client/v4/zones/{zone_id}/logs/requests
+        note: Retrieve Logpull data over HTTP for Enterprise accounts.
+dev_experience:
+  local_dev:
+    - Use staging destinations or sampled zones to test Logpush configurations before applying them to production accounts.
+  testing:
+    - Validate new Logpush jobs by inspecting delivered files and comparing counts to dashboard analytics for consistency.
+  ci_cd:
+    - Manage log delivery as code by storing job definitions in infrastructure repositories and applying updates via scripted API calls.
+migration_versioning:
+  versioning:
+    - Document job configurations, dataset selections, and destination settings; audit logs record changes to log delivery.
+  migrations:
+    - Migrate from Logpull to Logpush or Log Explorer by creating equivalent jobs and scheduling cutovers that minimize downtime.
+cost_awareness:
+  metering:
+    - Storage or SIEM costs accrue at the destination; Cloudflare Enterprise contracts may include usage-based pricing for specific datasets.
+  design_tips:
+    - Filter datasets to only required fields, and sample Instant Logs when investigating high-traffic zones to control downstream ingestion expenses.
+examples:
+  minimal:
+    description: Create a Logpush job for HTTP requests to an S3-compatible bucket.
+    files:
+      - path: create-logpush.sh
+        lang: bash
+        code: |
+          curl "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/logpush/jobs" \
+            --header "Authorization: Bearer $API_TOKEN" \
+            --json '{
+              "dataset": "http_requests",
+              "destination_conf": "s3://logs-bucket/path?region=us-east-1",
+              "name": "http-requests-logpush"
+            }'
+  advanced:
+    - description: Start an Instant Logs session with filters for status and country.
+      files:
+        - path: instant-logs.sh
+          lang: bash
+          code: |
+            curl "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/logpush/edge/jobs" \
+              --header "Authorization: Bearer $API_TOKEN" \
+              --json '{
+                "fields": "ClientIP,ClientCountry,EdgeResponseStatus,RayID",
+                "sample": 100,
+                "filter": "{\"where\":{\"and\":[{\"key\":\"EdgeResponseStatus\",\"operator\":\"in\",\"value\":\"500,502\"},{\"key\":\"ClientCountry\",\"operator\":\"eq\",\"value\":\"us\"}]}}",
+                "kind": "instant-logs"
+              }'
+glossary_refs:
+  - Logpush
+  - Instant Logs
+  - Logpull
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/logs/
+    title: Cloudflare Logs · Cloudflare Logs docs
+    accessed: "2025-11-07"
+    note: Product overview and feature descriptions for Logpush, Instant Logs, and Logpull.
+  - url: https://developers.cloudflare.com/logs/logpush/
+    title: Logpush · Cloudflare Logs docs
+    accessed: "2025-11-07"
+    note: Delivery cadence, limits, and Enterprise availability for Logpush jobs.
+  - url: https://developers.cloudflare.com/logs/instant-logs/
+    title: Instant Logs · Cloudflare Logs docs
+    accessed: "2025-11-07"
+    note: Streaming workflow, plan availability, session limits, and CLI usage.
+  - url: https://developers.cloudflare.com/logs/logpull/
+    title: Logpull · Cloudflare Logs docs
+    accessed: "2025-11-07"
+    note: Legacy REST API usage, Enterprise-only availability, and Customer Metadata Boundary constraints.
