@@ -10,5 +10,35 @@
     "fetched_at": "2025-11-07T18:28:25Z",
     "bytes": 435205,
     "sha256": "c182fb059db0207eac6f421d3c111587dd919c2a9a35f63a48fff486394163cf"
+  },
+  "pages": {
+    "available": true,
+    "fetched_at": "2025-11-07T18:28:26Z",
+    "bytes": 766053,
+    "sha256": "0fa6882af134ee4ff24489957db6698d0911e612d8ed9b9b454b29ba56ff931c"
+  },
+  "kv": {
+    "available": true,
+    "fetched_at": "2025-11-07T18:33:51Z",
+    "bytes": 165247,
+    "sha256": "3e8c8e571d07165029fee2ef68517f6366c6e833bb79aa14b7e737bdc7e34294"
+  },
+  "images": {
+    "available": true,
+    "fetched_at": "2025-11-07T18:28:03Z",
+    "bytes": 205756,
+    "sha256": "d6c6812799337efb38518fcfa05ff5496d4e215043a58814b95fc1f7e3c1eea2"
+  },
+  "durable_objects": {
+    "available": true,
+    "fetched_at": "2025-11-07T18:28:09Z",
+    "bytes": 356585,
+    "sha256": "38768f345bb354bd3798ec48876581c3fedb0815de1d4eac2d0e2759300d83a5"
+  },
+  "d1": {
+    "available": true,
+    "fetched_at": "2025-11-07T18:27:44Z",
+    "bytes": 425134,
+    "sha256": "1f32eca16057ac78899594b13069b7fc7b7496a9571472ef75b14d842299e04a"
   }
 }
