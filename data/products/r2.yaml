@@ -1,0 +1,367 @@
+id: r2
+name: Cloudflare R2
+category: storage
+summary: Cloudflare R2 is S3-compatible object storage on Cloudflare's network that removes egress fees while serving frequently accessed unstructured data for web assets, AI workloads, and user-generated content.
+docs:
+  homepage: https://developers.cloudflare.com/r2/
+  key_pages:
+    - title: Getting started guide
+      url: https://developers.cloudflare.com/r2/get-started/
+    - title: How R2 works
+      url: https://developers.cloudflare.com/r2/how-r2-works/
+    - title: Limits
+      url: https://developers.cloudflare.com/r2/platform/limits/
+    - title: Pricing
+      url: https://developers.cloudflare.com/r2/pricing/
+    - title: R2 Workers binding guide
+      url: https://developers.cloudflare.com/r2/api/workers/workers-api-usage/
+    - title: Data security
+      url: https://developers.cloudflare.com/r2/reference/data-security/
+capabilities:
+  - Store large volumes of unstructured data without egress charges for cloud-native apps, web content, podcasts, data lakes, and ML artifacts.
+  - Expose buckets over custom domains with caching, access controls, and optional r2.dev endpoints to serve content globally.
+  - Provide Workers bindings, Pages Functions bindings, and an S3-compatible API endpoint so existing tooling can read and write objects.
+how_it_works:
+  model: R2 is an S3-compatible, strongly consistent object store built on Cloudflare's global network and optimized to avoid egress fees.
+  architecture:
+    - The R2 Gateway runs on Cloudflare Workers to authenticate API traffic and route it through the network edge.
+    - A Durable Objects-based Metadata Service keeps object metadata consistent with a cache layer to accelerate lookups.
+    - Tiered Read Cache fronts the distributed storage fleet so frequently fetched objects are served closer to users via Cloudflare Tiered Cache.
+    - Distributed Storage Infrastructure persists encrypted object data within the selected region for durability.
+  execution:
+    - Write requests arrive at an edge gateway, retrieve encryption keys and placement from the metadata service, write encrypted bytes to storage, then commit metadata before returning HTTP 200.
+    - Read requests authenticate at the gateway, consult metadata, attempt to satisfy from the tiered read cache, and fall back to regional storage when cache misses occur.
+    - Custom-domain caching can serve reads directly from Cloudflare Cache, bypassing the gateway when configured.
+  consistency:
+    - Metadata commits enforce global read-after-write consistency so clients immediately observe writes and deletes.
+    - Enabling cache on custom domains trades some immediacy for edge performance because cached objects may persist until purged or TTL expiry.
+supported_languages:
+  runtimes:
+    - Cloudflare Workers JavaScript and TypeScript via R2 bucket bindings exposed to env variables.
+    - Cloudflare Pages Functions through BUCKET bindings configured in Wrangler or the dashboard.
+    - S3-compatible clients that target https://<ACCOUNT_ID>.r2.cloudflarestorage.com with region set to auto.
+  sdks:
+    - name: AWS SDK for JavaScript (v3)
+      url: https://developers.cloudflare.com/r2/reference/data-location/#using-jurisdictions-with-the-s3-api
+  notes:
+    - Set remote = true on bindings when using wrangler dev to exercise real R2 buckets during development.
+usage_patterns:
+  webpages:
+    - pattern: Serve static assets from an R2 bucket through a custom domain.
+      steps:
+        - Connect your bucket to a custom domain in the R2 dashboard to activate production-grade access controls and caching.
+        - Configure Cache Everything or Smart Tiered Cache so edge PoPs serve bucket content close to end users.
+        - Disable the managed r2.dev URL for production to keep traffic on the secured custom domain.
+  one_tier_apps:
+    - pattern: Build a Worker that reads and writes objects directly to R2.
+      steps:
+        - Scaffold a Worker project with npm create cloudflare and create a bucket with npx wrangler r2 bucket create <YOUR_BUCKET_NAME>.
+        - Bind the bucket in wrangler.toml under r2_buckets and expose it as an env variable.
+        - Implement fetch handlers that PUT, GET, and DELETE objects via env bindings and deploy with npx wrangler deploy.
+  multi_tier_apps:
+    - pattern: Migrate data from another cloud store and deliver it through Workers and custom domains.
+      steps:
+        - Launch a Super Slurper migration from the R2 data migration page to copy objects from S3-compatible storage into your bucket.
+        - Use your Worker binding to serve migrated objects and enforce authorization or business logic.
+        - Attach a custom domain to the bucket to enable caching, WAF, and access controls for end-user delivery.
+interactions:
+  produces_bindings:
+    - r2_buckets
+  consumes_bindings:
+    - workers
+    - pages
+  best_with:
+    - product_id: workers
+      reason: Workers bindings expose the bucket to serverless code for CRUD operations and deployment automation.
+    - product_id: pages
+      reason: Pages Functions can bind to R2 buckets to fetch assets directly within edge-rendered sites.
+  anti_patterns:
+    - Using the managed r2.dev endpoint for production workloads because it is rate limited and intended only for development.
+limits:
+  quotas:
+    - name: Data storage per bucket
+      value: Unlimited
+      scope: Per bucket
+      plan: All
+    - name: Maximum number of buckets per account
+      value: 1,000,000
+      scope: Account
+      plan: All
+    - name: Maximum rate of bucket management operations
+      value: 50 per second
+      scope: Per bucket
+      plan: All
+    - name: Custom domains per bucket
+      value: 50
+      scope: Per bucket
+      plan: All
+    - name: Maximum object size
+      value: 5 TiB
+      scope: Per object
+      plan: All
+    - name: Maximum single-part upload size
+      value: 5 GiB
+      scope: Single request
+      plan: All
+    - name: Multipart upload parts
+      value: 10,000 parts
+      scope: Per object
+      plan: All
+  performance:
+    - name: Managed public bucket rate limit
+      value: Hundreds of requests per second
+      scope: r2.dev endpoint
+      note: Exceeding the r2.dev throttle returns 429 responses and reduced throughput.
+  constraints:
+    - name: Concurrent writes per key
+      value: 1 write per second
+      note: Higher rates trigger 429 responses similar to other object stores.
+    - name: Bucket versioning APIs
+      value: Not implemented
+      note: S3 versioning operations like PutBucketVersioning are unavailable in R2.
+free_tier:
+  items:
+    - name: Storage allotment
+      value: 10 GB-month
+      reset_window: Monthly
+      scope: Standard storage
+    - name: Class A operations
+      value: 1 million requests
+      reset_window: Monthly
+      scope: Standard storage
+    - name: Class B operations
+      value: 10 million requests
+      reset_window: Monthly
+      scope: Standard storage
+    - name: Egress bandwidth
+      value: Free
+      reset_window: Monthly
+      scope: Standard storage
+  notes:
+    - Free tier benefits apply only to Standard storage; Infrequent Access usage is billed separately.
+security_compliance:
+  authz:
+    - Generate R2-specific API tokens with scoped permissions to manage buckets or restrict access to selected buckets.
+    - Protect Worker entry points by validating custom headers or other logic before allowing PUT and DELETE operations on buckets.
+  isolation:
+    - Configure jurisdictional buckets to keep objects within specific regions, and note that jurisdiction cannot change after creation.
+  data_residency:
+    - Use automatic placement or explicit location hints so data resides near access patterns while honoring residency requirements.
+  secrets:
+    uses:
+      - Store shared secrets like AUTH_KEY_SECRET with Wrangler secrets to enforce bucket write policies in Workers.
+configuration:
+  wrangler:
+    bindings:
+      - type: r2
+        key: MY_BUCKET
+        note: Declare r2_buckets bindings so Workers receive the bucket as an env variable for object operations.
+    example: |
+      [[r2_buckets]]
+      binding = 'MY_BUCKET'
+      bucket_name = '<YOUR_BUCKET_NAME>'
+  cli:
+    commands:
+      - npm create cloudflare@latest -- r2-worker
+      - npx wrangler r2 bucket create <YOUR_BUCKET_NAME>
+      - npx wrangler r2 bucket list
+      - npx wrangler secret put AUTH_KEY_SECRET
+      - npx wrangler deploy
+  api:
+    endpoints:
+      - method: ANY
+        path: https://<ACCOUNT_ID>.r2.cloudflarestorage.com/<bucket>/<key>
+        note: Base S3-compatible endpoint where clients issue object API operations with region set to auto.
+dev_experience:
+  local_dev:
+    - Run wrangler dev with remote = true on R2 bindings when you need development requests to hit live buckets.
+    - Use npx wrangler pages dev --r2=<BINDING_NAME> to mount R2 buckets inside Pages Functions during local previews.
+  testing:
+    - Exercise authorization logic by invoking Worker routes with curl and verifying header-based access rules before production deploys.
+  ci_cd:
+    - Automate deployments with npx wrangler deploy so each pipeline publishes Workers and attached bucket bindings globally.
+migration_versioning:
+  versioning:
+    - Plan application-level versioning because R2 does not implement S3 bucket versioning or related APIs.
+  migrations:
+    - Use Super Slurper jobs to copy objects from S3-compatible providers into R2 while preserving metadata and TLS-secure transfers.
+cost_awareness:
+  metering:
+    - Billing is based on GB-month storage and Class A/B operation counts for Standard and Infrequent Access tiers with free egress.
+  design_tips:
+    - Attach custom domains and enable Cloudflare Cache to satisfy repeated reads at the edge and minimize billed R2 operations.
+examples:
+  minimal:
+    description: Worker route demonstrating PUT, GET, and DELETE operations against an R2 bucket binding.
+    files:
+      - path: index.js
+        lang: javascript
+        code: |
+          export default {
+            async fetch(request, env) {
+              const url = new URL(request.url);
+              const key = url.pathname.slice(1);
+
+              switch (request.method) {
+                case "PUT": {
+                  await this.env.R2.put(key, request.body, {
+                    onlyIf: request.headers,
+                    httpMetadata: request.headers,
+                  });
+                  return new Response(`Put ${key} successfully!`);
+                }
+                case "GET": {
+                  const object = await this.env.R2.get(key, {
+                    onlyIf: request.headers,
+                    range: request.headers,
+                  });
+
+                  if (object === null) {
+                    return new Response("Object Not Found", { status: 404 });
+                  }
+
+                  const headers = new Headers();
+                  object.writeHttpMetadata(headers);
+                  headers.set("etag", object.httpEtag);
+
+                  // When no body is present, preconditions have failed
+                  return new Response("body" in object ? object.body : undefined, {
+                    status: "body" in object ? 200 : 412,
+                    headers,
+                  });
+                }
+                case "DELETE": {
+                  await this.env.R2.delete(key);
+                  return new Response("Deleted!");
+                }
+                default:
+                  return new Response("Method Not Allowed", {
+                    status: 405,
+                    headers: {
+                      Allow: "PUT, GET, DELETE",
+                    },
+                  });
+              }
+            },
+          };
+  advanced:
+    - description: Worker logic that restricts bucket writes with a custom header and allow list, plus CLI verification commands.
+      files:
+        - path: index.js
+          lang: javascript
+          code: |
+            const ALLOW_LIST = ["cat-pic.jpg"];
+
+            // Check requests for a pre-shared secret
+            const hasValidHeader = (request, env) => {
+              return request.headers.get("X-Custom-Auth-Key") === env.AUTH_KEY_SECRET;
+            };
+
+            function authorizeRequest(request, env, key) {
+              switch (request.method) {
+                case "PUT":
+                case "DELETE":
+                  return hasValidHeader(request, env);
+                case "GET":
+                  return ALLOW_LIST.includes(key);
+                default:
+                  return false;
+              }
+            }
+
+            export default {
+              async fetch(request, env, ctx) {
+                const url = new URL(request.url);
+                const key = url.pathname.slice(1);
+
+                if (!authorizeRequest(request, env, key)) {
+                  return new Response("Forbidden", { status: 403 });
+                }
+
+                // ...
+              },
+            };
+        - path: commands.sh
+          lang: bash
+          code: |
+            # Attempt to write an object without providing the "X-Custom-Auth-Key" header
+            curl https://your-worker.dev/cat-pic.jpg -X PUT --data-binary 'test'
+            #=> Forbidden
+            # Expected because header was missing
+
+            # Attempt to write an object with the wrong "X-Custom-Auth-Key" header value
+            curl https://your-worker.dev/cat-pic.jpg -X PUT --header "X-Custom-Auth-Key: hotdog" --data-binary 'test'
+            #=> Forbidden
+            # Expected because header value did not match the AUTH_KEY_SECRET value
+
+            # Attempt to write an object with the correct "X-Custom-Auth-Key" header value
+            # Note: Assume that "*********" is the value of your AUTH_KEY_SECRET Wrangler secret
+            curl https://your-worker.dev/cat-pic.jpg -X PUT --header "X-Custom-Auth-Key: *********" --data-binary 'test'
+            #=> Put cat-pic.jpg successfully!
+
+            # Attempt to read object called "foo"
+            curl https://your-worker.dev/foo
+            #=> Forbidden
+            # Expected because "foo" is not in the ALLOW_LIST
+
+            # Attempt to read an object called "cat-pic.jpg"
+            curl https://your-worker.dev/cat-pic.jpg
+            #=> test
+            # Note: This is the value that was successfully PUT above
+glossary_refs:
+  - Cloudflare Tiered Cache
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/r2/index.md
+    title: Overview · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: Product overview, primary use cases, and features such as Location Hints and bucket exposure options.
+  - url: https://developers.cloudflare.com/r2/how-r2-works/index.md
+    title: How R2 works · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: Architecture components, write and read flows, caching behavior, and performance guidance.
+  - url: https://developers.cloudflare.com/r2/get-started/index.md
+    title: Getting started guide · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: Wrangler installation, bucket creation, first object upload workflow, and access options.
+  - url: https://developers.cloudflare.com/r2/platform/limits/index.md
+    title: Limits · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: Bucket quotas, upload sizes, concurrency guidance, and r2.dev throttling policies.
+  - url: https://developers.cloudflare.com/r2/pricing/index.md
+    title: Pricing · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: Billing model, free tier allowances, operation classes, and egress pricing.
+  - url: https://developers.cloudflare.com/r2/api/workers/workers-api-usage/index.md
+    title: Use R2 from Workers · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: C3 scaffolding, wrangler binding configuration, Worker code samples, secrets, and deployment commands.
+  - url: https://developers.cloudflare.com/r2/reference/data-security/index.md
+    title: Data security · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: Encryption at rest and in transit plus compliance references for R2 data handling.
+  - url: https://developers.cloudflare.com/r2/reference/data-location/index.md
+    title: Data location · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: Automatic placement, Location Hints, jurisdiction restrictions, and Wrangler binding requirements.
+  - url: https://developers.cloudflare.com/r2/api/tokens/index.md
+    title: Authentication · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: API token creation, scoped permissions, jurisdictional endpoints, and temporary credential guidance.
+  - url: https://developers.cloudflare.com/r2/buckets/public-buckets/index.md
+    title: Public buckets · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: Custom domain setup, caching options, access controls, and r2.dev limitations.
+  - url: https://developers.cloudflare.com/r2/api/s3/api/index.md
+    title: S3 API compatibility · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: Base S3 endpoint, region guidance, checksum support, and unsupported versioning APIs.
+  - url: https://developers.cloudflare.com/r2/data-migration/super-slurper/index.md
+    title: Super Slurper · Cloudflare R2 docs
+    accessed: "2025-11-07"
+    note: Migration workflow, provider support, and metadata preservation during transfers.
+  - url: https://developers.cloudflare.com/pages/functions/bindings/index.md
+    title: Bindings · Cloudflare Pages docs
+    accessed: "2025-11-07"
+    note: Pages Functions R2 bindings, sample code, and local development commands.
