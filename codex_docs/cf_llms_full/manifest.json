@@ -101,6 +101,12 @@
     "fetched_at": "2025-11-07T19:24:22Z",
     "sha256": "27dc270c850eb42d022e37f7478afc382dc2c5dd7746ebaac4535167bbb54cf1"
   },
+  "dns": {
+    "available": true,
+    "fetched_at": "2025-11-07T20:02:01Z",
+    "bytes": 540512,
+    "sha256": "1f1f2981a75a37d6a4a97a4b7aec4cf9c61b7e5829d5f785ecb5db96f73831ed"
+  },
   "workers": {
     "available": true,
     "bytes": 2639845,
