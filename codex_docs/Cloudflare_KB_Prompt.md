@@ -1,6 +1,6 @@
 # Prompt: Cloudflare Technical Knowledge Base Builder for AI Agents
 
-You are an **expert Cloudflare technical writer and solutions architect** tasked with building a **machine-usable knowledge base** for AI agents.  
+You are an **expert Cloudflare technical writer and solutions architect** tasked with building a **machine-usable knowledge base** for AI agents.
 Your mission is to **extract, normalize, and encode** authoritative technical data from **Cloudflare’s official documentation only** into a consistent, schema-driven repository.
 
 The resulting repository will allow AI agents to generate **complete PRDs, architectures, and implementation plans** for websites, one-tier apps, multi-tier web apps, and e-commerce solutions—**using only Cloudflare products**.
@@ -9,9 +9,51 @@ Take as much time as needed to produce a **state-of-the-art** and **fully valida
 
 ---
 
+## 🛰️ Pre-Task 0: Fetch and cache Cloudflare `llms-full.txt`
+
+Before any analysis, **fetch and save** the large-model reference dumps (when available) for every product in scope. These are served by Cloudflare docs at each product’s root under the path `/llms-full.txt`.
+
+**Instructions**
+1. For each product below, attempt to download `https://developers.cloudflare.com/<product-root>/llms-full.txt`.
+2. Save each file under `codex_docs/cf_llms_full/<product-id>.txt`. Use the exact `id` slugs from our product files (e.g., `workers.txt`, `r2_sql.txt`).
+3. If a product does **not** expose `llms-full.txt` (404 or equivalent), skip it and record this in `codex_docs/cf_llms_full/manifest.json` with `"available": false`.
+4. For each successful fetch, record in `manifest.json`:
+   - `product_id`, `url`, `bytes`, `sha256`, and `fetched_at` (UTC ISO 8601).
+5. Treat these files as **reference-only inputs** for local indexing and agent research. Do **not** quote them as limits unless the canonical docs (non-llms pages) state the same values.
+
+**Products to fetch (`<product-root>`):**
+- Application & Data Platform:
+  containers · d1 · durable-objects · images · kv · pages · r2 · r2-sql · secrets-store · workers · workflows
+- Logging:
+  log-explorer · logs
+- Network Security:
+  network · cloudflare-one · cloudflare-one/traffic-policies (Gateway) · load-balancing · magic-cloud-networking · ssl · waf · dns/dns-firewall
+
+> Note: For **Gateway**, use the Traffic Policies docs root: `cloudflare-one/traffic-policies/llms-full.txt`.
+
+---
+
 ## 🎯 Scope
 
-Deeply research and encode technical data for **all** of the following Cloudflare products:
+Deeply research and encode technical data for **all** in-scope Cloudflare products.
+
+Each product has a **locally cached reference file** under:
+`codex_docs/cf_llms_full/<product>.txt`  
+This file is the `llms-full.txt` snapshot for that product.
+
+**Lookup order (local-first):**
+1. **Primary source:** Parse the local `codex_docs/cf_llms_full/<product>.txt` to extract all structured facts, limits, features, and definitions.
+2. **Fallback/verification:** If any section/value is missing, unclear, or appears outdated in the local cache, open the **official product documentation** link for that product and supplement or correct the entry.
+
+**Conflict handling:**
+When the cached file and live docs disagree, record a dispute and prefer the canonical docs:
+    
+    status: "disputed"
+    note: "Value differs between cached llms-full and canonical product page"
+
+Always treat official Cloudflare product pages as **authoritative** for quotas/limits and final definitions.  
+This **local-first, remote-verify** workflow ensures fast, consistent processing while staying aligned with the latest Cloudflare documentation.
+
 
 ### Application & Data Platform
 - Containers — https://developers.cloudflare.com/containers/
@@ -43,7 +85,7 @@ Deeply research and encode technical data for **all** of the following Cloudflar
 **Extra references (not products):**
 - Reference Architecture — https://developers.cloudflare.com/reference-architecture/
 
-Use **only** official Cloudflare sources.  
+Use **only** official Cloudflare sources.
 Every fact, limit, and feature must include **citation links** and **access dates**.
 
 ---
@@ -52,10 +94,33 @@ Every fact, limit, and feature must include **citation links** and **access date
 
 ```
 cf-architecture-lab/
-├─ README.md                              # Usage, purpose, validation steps
-├─ 00-overview.md                         # Scope, conventions, and citation policy
-├─ codex_docs/                            # Reference files consumed by Codex agents
-│  ├─ Cloudflare_KB_Prompt.md             # This prompt file
+├─ README.md
+├─ 00-overview.md
+├─ codex_docs/
+│  ├─ Cloudflare_KB_Prompt.md
+│  ├─ cf_llms_full/
+│  │  ├─ manifest.json
+│  │  ├─ workers.txt
+│  │  ├─ workflows.txt
+│  │  ├─ containers.txt
+│  │  ├─ d1.txt
+│  │  ├─ durable_objects.txt
+│  │  ├─ images.txt
+│  │  ├─ kv.txt
+│  │  ├─ pages.txt
+│  │  ├─ r2.txt
+│  │  ├─ r2_sql.txt
+│  │  ├─ secrets_store.txt
+│  │  ├─ log_explorer.txt
+│  │  ├─ logs.txt
+│  │  ├─ network.txt
+│  │  ├─ cloudflare_one.txt
+│  │  ├─ gateway.txt
+│  │  ├─ load_balancing.txt
+│  │  ├─ magic_cloud_networking.txt
+│  │  ├─ ssl_tls.txt
+│  │  ├─ waf.txt
+│  │  └─ dns_firewall.txt
 │  ├─ schemas_reference/
 │  │  ├─ product.schema.yaml
 │  │  ├─ interaction.schema.yaml
@@ -67,54 +132,14 @@ cf-architecture-lab/
 │  └─ validation_notes.md
 ├─ data/
 │  ├─ schemas/
-│  │  ├─ product.schema.yaml              # Canonical product schema
-│  │  ├─ interaction.schema.yaml          # Inter-product relationships
-│  │  └─ limits.schema.yaml               # Quotas and technical constraints
 │  ├─ products/
-│  │  ├─ containers.yaml
-│  │  ├─ d1.yaml
-│  │  ├─ durable_objects.yaml
-│  │  ├─ images.yaml
-│  │  ├─ kv.yaml
-│  │  ├─ pages.yaml
-│  │  ├─ r2.yaml
-│  │  ├─ r2_sql.yaml
-│  │  ├─ secrets_store.yaml
-│  │  ├─ workers.yaml
-│  │  ├─ workflows.yaml
-│  │  ├─ log_explorer.yaml
-│  │  ├─ logs.yaml
-│  │  ├─ network.yaml
-│  │  ├─ cloudflare_one.yaml
-│  │  ├─ gateway.yaml
-│  │  ├─ load_balancing.yaml
-│  │  ├─ magic_cloud_networking.yaml
-│  │  ├─ ssl_tls.yaml
-│  │  ├─ waf.yaml
-│  │  └─ dns_firewall.yaml
 │  ├─ matrices/
-│  │  ├─ free_tiers.csv                   # Normalized quotas per product
-│  │  ├─ interactions.csv                 # Product-to-product relationships
-│  │  └─ language_support.csv             # Supported runtimes and SDKs
-│  └─ glossary.yaml                       # Normalized terminology
+│  └─ glossary.yaml
 ├─ guides/
 │  ├─ patterns/
-│  │  ├─ static-site-pages-workers.md
-│  │  ├─ api-workers-durable-objects.md
-│  │  ├─ object-api-workers-r2.md
-│  │  ├─ sql-app-workers-d1.md
-│  │  ├─ vector-search-workers-vectorize.md
-│  │  ├─ media-images-r2-cdn.md
-│  │  ├─ workflows-orchestration.md
-│  │  ├─ tls-waf-gateway-hardening.md
-│  │  ├─ global-load-balancing-zero-downtime.md
-│  │  └─ zero-trust-cloudflare-one.md
 │  └─ guardrails/
-│     ├─ cost-controls.md
-│     ├─ limits-handling.md
-│     └─ security-secrets.md
 └─ 90-links/
-   └─ sources.md                          # All official Cloudflare URLs with access dates
+   └─ sources.md
 ```
 
 ---
@@ -136,6 +161,15 @@ cf-architecture-lab/
    ```
    Include notes explaining the discrepancy.
 4. Non-product references (e.g., Reference Architecture) may be cited for **patterns**, never for quotas unless they link to limits pages.
+5. **Use `llms-full.txt` caches for research only:** Treat files under `codex_docs/cf_llms_full/` as convenience inputs. All quotas/limits **must** be confirmed from canonical docs pages (deep links cited). When `llms-full.txt` content and canonical pages disagree, mark the product section as `status: "disputed"` and cite both, preferring canonical product pages for limits.
+
+**Recommended fetch naming (product_id → file)**:
+```
+workers → workers.txt
+durable_objects → durable_objects.txt
+r2_sql → r2_sql.txt
+ssl_tls → ssl_tls.txt
+```
 
 ---
 
@@ -264,7 +298,7 @@ This schema should also power the aggregated table in `data/matrices/free_tiers.
 
 ## ✅ Normalization Rules
 
-- **Never fabricate information.**  
+- **Never fabricate information.**
   If a value is missing from the official docs, leave blank and explain with a note.
 - Use **Cloudflare’s official terminology** only (e.g., “Class A operations,” “Time Travel”).
 - When limits differ per plan, encode multiple entries with explicit `plan` values.
@@ -277,7 +311,6 @@ This schema should also power the aggregated table in `data/matrices/free_tiers.
 ## 🧠 Required Coverage per Product
 
 Each product YAML must include, at minimum:
-
 1. Technical overview and model (runtime, architecture, isolation, consistency)
 2. Setup and configuration (Wrangler, CLI, API)
 3. Supported languages/runtimes/SDKs
@@ -325,6 +358,7 @@ Expand this list using Cloudflare docs as the authoritative source.
 - CSV matrices must include all referenced product IDs.
 - `90-links/sources.md` must list **every** citation with access dates.
 - Include a script or documented process to regenerate `50-free-tiers/matrix.md` from YAML/CSV data.
+- `codex_docs/cf_llms_full/manifest.json` exists and lists every in-scope product with accurate fetch metadata. If a file was unavailable, `available: false` must be recorded with the attempted URL and timestamp.
 
 ---
 
@@ -358,8 +392,8 @@ Expand this list using Cloudflare docs as the authoritative source.
 
 ## 🧩 Final Deliverable
 
-Return the **complete, validated repository** as text contents (ZIP-ready).  
-Each product must be fully documented under `data/products/`, conforming to the schema and referencing official Cloudflare documentation only.  
+Return the **complete, validated repository** as text contents (ZIP-ready).
+Each product must be fully documented under `data/products/`, conforming to the schema and referencing official Cloudflare documentation only.
 No imagination, no extrapolation — **only verified technical knowledge**.
 
 When complete, the knowledge base will serve as the **foundation dataset** for AI agents to autonomously plan, architect, and generate full Cloudflare-native applications.
