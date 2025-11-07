@@ -1,0 +1,269 @@
+id: dns
+name: Cloudflare DNS
+category: network_security
+summary: Authoritative DNS service on Cloudflare's global network that delivers fast, resilient resolution with integrated security controls for public and private zones.
+docs:
+  homepage: https://developers.cloudflare.com/dns/
+  key_pages:
+    - title: Get started with Cloudflare DNS
+      url: https://developers.cloudflare.com/dns/get-started/
+    - title: Features and plans
+      url: https://developers.cloudflare.com/dns/reference/all-features/
+    - title: Analytics and logs
+      url: https://developers.cloudflare.com/dns/additional-options/analytics/
+capabilities:
+  - Host authoritative DNS zones on Cloudflare nameservers with built-in DDoS mitigation and Anycast performance on every plan.
+  - Automate record lifecycle with dashboard workflows, bulk imports, and batched API updates for large-scale changes.
+  - Extend DNS beyond public zones with Enterprise internal DNS views that pair with Gateway resolver policies for private responses.
+how_it_works:
+  model: Cloudflare becomes the authoritative provider for your zone so its edge network answers queries and enforces DNS-level features.
+  architecture:
+    - Full setups delegate domain nameservers to Cloudflare so all records resolve from the edge, while partial setups proxy select hostnames through Cloudflare without replacing the primary DNS authority.
+    - Internal DNS groups Enterprise-only private zones into views that resolver policies select, returning answers only inside your network.
+    - DNS analytics aggregates query metrics across Cloudflare data centers with predefined dimensions and GraphQL schemas for detailed reporting.
+  execution:
+    - Teams add domains, review or import DNS records, and update nameservers to activate Cloudflare as the authoritative DNS.
+    - Record management happens through dashboard actions or REST calls that create, edit, delete, and batch-change entries in a single request body.
+    - Internal DNS traffic is on-ramped through supported connectivity options so Gateway resolver policies decide which view serves each query.
+  consistency:
+    - Cloudflare propagates DNS changes across its distributed key-value store; batched updates execute atomically per record to keep data synchronized worldwide.
+    - DNS analytics panels and GraphQL access expose uniform dimensions so monitoring reflects consistent query telemetry across zones and accounts.
+    - Import and export preserve record metadata like tags and proxy settings, enabling reproducible migrations between environments.
+supported_languages:
+  runtimes:
+    - Cloudflare dashboard workflows for DNS records and settings management.
+    - REST API requests to /client/v4/zones/{zone_id}/dns_records endpoints for programmatic control.
+    - GraphQL Analytics API schemas that expose DNS query data for automation and reporting.
+  sdks: []
+  notes:
+    - Zone file import and export accept standard BIND-formatted files to integrate with existing DNS tooling.
+usage_patterns:
+  webpages:
+    - pattern: Migrate a public domain to Cloudflare's full setup for authoritative DNS.
+      steps:
+        - Add the domain, review or import the existing zone file, and verify records in the dashboard.
+        - Update registrar nameservers to the Cloudflare-assigned values and wait for delegation to complete.
+        - Use DNS analytics to monitor query volume and health after cutover.
+  one_tier_apps:
+    - pattern: Keep an existing DNS provider while proxying select hostnames through a partial setup.
+      steps:
+        - Configure a partial (CNAME) setup and identify the hostnames to proxy via Cloudflare.
+        - Create or update the required CNAME records at the primary provider to point to Cloudflare edge hostnames.
+        - Manage proxied records in Cloudflare and leave non-proxied records at the authoritative provider.
+  multi_tier_apps:
+    - pattern: Serve internal applications with Cloudflare Internal DNS and Gateway resolver policies.
+      steps:
+        - Create internal DNS zones and group them into views aligned with network regions or teams.
+        - Connect private traffic to Cloudflare using the documented connectivity options for Gateway resolver.
+        - Author DNS records within internal zones so resolver policies answer queries with private responses.
+interactions:
+  produces_bindings: []
+  consumes_bindings:
+    - cloudflare_one
+  best_with:
+    - product_id: cloudflare_one
+      reason: Internal DNS uses Gateway resolver policies from Cloudflare One to route private queries to the correct view.
+  anti_patterns:
+    - Expecting Cloudflare to mitigate DNS-layer DDoS attacks for partial zones that still resolve on an external authoritative provider.
+limits:
+  quotas:
+    - name: DNS records per zone
+      value: "Free: 1,000 (pre-2024-09-01) or 200 (2024-09-01 onward); Pro/Business/Enterprise: 3,500"
+      scope: Per zone
+      plan: All plans
+    - name: Batched record operations
+      value: Free 200 records; Pro/Business/Enterprise 3,500 records
+      scope: Per batch request
+      plan: All plans
+  performance:
+    - name: DNS analytics time interval (zone)
+      value: Free 7 days; Pro/Business 31 days; Enterprise 62 days
+      scope: Analytics queries per zone
+      note: Maximum time range for zone-level DNS analytics panels and GraphQL queries.
+    - name: DNS analytics historical data (account)
+      value: Free/Pro/Business 8 days; Enterprise 62 days
+      scope: Account-level analytics retention
+      note: Controls lookback for account-wide query data in DNS analytics.
+  constraints:
+    - name: Zone file import size
+      value: 256 KiB per file
+      note: BIND-formatted imports must not exceed the documented size limit.
+    - name: Import API rate limit
+      value: 3 requests per minute per user
+      note: Applies to DNS record import operations via the API.
+    - name: DNS record comment length (Free vs paid)
+      value: Free 100 characters; Pro/Business/Enterprise 500 characters
+      note: Maximum stored comment size varies by plan when annotating records.
+free_tier:
+  items:
+    - name: Included DNS records for new zones
+      value: 200 records per zone (Free plan)
+      reset_window: Continuous
+      scope: Free zones created on or after 2024-09-01
+    - name: Batch edit capacity
+      value: 200 records per request
+      reset_window: Per operation
+      scope: Free plan
+  notes:
+    - Zones created before 2024-09-01 keep a 1,000 record allowance on the Free plan unless upgraded.
+security_compliance:
+  authz:
+    - DNSSEC adds signed responses when enabled so resolvers can verify Cloudflare-issued records before trusting them.
+    - API-driven imports and exports require scoped DNS tokens, ensuring only authorized principals modify zone data.
+  isolation:
+    - Internal DNS restricts private zones to Cloudflare Gateway resolver, preventing external resolvers from seeing private answers.
+    - Partial setups isolate proxied hostnames through Cloudflare while leaving other records at the primary authority.
+  data_residency:
+    - Cloudflare's Anycast network propagates DNS records globally so responses originate from nearby data centers.
+  secrets:
+    uses:
+      - Scoped API tokens or service keys control DNS mutations, including zone imports, exports, and batch updates.
+configuration:
+  wrangler:
+    bindings: []
+    example: ""
+  cli:
+    commands:
+      - curl "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/import" --request POST --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" --form "file=@your_formatted_file.txt"
+      - curl "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/export" --request GET --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+  api:
+    endpoints:
+      - method: POST
+        path: /client/v4/zones/{zone_id}/dns_records/import
+        note: Import BIND-formatted records with optional proxy flags.
+      - method: GET
+        path: /client/v4/zones/{zone_id}/dns_records/export
+        note: Export the current zone file with Cloudflare-specific tags.
+      - method: POST
+        path: /client/v4/zones/{zone_id}/dns_records/batch
+        note: Apply deletes, patches, puts, and posts in one batched DNS request.
+dev_experience:
+  local_dev:
+    - Use zone file export and import to stage changes offline and preserve record metadata when migrating environments.
+  testing:
+    - Review DNS analytics panels or GraphQL queries to validate query volumes, response codes, and data center distribution after updates.
+  ci_cd:
+    - Automate DNS rollouts with the batched records API so pipelines can group record deletions, edits, and creations transactionally.
+migration_versioning:
+  versioning:
+    - Maintain version-controlled BIND zone files and record annotations so imports reproduce desired DNS states.
+  migrations:
+    - Follow the full setup flow of reviewing records, updating nameservers, and monitoring propagation to migrate authority without downtime.
+cost_awareness:
+  metering:
+    - Plan-based feature matrices define record counts, DNS analytics retention, and advanced capabilities like custom nameservers.
+  design_tips:
+    - Track record totals per zone so Free plans stay under the 200-record cap for newly created zones or upgrade before exceeding limits.
+examples:
+  minimal:
+    description: Create a proxied A record through the DNS Records API using a JSON payload.
+    files:
+      - path: create-record.sh
+        lang: bash
+        code: |
+          curl "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+            --request POST \
+            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data '{
+              "type": "A",
+              "name": "www",
+              "content": "203.0.113.10",
+              "ttl": 300,
+              "proxied": true
+            }'
+  advanced:
+    - description: Import a prepared BIND zone file and then batch-edit records to update content and proxy settings.
+      files:
+        - path: import-zone.sh
+          lang: bash
+          code: |
+            curl "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/import" \
+              --request POST \
+              --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              --form "file=@dns-zone.txt"
+        - path: batch-update.json
+          lang: json
+          code: |
+            {
+              "patches": [
+                {
+                  "id": "62276440f783445380480484648c1017",
+                  "content": "192.0.2.46"
+                }
+              ],
+              "puts": [
+                {
+                  "id": "a50364543094428abde0f14061d42b0e",
+                  "content": "192.0.2.50",
+                  "name": "change.example.com",
+                  "type": "A"
+                }
+              ],
+              "posts": [
+                {
+                  "name": "@",
+                  "type": "A",
+                  "content": "192.0.2.41",
+                  "proxied": false
+                }
+              ]
+            }
+        - path: batch-update.sh
+          lang: bash
+          code: |
+            curl "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/batch" \
+              --request POST \
+              --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              --header "Content-Type: application/json" \
+              --data @batch-update.json
+glossary_refs:
+  - dnssec
+  - cname-flattening
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/dns/
+    title: Cloudflare DNS · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: Product overview, plan availability, and positioning.
+  - url: https://developers.cloudflare.com/dns/get-started/
+    title: Get started with Cloudflare DNS · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: Setup workflow, record management guidance, and Anycast resolution behavior.
+  - url: https://developers.cloudflare.com/dns/reference/all-features/
+    title: Features and plans · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: Plan-based record limits, feature availability, and record attribute quotas.
+  - url: https://developers.cloudflare.com/dns/additional-options/analytics/
+    title: Analytics and logs · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: Analytics retention windows, dashboard panels, and GraphQL access patterns.
+  - url: https://developers.cloudflare.com/dns/manage-dns-records/how-to/create-dns-records/
+    title: Manage DNS records · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: Dashboard and API workflows for creating, editing, and deleting records.
+  - url: https://developers.cloudflare.com/dns/manage-dns-records/how-to/batch-record-changes/
+    title: Batch record changes · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: Batched API behavior, record execution order, and per-plan batch limits.
+  - url: https://developers.cloudflare.com/dns/manage-dns-records/how-to/import-and-export/
+    title: Import and export records · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: Zone file formats, size and rate limits, and CLI/API commands.
+  - url: https://developers.cloudflare.com/dns/dnssec/
+    title: DNSSEC · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: DNSSEC capabilities, signing behavior, and migration considerations.
+  - url: https://developers.cloudflare.com/dns/internal-dns/
+    title: Internal DNS · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: Internal zone architecture, Gateway resolver integration, and Enterprise scope.
+  - url: https://developers.cloudflare.com/dns/zone-setups/full-setup/
+    title: Full setup · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: Delegation requirements and availability for Cloudflare as authoritative DNS.
+  - url: https://developers.cloudflare.com/dns/zone-setups/partial-setup/
+    title: Partial (CNAME) setup · Cloudflare DNS docs
+    accessed: "2025-11-07"
+    note: Partial proxy behavior, availability, and limitations such as DNS-layer DDoS coverage.
