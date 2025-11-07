@@ -5,6 +5,12 @@
     "bytes": 72756,
     "sha256": "d8ab0462c343bafe3cec5e143ca80c1dc5c34ce9b98a771e4b90fbced3c130ec"
   },
+  "pages": {
+    "available": true,
+    "fetched_at": "2025-11-07T18:28:26Z",
+    "bytes": 766053,
+    "sha256": "0fa6882af134ee4ff24489957db6698d0911e612d8ed9b9b454b29ba56ff931c"
+  },
   "kv": {
     "available": true,
     "fetched_at": "2025-11-07T18:33:51Z",
