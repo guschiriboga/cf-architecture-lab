@@ -1,0 +1,170 @@
+id: load_balancing
+name: Cloudflare Load Balancing
+category: network_security
+summary: Cloudflare Load Balancing distributes traffic across healthy endpoints to reduce latency, provide failover, and improve end-user experience.
+docs:
+  homepage: https://developers.cloudflare.com/load-balancing/
+  key_pages:
+    - title: Pools
+      url: https://developers.cloudflare.com/load-balancing/pools/
+    - title: Monitors
+      url: https://developers.cloudflare.com/load-balancing/monitors/
+    - title: Load Balancing API reference
+      url: https://developers.cloudflare.com/api/resources/load_balancers/
+capabilities:
+  - Distribute traffic evenly across healthy endpoints with automatic failover when an endpoint becomes unresponsive.
+  - Continuously monitor endpoint health using configurable monitors that send probes from multiple regions.
+  - Steer requests by latency, geography, or custom rules to place traffic where it performs best.
+  - Review analytics about traffic flow, pool health, and historical changes to diagnose incidents.
+how_it_works:
+  model: Load balancers reference pools of endpoints and health monitors to decide which origin should receive each request.
+  architecture:
+    - Pools group one or more endpoints and attach health monitors or monitor groups to track status.
+    - Monitors send protocol-specific probes and record events when an endpoint health state changes.
+    - Load balancers expose DNS responses that only include endpoints considered healthy by attached monitors.
+  execution:
+    - Administrators create pools, attach monitors, and then configure a load balancer that references those pools.
+    - Health monitor probes run at the configured interval from Cloudflare regions and mark endpoints unhealthy when they fail.
+    - When a pool becomes unhealthy, the load balancer removes it from rotation until health probes succeed again.
+  consistency:
+    - Monitor regions send three probes per region and evaluate majority success to mark endpoints healthy.
+    - Host headers defined on endpoints override monitor headers to keep checks consistent with application routing.
+    - Warning guidance explains that adding many regions or using small intervals increases probe traffic to maintain coverage.
+supported_languages:
+  runtimes: []
+  sdks: []
+  notes:
+    - Manage load balancers, pools, and monitors through the Cloudflare dashboard or API endpoints.
+usage_patterns:
+  webpages:
+    - pattern: Serve a single application from multiple origins with automatic failover.
+      steps:
+        - Create pools that list each origin endpoint you want to protect.
+        - Attach HTTP or TCP monitors so Cloudflare can evaluate endpoint health.
+        - Bind the pools to a load balancer so DNS answers return only healthy origins.
+  one_tier_apps:
+    - pattern: Direct traffic to the closest healthy endpoint for latency-sensitive workloads.
+      steps:
+        - Configure regional pools that align with user geography.
+        - Enable steering policies that account for latency or geo proximity when routing requests.
+        - Review analytics to confirm visitors reach the intended region.
+  multi_tier_apps:
+    - pattern: Combine load balancing with account-level health insights for complex services.
+      steps:
+        - Use monitor groups to aggregate results from multiple checks per endpoint.
+        - Select multiple health monitor regions so Cloudflare validates each network path.
+        - Pair the load balancer with Waiting Room or DNS failover for overflow protection.
+interactions:
+  produces_bindings:
+    - dns_records
+  consumes_bindings: []
+  best_with:
+    - product_id: dns
+      reason: Cloudflare DNS answers integrate with load balancers to advertise only healthy endpoint addresses.
+    - product_id: waiting_room
+      reason: Waiting Room manages overflow when demand exceeds load-balanced origin capacity.
+    - product_id: health_checks
+      reason: Standalone health checks complement load balancer monitors for external monitoring scenarios.
+  anti_patterns: []
+limits:
+  quotas: []
+  performance:
+    - name: Health monitor probe volume
+      value: Three probes per selected region per interval
+      scope: Per monitor region
+      note: Choosing All Data Centers or many regions increases the number of probes sent to each endpoint.
+  constraints:
+    - name: Monitor host header precedence
+      value: Endpoint host header overrides monitor header when both are set
+      note: Cloudflare uses the endpoint host header if defined.
+free_tier:
+  items: []
+  notes:
+    - Load Balancing is a paid add-on product with availability noted on the overview page.
+security_compliance:
+  authz: []
+  isolation: []
+  data_residency: []
+  secrets:
+    uses: []
+configuration:
+  wrangler:
+    bindings: []
+    example: ''
+  cli:
+    commands:
+      - curl -X POST "https://api.cloudflare.com/client/v4/accounts/{account_id}/load_balancers/pools" -d '{"name":"primary","origins":[{"name":"app-east","address":"198.51.100.10"}]}'
+      - curl -X POST "https://api.cloudflare.com/client/v4/accounts/{account_id}/load_balancers/monitors" -d '{"expected_codes":"2xx","interval":60,"type":"http"}'
+      - curl -X POST "https://api.cloudflare.com/client/v4/zones/{zone_id}/load_balancers" -d '{"name":"app.example.com","default_pools":["{pool_id}"]}'
+  api:
+    endpoints:
+      - method: POST
+        path: /client/v4/accounts/{account_id}/load_balancers/pools
+        note: Create a pool of endpoints.
+      - method: POST
+        path: /client/v4/accounts/{account_id}/load_balancers/monitors
+        note: Configure a health monitor.
+      - method: POST
+        path: /client/v4/zones/{zone_id}/load_balancers
+        note: Deploy a load balancer for a hostname.
+dev_experience:
+  local_dev:
+    - Test monitor requests against staging origins to confirm success criteria before production rollout.
+  testing:
+    - Use the Load Balancing event logs to verify when endpoints transition between healthy and unhealthy states.
+  ci_cd:
+    - Script API calls to update pools and monitors so deployment changes stay synchronized with infrastructure updates.
+migration_versioning:
+  versioning: []
+  migrations: []
+cost_awareness:
+  metering:
+    - Additional monitor regions or lower intervals send more probe traffic to origins, which can increase costs for upstream providers.
+  design_tips:
+    - Reuse monitor groups and pool definitions to avoid duplicating health checks across similar applications.
+examples:
+  minimal:
+    description: Define a single pool with two origins and attach a basic HTTP monitor.
+    files:
+      - path: monitor.json
+        lang: json
+        code: |
+          {
+            "type": "http",
+            "method": "GET",
+            "path": "/healthz",
+            "expected_codes": "2xx",
+            "interval": 60
+          }
+      - path: pool.json
+        lang: json
+        code: |
+          {
+            "name": "web-pool",
+            "origins": [
+              { "name": "primary", "address": "203.0.113.10" },
+              { "name": "secondary", "address": "198.51.100.20" }
+            ],
+            "monitor": "{monitor_id}"
+          }
+  advanced: []
+glossary_refs: []
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/load-balancing/
+    title: Cloudflare Load Balancing
+    accessed: 2025-11-07
+    note: Overview, feature list, and related products.
+  - url: https://developers.cloudflare.com/load-balancing/pools/
+    title: Pools
+    accessed: 2025-11-07
+    note: Pool concepts, health monitor attachment, and API commands.
+  - url: https://developers.cloudflare.com/load-balancing/monitors/
+    title: Monitors
+    accessed: 2025-11-07
+    note: Monitor behavior, region probing model, and configuration guidance.
+  - url: https://developers.cloudflare.com/api/resources/load_balancers/
+    title: Load Balancing API reference
+    accessed: 2025-11-07
+    note: API endpoints for pools, monitors, and load balancer configuration.

@@ -1,0 +1,240 @@
+id: workflows
+name: Cloudflare Workflows
+category: orchestration
+summary: Durable orchestration service for chaining multi-step processes on Workers with retries, sleeps, and persisted state.
+docs:
+  homepage: https://developers.cloudflare.com/workflows/
+  key_pages:
+    - title: Get started guide
+      url: https://developers.cloudflare.com/workflows/get-started/guide/
+    - title: Workflows limits
+      url: https://developers.cloudflare.com/workflows/reference/limits/
+    - title: Trigger Workflows
+      url: https://developers.cloudflare.com/workflows/build/trigger-workflows/
+capabilities:
+  - Define long-running sequences of steps with automatic retries, sleeps, and persisted state that survive disconnects.
+  - Trigger workflow instances from Workers, REST API calls, wrangler CLI, Queues, or cron handlers with typed bindings.
+  - Inspect execution status, metrics, and queued instances using built-in observability to coordinate parallel work safely.
+how_it_works:
+  model: Developers extend WorkflowEntrypoint classes that Cloudflare schedules inside the Workers runtime, persisting state per instance across steps.
+  architecture:
+    - Workflow definitions live alongside Worker scripts and are registered via wrangler configuration that binds a class name to a binding identifier.
+    - Cloudflare runs each step with the same isolate model as Workers while storing per-step state up to plan-specific quotas, resuming execution after waits or retries.
+    - Triggering a workflow via binding, API, or CLI enqueues an instance that Cloudflare schedules according to concurrency limits and plan allowances.
+  execution:
+    - Step handlers call step.do to run logic with automatic retries, step.sleep to delay future actions, and step.wait to pause for events without consuming CPU.
+    - Bindings from Workers enable fetching instance status, creating, terminating, or restarting runs programmatically using env.MY_WORKFLOW methods.
+    - Observability surfaces running, waiting, queued, and errored states so operators can track progress and respond to failures.
+  consistency:
+    - Each workflow step inherits Workers CPU limits (30 seconds default, up to 5 minutes paid) while wall-clock durations can wait up to a year via step.sleep.
+    - Instance concurrency caps (25 on Free, 10,000 on Paid) and queued instance limits ensure workloads remain predictable even under spikes.
+supported_languages:
+  runtimes:
+    - TypeScript and JavaScript modules extending WorkflowEntrypoint.
+    - Workers-supported languages compiled to JavaScript or WebAssembly that call into workflow bindings.
+  sdks: []
+  notes:
+    - Workflows share the same deployment toolchain as Workers, relying on wrangler configurations to register bindings and classes.
+usage_patterns:
+  webpages:
+    - pattern: Handle checkout flows with confirmation and follow-up messages.
+      steps:
+        - Create a Workflow class that processes payment, sends confirmation, sleeps for feedback windows, and triggers follow-up communication.
+        - Bind the workflow to a Worker handling the checkout route and trigger env.CHECKOUT.create() after validating the order.
+        - Poll instance status or subscribe to events to update UI components when steps complete.
+  one_tier_apps:
+    - pattern: Queue asynchronous API operations from a single Worker.
+      steps:
+        - Define steps that call external APIs with retries configured on step.do blocks.
+        - Trigger the workflow from a Worker fetch handler, passing parameters via create() payloads.
+        - Use workflow status to expose progress endpoints or to cancel long-running tasks if users request termination.
+  multi_tier_apps:
+    - pattern: Coordinate Workflows from Queues and cron handlers for multi-stage backends.
+      steps:
+        - Configure queue consumers or scheduled handlers to invoke workflow.create with job metadata.
+        - Chain step.sleep to space out notifications or waiting periods while Workflows manages persisted state.
+        - Combine Durable Objects or D1 in step code to store results and resume processing when events arrive.
+interactions:
+  produces_bindings:
+    - workflows
+  consumes_bindings:
+    - workers
+    - queues
+    - durable_objects
+  best_with:
+    - product_id: workers
+      reason: Workers trigger workflows, expose REST endpoints, and provide runtime context for each instance.
+    - product_id: queues
+      reason: Queue consumers can start workflows for reliable background processing when messages arrive.
+    - product_id: durable_objects
+      reason: Durable Objects hold state or coordinate events that workflows consume between steps.
+  anti_patterns:
+    - Attempting to store more than the per-step or per-instance persisted state limits, which results in errors and failed runs.
+limits:
+  quotas:
+    - name: Workflow instances per day
+      value: 100,000
+      scope: Account
+      plan: Workers Free
+    - name: Workflow instances per day
+      value: Unlimited
+      scope: Account
+      plan: Workers Paid
+    - name: Concurrent workflow instances
+      value: 25
+      scope: Account
+      plan: Workers Free
+    - name: Concurrent workflow instances
+      value: 10,000
+      scope: Account
+      plan: Workers Paid
+    - name: Persisted state per workflow instance
+      value: 100 MB
+      scope: Instance
+      plan: Workers Free
+    - name: Persisted state per workflow instance
+      value: 1 GB
+      scope: Instance
+      plan: Workers Paid
+  performance:
+    - name: CPU time per step
+      value: 10 ms default (Free), 30 seconds configurable up to 5 minutes (Paid)
+      scope: Per step
+      note: CPU configuration aligns with Workers limits for workflow execution.
+    - name: step.sleep maximum duration
+      value: 365 days
+      scope: Per step
+      note: Sleep operations can pause workflows for up to one year without consuming compute.
+  constraints:
+    - name: Workflow script size
+      value: 3 MB Free, 10 MB Paid
+      note: Script size inherits Worker bundle limits.
+    - name: Workflow steps per instance
+      value: 1024
+      note: Instances terminate if they exceed the maximum number of steps.
+    - name: Event payload size
+      value: 1 MiB
+      note: Events passed to workflows must be 1 MiB or less.
+free_tier:
+  items:
+    - name: Workflow state retention
+      value: 3 days
+      reset_window: Per completion
+      scope: Account
+  notes:
+    - Free plan executions share the Workers daily request quota; paid plans increase retention to 30 days.
+security_compliance:
+  authz:
+    - Triggering workflows via API requires scoped tokens, and Workers bindings respect account RBAC controls.
+  isolation:
+    - Workflows run inside the Workers sandbox, benefiting from the same V8 isolate and seccomp protections.
+  data_residency:
+    - Workflow state persists in Cloudflare’s global infrastructure, aligning with Workers execution regions.
+  secrets:
+    uses:
+      - Use Secrets Store or per-script variables inside workflow steps to access credentials securely.
+configuration:
+  wrangler:
+    bindings:
+      - type: workflows
+        key: MY_WORKFLOW
+        note: Bind named workflow classes to Worker scripts for create/get operations.
+    example: |
+      {
+        "name": "workflows-tutorial",
+        "main": "src/index.ts",
+        "workflows": [
+          {
+            "name": "checkout-workflow",
+            "binding": "CHECKOUT",
+            "class_name": "CheckoutWorkflow"
+          }
+        ]
+      }
+  cli:
+    commands:
+      - npx wrangler workflows deploy
+      - npx wrangler workflows run <workflow-name>
+      - npx wrangler workflows list
+  api:
+    endpoints:
+      - method: POST
+        path: /client/v4/accounts/{account_id}/workers/workflows/{workflow_name}/instances
+        note: Create a workflow instance via the REST API.
+      - method: GET
+        path: /client/v4/accounts/{account_id}/workers/workflows/{workflow_name}/instances/{instance_id}
+        note: Retrieve workflow instance status and metadata.
+dev_experience:
+  local_dev:
+    - Develop workflows alongside Workers using wrangler dev with bindings to simulate workflow invocations locally.
+  testing:
+    - Use wrangler workflows run and status commands to verify execution paths, retries, and concurrency behavior before production rollout.
+  ci_cd:
+    - Automate workflow deployments with wrangler workflows deploy in pipelines to keep code, bindings, and limits synchronized across environments.
+migration_versioning:
+  versioning:
+    - Workflows inherit Worker versioning; new deployments register updated workflow definitions while keeping previous versions for rollback.
+  migrations:
+    - Update wrangler configuration entries and redeploy when renaming workflows, adjusting bindings, or changing limits.
+cost_awareness:
+  metering:
+    - Workflow usage aligns with Workers billing for CPU and requests, plus per-instance concurrency tracked against plan thresholds.
+  design_tips:
+    - Structure steps to offload waiting periods with step.sleep and avoid consuming CPU, and shard workloads across multiple workflows if concurrency caps approach limits.
+examples:
+  minimal:
+    description: Checkout workflow with sleeps between notification steps.
+    files:
+      - path: src/workflow.ts
+        lang: typescript
+        code: |
+          export class CheckoutWorkflow extends WorkflowEntrypoint {
+            async run(event, step) {
+              const processorResponse = await step.do('submit payment', async () => {
+                let resp = await submitToPaymentProcessor(event.params.payment);
+                return await resp.json();
+              });
+              await step.do('send confirmation text', sendConfirmation);
+              await step.sleep('wait for feedback', '2 days');
+              await step.do('send feedback email', sendFeedbackEmail);
+            }
+          }
+  advanced:
+    - description: Worker triggering workflows and inspecting instance status.
+      files:
+        - path: src/index.ts
+          lang: typescript
+          code: |
+            interface Env {
+              MY_WORKFLOW: Workflow;
+            }
+
+            export default {
+              async fetch(req: Request, env: Env) {
+                const instanceId = new URL(req.url).searchParams.get("instanceId");
+                if (instanceId) {
+                  const instance = await env.MY_WORKFLOW.get(instanceId);
+                  return Response.json({ status: await instance.status() });
+                }
+                const newId = crypto.randomUUID();
+                const instance = await env.MY_WORKFLOW.create({ id: newId });
+                return Response.json({ id: instance.id, details: await instance.status() });
+              },
+            };
+glossary_refs:
+  - Workflows
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/workflows/
+    title: Overview · Cloudflare Workflows docs
+    accessed: "2025-11-07"
+    note: Product overview, availability, and workflow code example.
+  - url: https://developers.cloudflare.com/workflows/reference/limits/
+    title: Limits · Cloudflare Workflows docs
+    accessed: "2025-11-07"
+    note: Instance concurrency, state limits, CPU allowances, and plan differences.
+  - url: https://developers.cloudflare.com/workflows/build/trigger-workflows/
+    title: Trigger Workflows · Cloudflare Workflows docs
+    accessed: "2025-11-07"
+    note: Bindings, env methods, and CLI/API options for managing workflow instances.
