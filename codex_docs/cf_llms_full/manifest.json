@@ -5,6 +5,12 @@
     "bytes": 72756,
     "sha256": "d8ab0462c343bafe3cec5e143ca80c1dc5c34ce9b98a771e4b90fbced3c130ec"
   },
+  "images": {
+    "available": true,
+    "fetched_at": "2025-11-07T18:28:03Z",
+    "bytes": 205756,
+    "sha256": "d6c6812799337efb38518fcfa05ff5496d4e215043a58814b95fc1f7e3c1eea2"
+  },
   "durable_objects": {
     "available": true,
     "fetched_at": "2025-11-07T18:28:09Z",
