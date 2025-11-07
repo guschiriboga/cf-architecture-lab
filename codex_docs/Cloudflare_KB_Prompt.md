@@ -14,7 +14,8 @@ Take as much time as needed to produce a **state-of-the-art** and **fully valida
 Before any analysis, **fetch and save** the large-model reference dumps (when available) for every product in scope. These are served by Cloudflare docs at each product’s root under the path `/llms-full.txt`.
 
 **Instructions**
-1. For each product below, attempt to download `https://developers.cloudflare.com/<product-root>/llms-full.txt`.
+1. For fetching the files content use `curl -o` for example: `curl -o codex_docs/cf_llms_full/containers.txt https://developers.cloudflare.com/containers/llms-full.txt`
+1. For each product below, attempt to fetch `https://developers.cloudflare.com/<product-root>/llms-full.txt` using `curl -o` tool.
 2. Save each file under `codex_docs/cf_llms_full/<product-id>.txt`. Use the exact `id` slugs from our product files (e.g., `workers.txt`, `r2_sql.txt`).
 3. If a product does **not** expose `llms-full.txt` (404 or equivalent), skip it and record this in `codex_docs/cf_llms_full/manifest.json` with `"available": false`.
 4. For each successful fetch, record in `manifest.json`:
