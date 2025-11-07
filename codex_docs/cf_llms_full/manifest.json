@@ -124,5 +124,13 @@
     "fetched_at": "2025-11-07T20:00:41Z",
     "bytes": 24627,
     "sha256": "98a3c5aecee807c10d83cf87fe03a525cf1e736759c318280262a728493233f5"
+  },
+  "cloudflare_one": {
+    "product_id": "cloudflare_one",
+    "available": true,
+    "bytes": 12119214,
+    "sha256": "daf2ac21152011960c5c6fc85eb885d376b7d4965ce1779c1f3b2fb3b456eabe",
+    "fetched_at": "2025-11-07T20:56:09Z",
+    "source_url": "https://developers.cloudflare.com/cloudflare-one/llms-full.txt"
   }
 }
