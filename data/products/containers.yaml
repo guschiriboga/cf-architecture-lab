@@ -1,0 +1,234 @@
+id: containers
+name: Cloudflare Containers
+category: compute
+summary: Run container images alongside Workers so you can execute code packaged for any runtime without managing infrastructure.
+docs:
+  homepage: https://developers.cloudflare.com/containers/
+  key_pages:
+    - title: Getting started
+      url: https://developers.cloudflare.com/containers/get-started/
+    - title: Limits and Instance Types
+      url: https://developers.cloudflare.com/containers/platform-details/limits/
+    - title: Beta Info & Roadmap
+      url: https://developers.cloudflare.com/containers/beta-info/
+capabilities:
+  - Run code written in any programming language as part of Workers applications.
+  - Deploy container images globally and scale instances on demand from Worker logic.
+  - Control container lifecycle hooks, environment variables, and routing directly in Worker code.
+how_it_works:
+  model: Workers invoke Durable Objects that manage container instances and proxy requests to running containers.
+  architecture:
+    - Each container instance is backed by a container-enabled Durable Object that starts, stops, and routes traffic for the container.
+    - Wrangler builds the container image with Docker, pushes it to the integrated registry, and updates the Worker configuration with container bindings.
+    - Container placement is tied to Durable Object orchestration, allowing routing to specific instances or load balancing across multiple containers.
+  execution:
+    - Requests reach the Worker fetch handler, which selects a container binding and forwards the request to the container on its default port.
+    - The Container class exposes lifecycle hooks like onStart, onStop, and onError so Worker code can respond to container state changes.
+    - Containers support stateless load-balanced routing or stateful addressing by invoking getContainer or getByName with unique identifiers.
+  consistency:
+    - Durable Objects co-manage container state and ensure consistent routing for stateful workloads that map requests to specific instances.
+    - Container instances reuse cached layers across deploys to provide predictable builds while respecting configured instance limits.
+supported_languages:
+  runtimes:
+    - Any runtime that can run in a linux/amd64 container image.
+  sdks:
+    - name: "@cloudflare/containers"
+      url: https://developers.cloudflare.com/containers/get-started/
+  notes:
+    - Containers rely on Docker during deployment to build and push images through Wrangler commands.
+usage_patterns:
+  webpages:
+    - pattern: Handle HTTP routes in a Worker that proxy to individual container instances per path.
+      steps:
+        - Create a Worker using the containers starter template.
+        - Deploy the Worker and container image with `wrangler deploy` while Docker is running locally.
+        - Route requests like `/container/1` through getByName to reach dedicated container instances.
+  one_tier_apps:
+    - pattern: Run resource-intensive or specialized runtimes entirely from a Worker plus container binding.
+      steps:
+        - Extend the Container class to define defaultPort, sleepAfter, and envVars for the workload.
+        - Bind the container Durable Object in wrangler.toml using new_sqlite_classes and container configuration blocks.
+        - Invoke container.fetch within the Worker to execute the packaged application logic on demand.
+  multi_tier_apps:
+    - pattern: Combine Workers, Containers, and Durable Objects to mix stateless load balancing with stateful session routing.
+      steps:
+        - Define Worker routes that either load balance across container instances or address specific stateful instances.
+        - Use helper logic like getRandom to distribute requests or unique IDs to preserve affinity for stateful services.
+        - Integrate with other Workers platform features (for example Workflows or Queues) for additional orchestration, using container hooks for lifecycle control.
+interactions:
+  produces_bindings:
+    - containers
+    - durable_objects
+  consumes_bindings:
+    - durable_objects
+    - workers
+  best_with:
+    - product_id: workers
+      reason: Containers run as part of Workers applications that orchestrate routing, scaling, and lifecycle hooks.
+    - product_id: durable_objects
+      reason: Every container instance is paired with a Durable Object that manages state and connectivity.
+    - product_id: queues
+      reason: Official examples highlight Workflow and Queue integrations for orchestrating containerized tasks.
+  anti_patterns:
+    - Expecting new container deployments to serve traffic instantly before provisioning completes.
+limits:
+  quotas:
+    - name: Concurrent container memory pool
+      value: 400 GiB
+      scope: Account
+      plan: Workers Paid
+    - name: Concurrent container vCPU pool
+      value: 100 vCPU
+      scope: Account
+      plan: Workers Paid
+    - name: Concurrent container disk pool
+      value: 2 TB
+      scope: Account
+      plan: Workers Paid
+    - name: Total container image storage
+      value: 50 GB
+      scope: Account
+      plan: Workers Paid
+  performance:
+    - name: lite instance type resources
+      value: 1/16 vCPU, 256 MiB RAM, 2 GB disk
+      scope: Per instance
+      note: Configure via the instance_type property.
+    - name: standard-4 instance type resources
+      value: 4 vCPU, 12 GiB RAM, 20 GB disk
+      scope: Per instance
+      note: Largest predefined instance size available during beta.
+  constraints:
+    - name: Image architecture requirement
+      value: linux/amd64
+      note: Container images must target linux/amd64 to deploy on Cloudflare.
+    - name: Provisioning delay after first deploy
+      value: Several minutes
+      note: Containers may return errors immediately after first deployment until provisioning completes.
+free_tier:
+  items: []
+  notes:
+    - Containers are currently in beta and limited to the Workers Paid plan during the open beta period.
+security_compliance:
+  authz:
+    - Access to containers is mediated through Worker bindings configured in Wrangler.
+  isolation:
+    - Each container instance runs within a Durable Object boundary that isolates lifecycle and state per instance.
+  data_residency:
+    - Containers run near the requesting Worker but final placement depends on regional selection managed by Durable Objects.
+  secrets:
+    uses:
+      - Environment variables defined in the Container class and Wrangler configuration are passed securely to the container.
+configuration:
+  wrangler:
+    bindings:
+      - type: containers
+        key: containers
+        note: Declare container class name, image path, and max_instances along with Durable Object bindings.
+    example: |
+      {
+        "containers": [
+          {
+            "class_name": "MyContainer",
+            "image": "./Dockerfile",
+            "max_instances": 5
+          }
+        ],
+        "durable_objects": {
+          "bindings": [
+            {
+              "class_name": "MyContainer",
+              "name": "MY_CONTAINER"
+            }
+          ]
+        },
+        "migrations": [
+          {
+            "new_sqlite_classes": ["MyContainer"],
+            "tag": "v1"
+          }
+        ]
+      }
+  cli:
+    commands:
+      - npm create cloudflare@latest -- --template=cloudflare/templates/containers-template
+      - npx wrangler deploy
+      - npx wrangler containers list
+      - npx wrangler containers images list
+  api:
+    endpoints: []
+dev_experience:
+  local_dev:
+    - Docker must be running locally so Wrangler can build and push container images during deploys.
+  testing:
+    - Use wrangler containers list to confirm deployment status and container health after pushing updates.
+  ci_cd:
+    - Deploy updated Worker and container code together with wrangler deploy to roll out image changes.
+migration_versioning:
+  versioning:
+    - Wrangler migrations use new_sqlite_classes tags to register container-enabled Durable Object classes.
+  migrations:
+    - Update migrations arrays when introducing new container classes to ensure Durable Objects are provisioned with SQLite storage.
+cost_awareness:
+  metering:
+    - Container resources are constrained by aggregate memory, vCPU, disk, and image storage quotas per account.
+  design_tips:
+    - Choose the smallest instance_type that meets workload needs to stay within beta resource pools and control spend.
+examples:
+  minimal:
+    description: Worker routing requests to a single container instance using the Container class.
+    files:
+      - path: worker.js
+        lang: javascript
+        code: |
+          import { Container, getContainer } from "@cloudflare/containers";
+
+          export class MyContainer extends Container {
+            defaultPort = 4000;
+            sleepAfter = "10m";
+          }
+
+          export default {
+            async fetch(request, env) {
+              const { "session-id": sessionId } = await request.json();
+              const containerInstance = getContainer(env.MY_CONTAINER, sessionId);
+              return containerInstance.fetch(request);
+            },
+          };
+  advanced:
+    - description: Load balance requests across multiple container instances using helper routing logic.
+      files:
+        - path: src/index.js
+          lang: javascript
+          code: |
+            export default {
+              async fetch(request, env) {
+                const { pathname } = new URL(request.url);
+                if (pathname.startsWith("/lb")) {
+                  const container = await getRandom(env.MY_CONTAINER, 3);
+                  return await container.fetch(request);
+                }
+                const container = env.MY_CONTAINER.getByName(pathname);
+                return await container.fetch(request);
+              },
+            };
+glossary_refs: []
+status: open_beta
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/containers/
+    title: Overview · Cloudflare Containers docs
+    accessed: "2025-11-07"
+    note: Summary, capabilities, Worker integration example, CLI template commands, and code sample.
+  - url: https://developers.cloudflare.com/containers/get-started/
+    title: Getting started · Cloudflare Containers docs
+    accessed: "2025-11-07"
+    note: Deployment workflow, Durable Object pairing, lifecycle hooks, wrangler configuration, Docker requirement, routing patterns, and load balancing guidance.
+  - url: https://developers.cloudflare.com/containers/platform-details/limits/
+    title: Limits and Instance Types · Cloudflare Containers docs
+    accessed: "2025-11-07"
+    note: Instance types, account quotas, and resource limits for containers.
+  - url: https://developers.cloudflare.com/containers/beta-info/
+    title: Beta Info & Roadmap · Cloudflare Containers docs
+    accessed: "2025-11-07"
+    note: Beta status, feature roadmap, and limitations such as lack of autoscaling and co-location.
