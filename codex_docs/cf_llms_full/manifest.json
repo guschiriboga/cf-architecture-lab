@@ -88,5 +88,23 @@
     "fetched_at": "2025-11-07T19:24:22Z",
     "bytes": 0,
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "r2-sql": {
+    "available": true,
+    "fetched_at": "2025-11-07T19:52:25Z",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "workflows": {
+    "available": true,
+    "fetched_at": "2025-11-07T19:52:59Z",
+    "bytes": 178477,
+    "sha256": "e2f60e771492df60658babbf5be0932bfe307b9592eaf0887450abb3a2777597"
+  },
+  "log-explorer": {
+    "available": true,
+    "fetched_at": "2025-11-07T19:52:59Z",
+    "bytes": 27607,
+    "sha256": "23ede7779bb8489c7cd28b31cb6596595ef1bfc157a474fcf3b3c6fb4062d57a"
   }
 }
