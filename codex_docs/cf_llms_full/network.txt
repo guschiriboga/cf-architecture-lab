@@ -1,0 +1,536 @@
+<page>
+---
+title: Overview · Cloudflare Network settings docs
+lastUpdated: 2025-03-14T16:33:10.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/
+  md: https://developers.cloudflare.com/network/index.md
+---
+
+Manage network settings for your website.
+
+Available on all plans
+
+***
+
+## Features
+
+### IP Geolocation
+
+Include the country code of the visitor location with all requests to your website.
+
+[Use IP Geolocation](https://developers.cloudflare.com/network/ip-geolocation/)
+
+### IPv6 Compatibility
+
+Enable IPv6 support and gateway.
+
+[Use IPv6 Compatibility](https://developers.cloudflare.com/network/ipv6-compatibility/)
+
+### WebSockets
+
+Allow WebSockets connections to your origin server.
+
+[Use WebSockets](https://developers.cloudflare.com/network/websockets/)
+
+***
+
+## Related products
+
+**[China Network](https://developers.cloudflare.com/china-network/)**
+
+The Cloudflare China Network is a package of selected Cloudflare’s performance and security products running on data centers located in mainland China and operated by Cloudflare’s partner JD Cloud.
+
+**[Managed Transforms](https://developers.cloudflare.com/rules/transform/managed-transforms/)**
+
+Managed Transforms allow you to perform common adjustments to HTTP request and response headers with the click of a button.
+
+</page>
+
+<page>
+---
+title: 404 - Page Not Found · Cloudflare Network settings docs
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/404/
+  md: https://developers.cloudflare.com/network/404/index.md
+---
+
+# 404
+
+Check the URL, try using our [search](https://developers.cloudflare.com/search/) or try our LLM-friendly [llms.txt directory](https://developers.cloudflare.com/llms.txt).
+
+</page>
+
+<page>
+---
+title: gRPC connections · Cloudflare Network settings docs
+description: Cloudflare offers support for gRPC to protect your APIs on any
+  proxied gRPC endpoints. The gRPC protocol helps build efficient APIs with
+  smaller payloads for reduced bandwidth usage, decreased latency, and faster
+  implementations.
+lastUpdated: 2025-02-11T10:50:09.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/grpc-connections/
+  md: https://developers.cloudflare.com/network/grpc-connections/index.md
+---
+
+Cloudflare offers support for gRPC to protect your APIs on any [proxied gRPC endpoints](https://developers.cloudflare.com/dns/proxy-status/). The gRPC protocol helps build efficient APIs with smaller payloads for reduced bandwidth usage, decreased latency, and faster implementations.
+
+## Availability
+
+| | Free | Pro | Business | Enterprise |
+| - | - | - | - | - |
+| Availability | Yes | Yes | Yes | Yes |
+
+Charges may occur for gRPC traffic over add-on products such as [Argo Smart Routing](https://developers.cloudflare.com/argo-smart-routing/), [WAF](https://developers.cloudflare.com/waf/), and [Bot Management](https://developers.cloudflare.com/bots/).
+
+## Limitations
+
+Running gRPC traffic on Cloudflare is compatible with most Cloudflare products.
+
+However, the following products have limited capabilities with gRPC requests:
+
+* The [Cloudflare WAF](https://developers.cloudflare.com/waf/) will only run for header inspection during the connection phase. WAF Managed Rules will not run on the content of a gRPC stream.
+
+* Cloudflare Tunnel supports gRPC traffic via [private subnet routing](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/private-net/). Public hostname deployments are not currently supported.
+
+* [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/) does not support gRPC traffic sent through Cloudflare’s reverse proxy. gRPC traffic will be ignored by Access if gRPC is enabled in Cloudflare. We recommend disabling gRPC for any sensitive origin servers protected by Access or enabling another means of authenticating gRPC traffic to your origin servers.
+
+## Enable gRPC
+
+### Requirements
+
+* Your gRPC endpoint must listen on port 443. 
+
+* Your gRPC endpoint must support TLS and HTTP/2.
+
+* HTTP/2 must be advertised over ALPN.
+
+* Use `application/grpc` or `application/grpc+<message type` (for example: `application/grpc+proto`) for the **Content-Type** header of gRPC requests.
+
+* Make sure that the hostname that hosts your gRPC endpoint:
+
+  * Is set to [proxied](https://developers.cloudflare.com/dns/proxy-status/)
+  * Uses at least the [Full SSL/TLS encryption mode](https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/full/).
+
+### Procedure
+
+To change the **gRPC** setting in the dashboard:
+
+1. Log in to your [Cloudflare account](https://dash.cloudflare.com) and go to a specific domain.
+2. Go to **Network**.
+3. For **gRPC**, switch the toggle to **On**.
+
+</page>
+
+<page>
+---
+title: IP geolocation · Cloudflare Network settings docs
+description: IP geolocation adds the CF-IPCountry header to all requests to your
+  origin server.
+lastUpdated: 2025-05-30T11:31:41.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/ip-geolocation/
+  md: https://developers.cloudflare.com/network/ip-geolocation/index.md
+---
+
+IP geolocation adds the [`CF-IPCountry` header](https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-ipcountry) to all requests to your origin server.
+
+Cloudflare automatically updates its IP geolocation database from several data sources, typically twice a week.
+
+## Availability
+
+| | Free | Pro | Business | Enterprise |
+| - | - | - | - | - |
+| Availability | Yes | Yes | Yes | Yes |
+
+## Add IP geolocation information
+
+The recommended procedure to enable IP geolocation information is to [enable the **Add visitor location headers** Managed Transform](https://developers.cloudflare.com/rules/transform/managed-transforms/reference/#add-visitor-location-headers). This Managed Transform adds HTTP request headers with location information for the visitor's IP address, such as city, country, continent, longitude, and latitude.
+
+If you only want the request header for the visitor's country, you can enable **IP Geolocation**.
+
+* Dashboard
+
+  To enable **IP Geolocation** in the dashboard:
+
+  1. Log in to your [Cloudflare account](https://dash.cloudflare.com) and go to a specific domain.
+  2. Go to **Network**.
+  3. For **IP Geolocation**, switch the toggle to **On**.
+
+* API
+
+  To enable **IP Geolocation** with the API, send a [`PATCH`](https://developers.cloudflare.com/api/resources/zones/subresources/settings/methods/edit/) request with `ip_geolocation` as the setting name in the URI path, and the `value` parameter set to `"on"`.
+
+Note
+
+In order to use this data, you will need to then retrieve it from the [`CF-IPCountry` header](https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-ipcountry).
+
+***
+
+## Report an incorrect IP location
+
+If you find an incorrect IP location, consider the following:
+
+* If the IP is part of the [current Cloudflare IP ranges](https://www.cloudflare.com/ips/), report to `ip-corrections@cloudflare.com`.
+* If the IP is **not** listed within the [current Cloudflare IP ranges](https://www.cloudflare.com/ips/), [report to IPinfo](https://ipinfo.io/corrections).
+
+</page>
+
+<page>
+---
+title: IPv6 compatibility · Cloudflare Network settings docs
+description: Cloudflare enables IPv6 on all domains without requiring additional
+  configuration or hardware (as long as your host provides IPv6 support).
+lastUpdated: 2025-02-11T10:50:09.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/ipv6-compatibility/
+  md: https://developers.cloudflare.com/network/ipv6-compatibility/index.md
+---
+
+Cloudflare enables IPv6 on all domains without requiring additional configuration or hardware (as long as your host provides IPv6 support).
+
+When both IPv4 and IPv6 connections are available, Cloudflare prefers IPv4.
+
+## Availability
+
+| | Free | Pro | Business | Enterprise |
+| - | - | - | - | - |
+| Availability | Yes | Yes | Yes | Yes |
+| Can customize | No | No | No | Yes |
+
+## Enable IPv6 compatibility
+
+By default, IPv6 compatibility is enabled on your domain and will apply to all domains and subdomains covered by [proxied DNS records](https://developers.cloudflare.com/dns/proxy-status/).
+
+Note
+
+If you have signed up for Cloudflare through a [Cloudflare hosting partner](http://www.cloudflare.com/hosting-partners) or by use [partial setup](https://developers.cloudflare.com/dns/zone-setups/partial-setup/), IPv6 compatibility does not apply to your apex domain.
+
+## Disable IPv6 compatibility
+
+If your origin web server only understands IPv4 formatted IP addresses, non-Enterprise customers should [enable **Pseudo IPv4**](https://developers.cloudflare.com/network/pseudo-ipv4/).
+
+Alternatively, customers with an Enterprise account can disable Cloudflare's IPv6 compatibility.
+
+* Dashboard
+
+  To disable **IPv6 Compatibility** in the dashboard:
+
+  1. Log in to your [Cloudflare account](https://dash.cloudflare.com) and go to a specific domain.
+  2. Go to **Network**.
+  3. For **IPv6 Compatibility**, switch the toggle to **Off**.
+
+* API
+
+  To disable **IPv6 Compatibility** with the API, send a [`PATCH`](https://developers.cloudflare.com/api/resources/zones/subresources/settings/methods/edit/) request with `ipv6` as the setting name in the URI path, and the `value` parameter set to `"off"`.
+
+Note
+
+Even when IPv6 is disabled, domains can still receive IPv6 traffic via the Tor network. To completely disable all IPv6 traffic:
+
+* Disable [**Onion Routing**](https://developers.cloudflare.com/network/onion-routing/).
+* Use a [WAF custom rule](https://developers.cloudflare.com/waf/custom-rules/create-dashboard/) to block `0:0:0:0:0:0:0:0/0` using the filter `ip.src in {::/0}`.
+
+***
+
+## Troubleshoot an IPv6 network issue
+
+Provide the following information to [Cloudflare Support](https://developers.cloudflare.com/support/contacting-cloudflare-support/) if you experience issues with IPv6 connectivity:
+
+* A [traceroute](https://developers.cloudflare.com/support/troubleshooting/general-troubleshooting/gathering-information-for-troubleshooting-sites/#perform-a-traceroute) that demonstrates the IPv6 connection issues,
+* the [Cloudflare data center serving your request](https://developers.cloudflare.com/support/troubleshooting/general-troubleshooting/gathering-information-for-troubleshooting-sites/#identify-the-cloudflare-data-center-serving-your-request) when the IPv6 issues occur, and
+* confirmation of whether [disabling IPv6 Compatibility](#disable-ipv6-compatibility) resolves the issue.
+
+</page>
+
+<page>
+---
+title: Maximum upload size · Cloudflare Network settings docs
+lastUpdated: 2024-08-13T19:56:56.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/maximum-upload-size/
+  md: https://developers.cloudflare.com/network/maximum-upload-size/index.md
+---
+
+
+</page>
+
+<page>
+---
+title: Onion Routing and Tor support · Cloudflare Network settings docs
+description: Improve the Tor user experience by enabling Onion Routing, which
+  enables Cloudflare to serve your website’s content directly through the Tor
+  network and without requiring exit nodes.
+lastUpdated: 2025-03-19T10:19:09.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/onion-routing/
+  md: https://developers.cloudflare.com/network/onion-routing/index.md
+---
+
+Improve the Tor user experience by enabling Onion Routing, which enables Cloudflare to serve your website’s content directly through the Tor network and without requiring exit nodes.
+
+## Availability
+
+| | Free | Pro | Business | Enterprise |
+| - | - | - | - | - |
+| Availability | Yes | Yes | Yes | Yes |
+
+## How it works
+
+Onion Routing helps improve Tor browsing as follows:
+
+* Tor users no longer access your site via exit nodes, which can sometimes be compromised, and may snoop on user traffic.
+* Human Tor users and bots can be distinguished by our Onion services, such that interactive challenges are only served to malicious bot traffic.
+
+[Tor Browser](https://tb-manual.torproject.org/about/) users receive an [alt-svc header](https://httpwg.org/specs/rfc7838.html#alt-svc) as part of the response to the first request to your website. The browser then creates a Tor Circuit to access this website using the `.onion` TLD service provided by this header.
+
+You should note that the visible domain in the user interface remains unchanged, as the host header and the SNI are preserved. However, the underlying connection changes to be routed through Tor, as the [UI denotes on the left of the address bar](https://tb-manual.torproject.org/managing-identities/#managing-identities) with a Tor Circuit. Cloudflare does not provide a certificate for the `.onion` domain provided as part of alt-svc flow, which therefore cannot be accessed via HTTPS.
+
+## Enable Onion Routing
+
+* Dashboard
+
+  To enable **Onion Routing** in the dashboard:
+
+  1. Log in to your [Cloudflare account](https://dash.cloudflare.com), and select your account and domain.
+  2. Go to **Network**.
+  3. For **Onion Routing**, switch the toggle to **On**.
+
+* API
+
+  To enable **Onion Routing** with the API, send a [`PATCH`](https://developers.cloudflare.com/api/resources/zones/subresources/settings/methods/edit/) request with `opportunistic_onion` as the setting name in the URI path, and the `value` parameter set to `"on"`.
+
+</page>
+
+<page>
+---
+title: Pseudo IPv4 · Cloudflare Network settings docs
+description: Cloudflare customers can use Pseudo IPv4 if their origin web server
+  only understands IPv4 formatted IP addresses (meaning it would not support
+  Cloudflare's default IPv6 compatibility).
+lastUpdated: 2024-12-16T22:33:26.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/pseudo-ipv4/
+  md: https://developers.cloudflare.com/network/pseudo-ipv4/index.md
+---
+
+Cloudflare customers can use **Pseudo IPv4** if their origin web server only understands IPv4 formatted IP addresses (meaning it would not support Cloudflare's default [IPv6 compatibility](https://developers.cloudflare.com/network/ipv6-compatibility/)).
+
+## Availability
+
+| | Free | Pro | Business | Enterprise |
+| - | - | - | - | - |
+| Availability | Yes | Yes | Yes | Yes |
+
+## Background
+
+Some older origin server analytics and fraud detection software expect IP addresses in an IPv4 format and do not support IPv6 addresses.
+
+**Pseudo IPv4** uses the [Class E IPv4 address space](https://tools.ietf.org/html/rfc1112#section-4) to provide as many unique IPv4 addresses corresponding to IPv6 addresses as possible.
+
+* Example Class E IPv4 address: `240.16.0.1`
+* Example IPv6 address: `2400:cb00:f00d:dead:beef:1111:2222:3333`
+
+Note
+
+Class E IPv4 addresses are designated as experimental and are not used for production Internet traffic.
+
+## Configure Pseudo IPv4
+
+Cloudflare offers three options for configuring **Pseudo IPv4**:
+
+* **Off**: Default value.
+
+* **Add Header**: Cloudflare automatically adds the `Cf-Pseudo-IPv4` header with a Class E IPv4 address hashed from the original IPv6 address.
+
+* **Overwrite Headers**: 
+
+  If **Pseudo IPv4** is set to `Overwrite Headers` - Cloudflare overwrites the existing `Cf-Connecting-IP` and `X-Forwarded-For` headers with a pseudo IPv4 address while preserving the real IPv6 address in `CF-Connecting-IPv6` header.
+
+Note
+
+When using *Overwrite Headers*, no software changes are necessary in your origin web server.
+
+To configure **Pseudo IPv4**:
+
+* Dashboard
+
+  To change the **Pseudo IPv4** setting in the dashboard:
+
+  1. Log in to your [Cloudflare account](https://dash.cloudflare.com) and go to a specific domain.
+  2. Go to **Network**.
+  3. For **Pseudo IPv4**, choose your desired setting.
+
+* API
+
+  To change **Pseudo IPv4** with the API, send a [`PATCH`](https://developers.cloudflare.com/api/resources/zones/subresources/settings/methods/edit/) request with `pseudo_ipv4` as the setting name in the URI path, and the `value` parameter set to your desired value: `"off"`, `"add_header"`, or `"overwrite_header"`.
+
+</page>
+
+<page>
+---
+title: Response Buffering · Cloudflare Network settings docs
+description: If your domain sends many small packets, it may be faster to buffer
+  the file and deliver the full payload all at once (instead of streaming it).
+lastUpdated: 2025-06-11T17:18:54.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/response-buffering/
+  md: https://developers.cloudflare.com/network/response-buffering/index.md
+---
+
+If your domain sends many small packets, it may be faster to buffer the file and deliver the full payload all at once (instead of streaming it).
+
+## Availability
+
+| | Free | Pro | Business | Enterprise |
+| - | - | - | - | - |
+| Availability | No | No | No | Yes |
+
+## How it works
+
+By default, Cloudflare **streams** traffic data, meaning that each packet is sent as it becomes available. This can improve the delivery of large files. However, this streaming behavior only applies to dynamic traffic; cacheable traffic (that is, **any** status noted in [Cloudflare cache responses](https://developers.cloudflare.com/cache/concepts/cache-responses/) with the exception of **DYNAMIC**) is buffered and this behavior cannot be changed.
+
+If your domain sends many small packets, however, it might be faster to **buffer** the file. This approach waits to send the full file until all packets are ready, preventing a client browser from having to re-assemble packets.
+
+## Enable Response Buffering
+
+* Dashboard
+
+  To enable **Response Buffering** in the dashboard:
+
+  1. Log in to your [Cloudflare account](https://dash.cloudflare.com) and go to a specific domain.
+  2. Go to **Network**.
+  3. For **Response Buffering**, switch the toggle to **On**.
+
+* API
+
+  To enable **Response Buffering** with the API, send a [`PATCH`](https://developers.cloudflare.com/api/resources/zones/subresources/settings/methods/edit/) request with `response_buffering` as the setting name in the URI path, and the `value` parameter set to `"on"`.
+
+</page>
+
+<page>
+---
+title: Understanding the True-Client-IP Header · Cloudflare Network settings docs
+description: Enabling the True-Client-IP Header adds the True-Client-IP header
+  to all requests to your origin server, which includes the end user's IP
+  address.
+lastUpdated: 2025-01-28T15:34:30.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/true-client-ip-header/
+  md: https://developers.cloudflare.com/network/true-client-ip-header/index.md
+---
+
+Enabling the True-Client-IP Header adds the [`True-Client-IP` header](https://developers.cloudflare.com/fundamentals/reference/http-headers/#true-client-ip-enterprise-plan-only) to all requests to your origin server, which includes the end user's IP address.
+
+## Availability
+
+| | Free | Pro | Business | Enterprise |
+| - | - | - | - | - |
+| Availability | No | No | No | Yes |
+
+## Add True-Client-IP Header
+
+The recommended procedure to access client IP information is to [enable the **Add "True-Client-IP" header** Managed Transform](https://developers.cloudflare.com/rules/transform/managed-transforms/reference/#add-true-client-ip-header).
+
+Note
+
+To use this data, you will need to then retrieve it from the [`True-Client-IP` header](https://developers.cloudflare.com/fundamentals/reference/http-headers/#cf-ipcountry).
+
+## Additional resources
+
+For additional guidance on using True-Client-IP Header with Cloudflare, refer to the following resources:
+
+* [Available Managed Transforms](https://developers.cloudflare.com/rules/transform/managed-transforms/reference/#add-true-client-ip-header)
+* [Cloudflare HTTP headers](https://developers.cloudflare.com/fundamentals/reference/http-headers/#true-client-ip-enterprise-plan-only)
+* [Restoring original visitor IPs](https://developers.cloudflare.com/support/troubleshooting/restoring-visitor-ips/restoring-original-visitor-ips/)
+
+</page>
+
+<page>
+---
+title: WebSockets · Cloudflare Network settings docs
+description: Cloudflare supports proxied WebSocket connections without
+  additional configuration.
+lastUpdated: 2024-12-24T16:28:51.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/network/websockets/
+  md: https://developers.cloudflare.com/network/websockets/index.md
+---
+
+Cloudflare supports proxied WebSocket connections without additional configuration.
+
+## Background
+
+WebSockets are open connections sustained between the client and the origin server. Inside a WebSockets connection, the client and the origin can pass data back and forth without having to reestablish sessions. This makes exchanging data within a WebSockets connection fast. WebSockets are often used for real-time applications such as live chat and gaming.
+
+## Enable WebSockets
+
+* Dashboard
+
+  To enable **WebSockets** connections to your origin server in the dashboard:
+
+  1. Log in to your [Cloudflare account](https://dash.cloudflare.com) and go to a specific domain.
+  2. Go to **Network**.
+  3. For **WebSockets**, switch the toggle to **On**.
+
+* API
+
+  To enable **WebSockets** connections to your origin server with the API, send a [`PATCH`](https://developers.cloudflare.com/api/resources/zones/subresources/settings/methods/edit/) request with `websockets` as the setting name in the URI path, and the `value` parameter set to `"on"`.
+
+## Compatibility notes
+
+| Product | Compatible | Notes |
+| - | - | - |
+| [SSL](https://developers.cloudflare.com/ssl/) | Yes | |
+| [WAF](https://developers.cloudflare.com/waf/) | Yes\* | The initial HTTP 101 request is subject to WAF managed rules, custom rules, rate limiting rules, and other WAF features like any other WebSockets connection. However, once a connection has been established, the WAF does not perform any further inspections. |
+| [Workers](https://developers.cloudflare.com/workers/examples/websockets/) | Yes | You can also use [Durable Objects](https://developers.cloudflare.com/durable-objects/) as an endpoint for WebSocket sessions, giving you full control over messages sent to and from clients. |
+
+Note
+
+Cloudflare also supports [ASP.NET SignalR](http://signalr.net/), which helps negotiate which transport method to use (long polling or WebSockets).
+
+## Availability
+
+WebSockets are supported on all Cloudflare plans.
+
+## Requests and Bandwidth measurement
+
+Given the nature of WebSocket connections, you may notice they differ from typical HTTP traffic in terms of requests and bandwidth usage. If you are an Enterprise customer, it is important to consider how Cloudflare measures requests and bandwidth to accurately estimate your usage.
+
+Cloudflare measures a single WebSocket connection in the following way:
+
+* **Requests**: Cloudflare recognizes only the initial upgrade request per WebSocket connection as an HTTP request. Even though you can send a bidirectional message stream through the established WebSocket connection, it will be counted as a single long-lived HTTP request.
+
+* **Bandwidth**: Cloudflare measures data transfer sent from Cloudflare to the client. This typically means that messages from the WebSocket server behind Cloudflare to the WebSocket client are counted towards bandwidth usage.
+
+Once a WebSocket connection is closed, you can view your aggregated WebSocket usage through [Traffic Analytics](https://developers.cloudflare.com/analytics/account-and-zone-analytics/zone-analytics/#traffic), the [GraphQL Analytics API](https://developers.cloudflare.com/analytics/graphql-api/), and [HTTP requests logs](https://developers.cloudflare.com/logs/reference/log-fields/zone/http_requests/).
+
+## Technical note
+
+When Cloudflare releases new code to its global network, we may restart servers, which terminates WebSockets connections.
+
+### Best practices
+
+* Implement a [keepalive](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#pings_and_pongs_the_heartbeat_of_websockets).
+* Review and then remove or extend timeout settings on the origin and/or on the client.
+
+### Troubleshooting
+
+Investigating issues with Websocket can be facilitated with client tools like [wscat](https://github.com/websockets/wscat). Being able to reproduce an issue on a single URL with a minimalistic tool helps narrowing down the issue.
+
+The `EdgeStartTimestamp` and `EdgeStopTimestamp` fields in [HTTP requests logs](https://developers.cloudflare.com/logs/reference/log-fields/zone/http_requests/) represent the duration of the WebSocket connection (they do not represent the initial HTTP connection).
+
+</page>
+

@@ -106,5 +106,11 @@
     "fetched_at": "2025-11-07T19:52:59Z",
     "bytes": 27607,
     "sha256": "23ede7779bb8489c7cd28b31cb6596595ef1bfc157a474fcf3b3c6fb4062d57a"
+  },
+  "network": {
+    "available": true,
+    "fetched_at": "2025-11-07T20:00:41Z",
+    "bytes": 24627,
+    "sha256": "98a3c5aecee807c10d83cf87fe03a525cf1e736759c318280262a728493233f5"
   }
 }
