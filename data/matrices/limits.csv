@@ -1,0 +1,124 @@
+product_id,category,name,value,scope,plan,reset_window,note,source_url,accessed
+cloudflare_one,quota,Access applications per account,500,Per account,All plans,,,https://developers.cloudflare.com/cloudflare-one/account-limits/,2025-11-07
+cloudflare_one,quota,Cloudflared tunnels per account,1000,Per account,All plans,,,https://developers.cloudflare.com/cloudflare-one/account-limits/,2025-11-07
+cloudflare_one,quota,Data Loss Prevention custom entries,25,Per account,Zero Trust Enterprise add-on,,,https://developers.cloudflare.com/cloudflare-one/account-limits/,2025-11-07
+cloudflare_one,quota,Gateway DNS policies per account,500,Per account,All plans,,,https://developers.cloudflare.com/cloudflare-one/account-limits/,2025-11-07
+cloudflare_one,performance,Concurrent HTTP/2 streams,256,Gateway proxy endpoint,,,Gateway limits concurrent HTTP/2 streams per connection.,https://developers.cloudflare.com/cloudflare-one/account-limits/,2025-11-07
+cloudflare_one,constraint,DLP file size,"100 MB per file (ZIP content <= 200 MB, 10 nested levels)",,,,DLP only scans files within documented size and compression limits.,https://developers.cloudflare.com/cloudflare-one/account-limits/,2025-11-07
+containers,quota,Concurrent container disk pool,2 TB,Account,Workers Paid,,,https://developers.cloudflare.com/containers/platform-details/limits/,2025-11-07
+containers,quota,Concurrent container memory pool,400 GiB,Account,Workers Paid,,,https://developers.cloudflare.com/containers/platform-details/limits/,2025-11-07
+containers,quota,Concurrent container vCPU pool,100 vCPU,Account,Workers Paid,,,https://developers.cloudflare.com/containers/platform-details/limits/,2025-11-07
+containers,quota,Total container image storage,50 GB,Account,Workers Paid,,,https://developers.cloudflare.com/containers/platform-details/limits/,2025-11-07
+containers,performance,lite instance type resources,"1/16 vCPU, 256 MiB RAM, 2 GB disk",Per instance,,,Configure via the instance_type property.,https://developers.cloudflare.com/containers/platform-details/limits/,2025-11-07
+containers,performance,standard-4 instance type resources,"4 vCPU, 12 GiB RAM, 20 GB disk",Per instance,,,Largest predefined instance size available during beta.,https://developers.cloudflare.com/containers/platform-details/limits/,2025-11-07
+containers,constraint,Image architecture requirement,linux/amd64,,,,Container images must target linux/amd64 to deploy on Cloudflare.,https://developers.cloudflare.com/containers/get-started/,2025-11-07
+containers,constraint,Provisioning delay after first deploy,Several minutes,,,,Containers may return errors immediately after first deployment until provisioning completes.,https://developers.cloudflare.com/containers/get-started/,2025-11-07
+d1,quota,Databases per account,"50,000 (Workers Paid) / 10 (Free)",Account,Workers Paid and Free,,,https://developers.cloudflare.com/d1/platform/limits/,2025-11-07
+d1,quota,Maximum database size,10 GB (Workers Paid) / 500 MB (Free),Per database,Workers Paid and Free,,,https://developers.cloudflare.com/d1/platform/limits/,2025-11-07
+d1,quota,Maximum storage per account,1 TB (Workers Paid) / 5 GB (Free),Account,Workers Paid and Free,,,https://developers.cloudflare.com/d1/platform/limits/,2025-11-07
+d1,quota,Time Travel restore operations,10 restores per 10 minutes per database,Per database,All,,,https://developers.cloudflare.com/d1/platform/limits/,2025-11-07
+d1,performance,Maximum simultaneous Worker connections,6 per invocation,Per Worker invocation,,,Each Worker can open up to six concurrent D1 connections.,https://developers.cloudflare.com/d1/platform/limits/,2025-11-07
+d1,performance,SQL statement length limit,100 KB,Per statement,,,Applies to each statement including those inside batches.,https://developers.cloudflare.com/d1/platform/limits/,2025-11-07
+d1,constraint,Maximum bound parameters per query,100,,,,Parameterized statements cannot exceed 100 bound values.,https://developers.cloudflare.com/d1/platform/limits/,2025-11-07
+d1,constraint,Maximum SQL query duration,30 seconds,,,,Matches Cloudflare API request timeout for batch operations.,https://developers.cloudflare.com/d1/platform/limits/,2025-11-07
+d1,constraint,Maximum table columns,100,,,,Tables cannot define more than 100 columns each.,https://developers.cloudflare.com/d1/platform/limits/,2025-11-07
+dns,quota,Batched record operations,"Free 200 records; Pro/Business/Enterprise 3,500 records",Per batch request,All plans,,,https://developers.cloudflare.com/dns/reference/all-features/,2025-11-07
+dns,quota,DNS records per zone,"Free: 1,000 (pre-2024-09-01) or 200 (2024-09-01 onward); Pro/Business/Enterprise: 3,500",Per zone,All plans,,,https://developers.cloudflare.com/dns/manage-dns-records/how-to/import-and-export/,2025-11-07
+dns,performance,DNS analytics historical data (account),Free/Pro/Business 8 days; Enterprise 62 days,Account-level analytics retention,,,Controls lookback for account-wide query data in DNS analytics.,https://developers.cloudflare.com/dns/additional-options/analytics/,2025-11-07
+dns,performance,DNS analytics time interval (zone),Free 7 days; Pro/Business 31 days; Enterprise 62 days,Analytics queries per zone,,,Maximum time range for zone-level DNS analytics panels and GraphQL queries.,https://developers.cloudflare.com/dns/additional-options/analytics/,2025-11-07
+dns,constraint,DNS record comment length (Free vs paid),Free 100 characters; Pro/Business/Enterprise 500 characters,,,,Maximum stored comment size varies by plan when annotating records.,https://developers.cloudflare.com/dns/reference/all-features/,2025-11-07
+dns,constraint,Import API rate limit,3 requests per minute per user,,,,Applies to DNS record import operations via the API.,https://developers.cloudflare.com/dns/manage-dns-records/how-to/import-and-export/,2025-11-07
+dns,constraint,Zone file import size,256 KiB per file,,,,BIND-formatted imports must not exceed the documented size limit.,https://developers.cloudflare.com/dns/manage-dns-records/how-to/import-and-export/,2025-11-07
+durable_objects,quota,Maximum Durable Object classes,500 (Workers Paid) / 100 (Free),Account,Workers Paid and Free,,,https://developers.cloudflare.com/durable-objects/platform/limits/,2025-11-07
+durable_objects,quota,Storage per account (Free plan),5 GB,Account,Workers Free,,,https://developers.cloudflare.com/durable-objects/platform/limits/,2025-11-07
+durable_objects,quota,Storage per account (Paid plan),Unlimited (billed by usage),Account,Workers Paid,,,https://developers.cloudflare.com/durable-objects/platform/limits/,2025-11-07
+durable_objects,quota,Storage per Durable Object,10 GB,Per object,Workers Paid,,,https://developers.cloudflare.com/durable-objects/platform/limits/,2025-11-07
+durable_objects,performance,CPU per request,"30 seconds default, configurable to 5 minutes of active CPU",Per invocation,,,CPU time resets with each incoming request or message and can be increased via wrangler limits.,https://developers.cloudflare.com/durable-objects/platform/limits/,2025-11-07
+durable_objects,performance,WebSocket message size,32 MiB,Per received message,,,Applies to incoming WebSocket payloads handled by Durable Objects.,https://developers.cloudflare.com/durable-objects/platform/limits/,2025-11-07
+durable_objects,constraint,Key and value size limit,2 MB combined,,,,Applies to entries stored via key-value APIs within Durable Objects.,https://developers.cloudflare.com/durable-objects/platform/limits/,2025-11-07
+durable_objects,constraint,Maximum bound parameters per query,100,,,,Parameterized SQL statements cannot exceed 100 bound values.,https://developers.cloudflare.com/durable-objects/platform/limits/,2025-11-07
+durable_objects,constraint,Maximum SQL statement length,100 KB,,,,Mirrors SQLite-backed Durable Object SQL limits.,https://developers.cloudflare.com/durable-objects/platform/limits/,2025-11-07
+gateway,quota,Dedicated egress IP availability,Enterprise-only,Per account,Enterprise,,,https://developers.cloudflare.com/cloudflare-one/traffic-policies/egress-policies/,2025-11-07
+gateway,performance,Default egress routing,Uses nearest Cloudflare data center when no egress policy matches,Traffic without explicit dedicated egress selection,,,Load balancing retains user selection when multiple data centers are equally close.,https://developers.cloudflare.com/cloudflare-one/traffic-policies/egress-policies/,2025-11-07
+gateway,constraint,WARP shared egress IPs,Default egress IP addresses are shared across all WARP users without Enterprise entitlement,,,,"Cloudflare does not publish shared WARP egress ranges, so allowlists require dedicated IP purchases.",https://developers.cloudflare.com/cloudflare-one/traffic-policies/egress-policies/,2025-11-07
+images,quota,Included unique transformations,5000 per month,Per account,Images Free,,,https://developers.cloudflare.com/images/transform-images/,2025-11-07
+images,performance,Transformation caching window,30 days per unique transformation,Global cache,,,Images counts each transformation once in a rolling 30-day period before billing again.,https://developers.cloudflare.com/images/pricing/,2025-11-07
+images,constraint,Direct upload URL expiry,"30 minutes default, up to 6 hours",,,,One-time upload URLs expire after 30 minutes unless extended to a six-hour maximum.,https://developers.cloudflare.com/images/upload-images/direct-creator-upload/,2025-11-07
+images,constraint,Stored image file size,10 MB maximum per upload,,,,Uploaded images kept in the Images storage bucket cannot exceed 10 MB.,https://developers.cloudflare.com/images/upload-images/,2025-11-07
+images,constraint,Transformation input size,"70 MB input, 100 megapixel area limit",,,,Remote transformation requests must stay under the size and area limits enforced by Images.,https://developers.cloudflare.com/images/transform-images/,2025-11-07
+images,constraint,Variant count per image,Up to 100 named variants,,,,Each image can define 100 variants describing target resizing or formatting behaviors.,https://developers.cloudflare.com/images/pricing/,2025-11-07
+kv,quota,Operations per invocation,1000 external calls,Per Worker invocation,All plans,,,https://developers.cloudflare.com/kv/platform/limits/,2025-11-07
+kv,quota,Reads per day (Free plan),"100,000",Per account,Workers Free,,,https://developers.cloudflare.com/kv/platform/limits/,2025-11-07
+kv,quota,Writes per day (Free plan),"1,000",Per account,Workers Free,,,https://developers.cloudflare.com/kv/platform/limits/,2025-11-07
+kv,performance,Minimum cacheTtl,60 seconds,Read cache,,,cacheTtl parameters shorter than 60 seconds are not permitted.,https://developers.cloudflare.com/kv/platform/limits/,2025-11-07
+kv,performance,Value size ceiling,25 MiB,Per key,,,Individual values stored in KV cannot exceed 25 MiB.,https://developers.cloudflare.com/kv/platform/limits/,2025-11-07
+kv,constraint,Metadata size,1024 bytes,,,,Metadata attached to keys must remain within the documented limit.,https://developers.cloudflare.com/kv/platform/limits/,2025-11-07
+kv,constraint,Storage per account (Free),1 GB,,,,Free plan accounts are capped at 1 GB of total KV storage.,https://developers.cloudflare.com/kv/platform/limits/,2025-11-07
+kv,constraint,Writes to the same key,1 per second,,,,Each key can be updated at most once per second across plans.,https://developers.cloudflare.com/kv/platform/limits/,2025-11-07
+load_balancing,performance,Health monitor probe volume,Three probes per selected region per interval,Per monitor region,,,Choosing All Data Centers or many regions increases the number of probes sent to each endpoint.,https://developers.cloudflare.com/load-balancing/pools/,2025-11-07
+load_balancing,constraint,Monitor host header precedence,Endpoint host header overrides monitor header when both are set,,,,Cloudflare uses the endpoint host header if defined.,https://developers.cloudflare.com/api/resources/load_balancers/,2025-11-07
+log_explorer,quota,Contract retention,Up to 2 years,Account,Contract add-on,,,https://developers.cloudflare.com/log-explorer/,2025-11-07
+log_explorer,performance,Query best practice window,Narrow time ranges recommended,Per query,,,Focused time windows reduce data scanned and avoid timeouts.,https://developers.cloudflare.com/log-explorer/log-search/,2025-11-07
+log_explorer,constraint,Customer Metadata Boundary,Not currently supported,,,,Log Explorer does not yet support metadata boundary controls.,https://developers.cloudflare.com/log-explorer/,2025-11-07
+log_explorer,constraint,Dataset availability,Only enabled datasets ingest data,,,,Logs before enabling a dataset are unavailable in Log Explorer.,https://developers.cloudflare.com/log-explorer/log-search/,2025-11-07
+logs,quota,Logpush jobs per zone,4,Zone,Enterprise,,,https://developers.cloudflare.com/logs/logpush/,2025-11-07
+logs,performance,Logpush delivery cadence,As fast as once per minute,Per job,,,"Batches have no minimum size, delivering logs quickly to destinations.",https://developers.cloudflare.com/logs/logpush/,2025-11-07
+logs,constraint,Instant Logs availability,Business and Enterprise plans,,,,Instant Logs is unavailable on Free or Pro plans.,https://developers.cloudflare.com/logs/instant-logs/,2025-11-07
+logs,constraint,Instant Logs session limit,"One active session per zone, 60-minute duration, five-minute idle timeout",,,,Streams end automatically when limits are reached.,https://developers.cloudflare.com/logs/instant-logs/,2025-11-07
+logs,constraint,Logpull availability,Enterprise plan only,,,,Logpull does not operate when Customer Metadata Boundary is set to EU-only.,https://developers.cloudflare.com/logs/logpull/,2025-11-07
+magic_cloud_networking,constraint,Availability status,Closed beta,,,,Customers request access before using the product.,https://developers.cloudflare.com/magic-cloud-networking/,2025-11-07
+network,performance,WebSocket request counting,One HTTP upgrade request per WebSocket connection,Per connection,,,Cloudflare measures WebSocket bandwidth as data sent from Cloudflare to the client during the session.,https://developers.cloudflare.com/network/websockets/,2025-11-07
+network,constraint,IPv4 preference for origin connections,IPv4 origin selected when both IPv4 and IPv6 are configured,,,,Cloudflare prefers IPv4 origin addresses when dual-stack records are proxied.,https://developers.cloudflare.com/network/ipv6-compatibility/,2025-11-07
+pages,quota,Builds per month (Free plan),500,Per account,Free,,,https://developers.cloudflare.com/pages/platform/limits/,2025-11-07
+pages,quota,Custom domains per project (Free),100,Per project,Free,,,https://developers.cloudflare.com/pages/platform/limits/,2025-11-07
+pages,performance,Build timeout,20 minutes,Each build,,,Git-integrated builds terminate after 20 minutes of execution.,https://developers.cloudflare.com/pages/platform/limits/,2025-11-07
+pages,constraint,Drag and drop limits,"1,000 files, 25 MiB each",,,,Dashboard uploads cap file count and size as documented.,https://developers.cloudflare.com/pages/platform/limits/,2025-11-07
+pages,constraint,Files per deployment (Direct Upload Wrangler),"20,000 files, 25 MiB each",,,,"Wrangler uploads support up to 20,000 assets with a 25 MiB per-file limit.",https://developers.cloudflare.com/pages/get-started/direct-upload/,2025-11-07
+pages,constraint,Function usage model,Standard Workers usage,,,,Functions requests count against Workers plan quotas.,https://developers.cloudflare.com/pages/functions/,2025-11-07
+r2,quota,Custom domains per bucket,50,Per bucket,All,,,https://developers.cloudflare.com/r2/platform/limits/index.md,2025-11-07
+r2,quota,Data storage per bucket,Unlimited,Per bucket,All,,,https://developers.cloudflare.com/r2/platform/limits/index.md,2025-11-07
+r2,quota,Maximum number of buckets per account,"1,000,000",Account,All,,,https://developers.cloudflare.com/r2/platform/limits/index.md,2025-11-07
+r2,quota,Maximum object size,5 TiB,Per object,All,,,https://developers.cloudflare.com/r2/platform/limits/index.md,2025-11-07
+r2,quota,Maximum rate of bucket management operations,50 per second,Per bucket,All,,,https://developers.cloudflare.com/r2/platform/limits/index.md,2025-11-07
+r2,quota,Maximum single-part upload size,5 GiB,Single request,All,,,https://developers.cloudflare.com/r2/platform/limits/index.md,2025-11-07
+r2,quota,Multipart upload parts,"10,000 parts",Per object,All,,,https://developers.cloudflare.com/r2/platform/limits/index.md,2025-11-07
+r2,performance,Managed public bucket rate limit,Hundreds of requests per second,r2.dev endpoint,,,Exceeding the r2.dev throttle returns 429 responses and reduced throughput.,https://developers.cloudflare.com/r2/platform/limits/index.md,2025-11-07
+r2,constraint,Bucket versioning APIs,Not implemented,,,,S3 versioning operations like PutBucketVersioning are unavailable in R2.,https://developers.cloudflare.com/r2/platform/limits/index.md,2025-11-07
+r2,constraint,Concurrent writes per key,1 write per second,,,,Higher rates trigger 429 responses similar to other object stores.,https://developers.cloudflare.com/r2/how-r2-works/index.md,2025-11-07
+r2_sql,quota,Result limit range,"1–10,000 rows per query",Per query,All plans,,,https://developers.cloudflare.com/r2-sql/reference/limitations-best-practices/,2025-11-07
+r2_sql,performance,Default LIMIT when omitted,500 rows,Per query,,,Queries without an explicit LIMIT default to returning 500 rows.,https://developers.cloudflare.com/r2-sql/reference/limitations-best-practices/,2025-11-07
+r2_sql,constraint,Aggregation support,Aggregate functions unavailable,,,,"COUNT, AVG, MAX, and similar functions are not implemented in R2 SQL.",https://developers.cloudflare.com/r2-sql/reference/limitations-best-practices/,2025-11-07
+r2_sql,constraint,JOIN availability,JOIN operations unsupported,,,,Queries must target a single table without joins or subqueries.,https://developers.cloudflare.com/r2-sql/reference/limitations-best-practices/,2025-11-07
+r2_sql,constraint,Ordering rules,ORDER BY restricted to partition keys,,,,Sorting can only reference columns that are part of the table's partition key.,https://developers.cloudflare.com/r2-sql/query-data/,2025-11-07
+r2_sql,constraint,Pagination,OFFSET syntax unsupported,,,,LIMIT accepts a single integer without pagination parameters.,https://developers.cloudflare.com/r2-sql/reference/limitations-best-practices/,2025-11-07
+r2_sql,constraint,SQL feature support,"Only SELECT, FROM, WHERE, ORDER BY, LIMIT",,,,"Other SQL clauses such as GROUP BY, UNION, and window functions are unavailable.",https://developers.cloudflare.com/r2-sql/reference/limitations-best-practices/,2025-11-07
+secrets_store,quota,Secrets per account,100,Account,Open beta,,,https://developers.cloudflare.com/secrets-store/manage-secrets/,2025-11-07
+secrets_store,quota,Stores per account,1,Account,Open beta,,,https://developers.cloudflare.com/secrets-store/manage-secrets/,2025-11-07
+secrets_store,constraint,Regional availability,Not available in China Network,,,,Secrets Store cannot be used on the Cloudflare China Network operated by JD Cloud.,https://developers.cloudflare.com/secrets-store/,2025-11-07
+secrets_store,constraint,Secret naming rules,No spaces in name,,,,Secret names cannot contain whitespace characters.,https://developers.cloudflare.com/secrets-store/manage-secrets/,2025-11-07
+secrets_store,constraint,Secret value size,1024 bytes,,,,Each secret must be a string no larger than 1024 bytes.,https://developers.cloudflare.com/secrets-store/manage-secrets/,2025-11-07
+ssl_tls,constraint,Per-hostname minimum TLS requirement,Requires Advanced Certificate Manager,,,,Only customers with the add-on can set host-level minimum TLS versions.,https://developers.cloudflare.com/ssl/edge-certificates/additional-options/minimum-tls/,2025-11-07
+waf,quota,Custom rule capacity,"5 / 20 / 100 / 1,000",Per zone by plan,"Free, Pro, Business, Enterprise",,,https://developers.cloudflare.com/waf/custom-rules/,2025-11-07
+waf,constraint,Regex availability,Included on Business and Enterprise plans,,,,Regex support is not available on Free or Pro custom rules.,https://developers.cloudflare.com/waf/custom-rules/,2025-11-07
+workers,quota,Cron triggers per account,5,Account,Workers Free,,,https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workers,quota,Cron triggers per account,250,Account,Workers Paid,,,https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workers,quota,Subrequests per invocation,50,Per request,Workers Free,,,https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workers,quota,Subrequests per invocation,1000,Per request,Workers Paid,,,https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workers,quota,Worker scripts per account,100,Account,Workers Free,,,https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workers,quota,Worker scripts per account,500,Account,Workers Paid,,,https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workers,performance,CPU time per invocation,"30 seconds default, up to 5 minutes configurable",Per request,,,"Free plan Workers default to 10 ms CPU, while paid plans can raise limits via configuration.",https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workers,performance,Memory per isolate,128 MB,Per isolate,,,Runtime gracefully recycles isolates that exceed memory to maintain stability.,https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workers,constraint,Request header size,128 KB,,,,Aggregate request header size limit applies regardless of plan.,https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workers,constraint,Request URL length,16 KB,,,,Requests beyond 16 KB URLs are rejected before hitting the Worker.,https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workers,constraint,Worker bundle size,"3 MB (Free), 10 MB (Paid)",,,,Worker size limits govern uploaded script bundles per plan tier.,https://developers.cloudflare.com/workers/platform/limits/,2025-11-07
+workflows,quota,Concurrent workflow instances,25,Account,Workers Free,,,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
+workflows,quota,Concurrent workflow instances,"10,000",Account,Workers Paid,,,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
+workflows,quota,Persisted state per workflow instance,100 MB,Instance,Workers Free,,,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
+workflows,quota,Persisted state per workflow instance,1 GB,Instance,Workers Paid,,,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
+workflows,quota,Workflow instances per day,"100,000",Account,Workers Free,,,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
+workflows,quota,Workflow instances per day,Unlimited,Account,Workers Paid,,,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
+workflows,performance,CPU time per step,"10 ms default (Free), 30 seconds configurable up to 5 minutes (Paid)",Per step,,,CPU configuration aligns with Workers limits for workflow execution.,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
+workflows,performance,step.sleep maximum duration,365 days,Per step,,,Sleep operations can pause workflows for up to one year without consuming compute.,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
+workflows,constraint,Event payload size,1 MiB,,,,Events passed to workflows must be 1 MiB or less.,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
+workflows,constraint,Workflow script size,"3 MB Free, 10 MB Paid",,,,Script size inherits Worker bundle limits.,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
+workflows,constraint,Workflow steps per instance,1024,,,,Instances terminate if they exceed the maximum number of steps.,https://developers.cloudflare.com/workflows/reference/limits/,2025-11-07
