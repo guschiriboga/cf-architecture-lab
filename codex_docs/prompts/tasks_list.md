@@ -112,7 +112,7 @@ Fetch `/llms-full.txt` per product into `codex_docs/cf_llms_full/` and create `m
 - **T1.18_magic_cloud_networking_fetch** — root: `magic-cloud-networking` → docs: https://developers.cloudflare.com/magic-cloud-networking/
 - **T1.19_ssl_tls_fetch** — root: `ssl` → docs: https://developers.cloudflare.com/ssl/
 - **T1.20_waf_fetch** — root: `waf` → docs: https://developers.cloudflare.com/waf/
-- **T1.21_dns_fetch** — root: `dns/dns-firewall` → docs: https://developers.cloudflare.com/dns/dns/
+- **T1.21_dns_fetch** — root: `dns` → docs: https://developers.cloudflare.com/dns/
 ---
 
 ## T2 — Per‑product product record build
@@ -155,7 +155,7 @@ Create `data/products/<product_id>.yaml` that **validates** against `product.sch
 - **T2.18_magic_cloud_networking_product_record** — docs: https://developers.cloudflare.com/magic-cloud-networking/
 - **T2.19_ssl_tls_product_record** — docs: https://developers.cloudflare.com/ssl/
 - **T2.20_waf_product_record** — docs: https://developers.cloudflare.com/waf/
-- **T2.21_dns_product_record** — docs: https://developers.cloudflare.com/dns/dns/
+- **T2.21_dns_product_record** — docs: https://developers.cloudflare.com/dns/
 ---
 
 ## T3 — Interactions matrix
