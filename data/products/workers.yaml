@@ -1,0 +1,248 @@
+id: workers
+name: Cloudflare Workers
+category: compute
+summary: Serverless compute platform that runs code on Cloudflare’s global edge with instant scaling, built-in routing, and deep integrations across the developer platform.
+docs:
+  homepage: https://developers.cloudflare.com/workers/
+  key_pages:
+    - title: Build overview
+      url: https://developers.cloudflare.com/workers/
+    - title: Platform limits
+      url: https://developers.cloudflare.com/workers/platform/limits/
+    - title: How Workers works
+      url: https://developers.cloudflare.com/workers/reference/how-workers-works/
+    - title: CLI get started
+      url: https://developers.cloudflare.com/workers/get-started/guide/
+capabilities:
+  - Deploy front-end, API, and background workloads globally without managing servers while benefiting from Cloudflare’s low-latency network.
+  - Bind to Cloudflare data services such as KV, D1, Durable Objects, and R2 to build full-stack applications close to users.
+  - Use familiar languages, frameworks, and CLI tooling to develop, test, and observe edge-native applications with integrated logs and analytics.
+how_it_works:
+  model: Workers run JavaScript, TypeScript, WebAssembly, and Python code inside V8 isolates that execute on every Cloudflare location.
+  architecture:
+    - The runtime deploys isolates across Cloudflare’s global network so requests invoke the fetch handler near the client without cold starts.
+    - Bindings connect Workers to data products; configuration lives in wrangler.toml or dashboard settings that define external resources per deployment.
+    - Supervisor processes deliver encrypted script bundles to sandboxed isolates that cannot access the filesystem or arbitrary network destinations.
+  execution:
+    - Each request triggers the exported fetch handler, which can perform asynchronous work, subrequests, and background tasks via event.waitUntil().
+    - Developers iterate locally with wrangler dev and publish updates through wrangler deploy or dashboard workflows that roll out new versions instantly.
+    - Observability surfaces CPU time, wall time, and logs so teams can inspect invocations, tune limits, and troubleshoot with Instant Logs or Logpush integrations.
+  consistency:
+    - Cloudflare enforces per-request CPU and memory limits while allowing long-lived execution as long as the client remains connected.
+    - Daily request quotas and subrequest counts vary by plan, ensuring free usage stays predictable and paid plans can configure higher ceilings.
+supported_languages:
+  runtimes:
+    - JavaScript and TypeScript modules executed in the Workers runtime.
+    - Python support via Workers for Platforms runtime.
+    - WebAssembly modules compiled from languages such as Rust and C.
+  sdks: []
+  notes:
+    - Framework-specific adapters like React, Vue, and Next.js run through C3 templates that target the Workers runtime.
+usage_patterns:
+  webpages:
+    - pattern: Serve dynamic web frameworks from the edge.
+      steps:
+        - Generate a project with npm create cloudflare selecting the Worker template for your framework.
+        - Run npx wrangler dev to preview the application locally with live reload and global URL emulation.
+        - Deploy via wrangler deploy so Cloudflare routes production traffic through the Worker backed by static assets and server-side rendering.
+  one_tier_apps:
+    - pattern: Build HTTP APIs that proxy to external services with Smart Placement.
+      steps:
+        - Implement a fetch handler that inspects requests and forwards them to upstream APIs using fetch with streaming responses.
+        - Configure bindings for secrets, KV namespaces, or Durable Objects depending on the integration points.
+        - Instrument logging and metrics using Workers Logs to monitor CPU time, subrequests, and upstream latency.
+  multi_tier_apps:
+    - pattern: Coordinate multi-step workflows that combine Durable Objects, Queues, and background jobs.
+      steps:
+        - Define Worker routes that accept client traffic and queue long-running work via Queues or Workflows.
+        - Store state in Durable Objects or D1 while using event.waitUntil to finalize asynchronous operations.
+        - Observe orchestration with Workers metrics, adjusting CPU limits per script to keep throughput predictable.
+interactions:
+  produces_bindings: []
+  consumes_bindings:
+    - kv_namespaces
+    - r2_buckets
+    - d1_databases
+    - durable_objects
+    - queues
+  best_with:
+    - product_id: durable_objects
+      reason: Durable Objects provide per-entity state that complements stateless Workers for coordination.
+    - product_id: d1
+      reason: Workers invoke D1 bindings to execute SQL queries directly from edge code.
+    - product_id: r2
+      reason: R2 buckets supply object storage that Workers can fetch and mutate without egress fees.
+  anti_patterns:
+    - Running CPU-bound workloads that exceed configurable CPU limits without streaming or batching, which can lead to terminated executions.
+limits:
+  quotas:
+    - name: Subrequests per invocation
+      value: 50
+      scope: Per request
+      plan: Workers Free
+    - name: Subrequests per invocation
+      value: 1000
+      scope: Per request
+      plan: Workers Paid
+    - name: Cron triggers per account
+      value: 5
+      scope: Account
+      plan: Workers Free
+    - name: Cron triggers per account
+      value: 250
+      scope: Account
+      plan: Workers Paid
+    - name: Worker scripts per account
+      value: 100
+      scope: Account
+      plan: Workers Free
+    - name: Worker scripts per account
+      value: 500
+      scope: Account
+      plan: Workers Paid
+  performance:
+    - name: CPU time per invocation
+      value: 30 seconds default, up to 5 minutes configurable
+      scope: Per request
+      note: Free plan Workers default to 10 ms CPU, while paid plans can raise limits via configuration.
+    - name: Memory per isolate
+      value: 128 MB
+      scope: Per isolate
+      note: Runtime gracefully recycles isolates that exceed memory to maintain stability.
+  constraints:
+    - name: Worker bundle size
+      value: 3 MB (Free), 10 MB (Paid)
+      note: Worker size limits govern uploaded script bundles per plan tier.
+    - name: Request URL length
+      value: 16 KB
+      note: Requests beyond 16 KB URLs are rejected before hitting the Worker.
+    - name: Request header size
+      value: 128 KB
+      note: Aggregate request header size limit applies regardless of plan.
+free_tier:
+  items:
+    - name: Requests
+      value: 100,000 per day and 1,000 per minute
+      reset_window: Daily
+      scope: Account
+  notes:
+    - Free plan usage counts reset at midnight UTC and Workers automatically fail open or closed when the quota is exceeded.
+security_compliance:
+  authz:
+    - Worker deployments require authenticated Cloudflare accounts and RBAC roles, and API tokens scoped to Workers operations.
+  isolation:
+    - Code runs inside V8 isolates with additional Linux namespace and seccomp sandboxing that block filesystem and direct network access.
+  data_residency:
+    - Workloads execute across Cloudflare’s global network with Smart Placement optimizations based on client proximity.
+  secrets:
+    uses:
+      - Workers integrate with Secrets Store bindings and per-script variables to keep credentials out of source code.
+configuration:
+  wrangler:
+    bindings:
+      - type: kv_namespaces
+        key: KV
+        note: Map Worker environments to Cloudflare KV namespaces for cached data.
+      - type: d1_databases
+        key: DB
+        note: Bind D1 databases for SQL access using env.DB.prepare().
+    example: |
+      {
+        "name": "my-worker",
+        "main": "src/index.js",
+        "compatibility_date": "2025-02-27",
+        "kv_namespaces": [
+          { "binding": "CACHE", "id": "<KV_NAMESPACE_ID>" }
+        ],
+        "d1_databases": [
+          { "binding": "DB", "database_id": "<D1_DATABASE_ID>" }
+        ]
+      }
+  cli:
+    commands:
+      - npm create cloudflare@latest -- my-first-worker
+      - npx wrangler dev
+      - npx wrangler deploy
+      - npx wrangler tail
+  api:
+    endpoints:
+      - method: POST
+        path: /client/v4/accounts/{account_id}/workers/scripts
+        note: Upload new Worker scripts programmatically.
+      - method: PUT
+        path: /client/v4/accounts/{account_id}/workers/scripts/{script_name}
+        note: Update existing Worker deployments via API.
+dev_experience:
+  local_dev:
+    - wrangler dev launches a local preview with live reload and automatically opens browser previews.
+  testing:
+    - Use wrangler test and Workers Logs to verify responses, CPU time, and subrequests before deploying to production.
+  ci_cd:
+    - Integrate wrangler deploy in pipelines with scoped API tokens to promote new versions and roll back quickly if issues occur.
+migration_versioning:
+  versioning:
+    - Scripts are versioned through deployments, and wrangler supports environments for staging and production routes.
+  migrations:
+    - Update bindings, compatibility dates, and limits via wrangler.toml migrations when enabling new features or adjusting resource usage.
+cost_awareness:
+  metering:
+    - Request counts, subrequests, and CPU time drive billing; free plan quotas enforce caps before charges occur.
+  design_tips:
+    - Optimize fetch usage and share caches to minimize subrequests and stay within plan limits; upgrade CPU time only when profiling indicates a need.
+examples:
+  minimal:
+    description: Hello World Worker responding to every request.
+    files:
+      - path: src/index.js
+        lang: javascript
+        code: |
+          export default {
+            async fetch(request, env, ctx) {
+              return new Response("Hello World!");
+            },
+          };
+  advanced:
+    - description: API Worker proxying to an upstream service with error handling.
+      files:
+        - path: src/index.js
+          lang: javascript
+          code: |
+            export default {
+              async fetch(request, env) {
+                const url = new URL(request.url);
+                url.hostname = "api.example.com";
+                const upstream = await fetch(url.toString(), {
+                  method: request.method,
+                  headers: request.headers,
+                  body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
+                });
+                return upstream.ok
+                  ? new Response(upstream.body, upstream)
+                  : new Response("Upstream error", { status: upstream.status });
+              },
+            };
+glossary_refs:
+  - Workers runtime
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/workers/
+    title: Overview · Cloudflare Workers docs
+    accessed: "2025-11-07"
+    note: Product capabilities, supported languages, frameworks, and getting started guidance.
+  - url: https://developers.cloudflare.com/workers/platform/limits/
+    title: Limits · Cloudflare Workers docs
+    accessed: "2025-11-07"
+    note: Plan-based quotas, CPU configuration, request limits, and memory constraints.
+  - url: https://developers.cloudflare.com/workers/reference/how-workers-works/
+    title: How Workers works · Cloudflare Workers docs
+    accessed: "2025-11-07"
+    note: Runtime architecture, V8 isolates, distributed execution, and fetch lifecycle.
+  - url: https://developers.cloudflare.com/workers/reference/security-model/
+    title: Security model · Cloudflare Workers docs
+    accessed: "2025-11-07"
+    note: Isolation layers, Spectre mitigations, and sandbox security design.
+  - url: https://developers.cloudflare.com/workers/get-started/guide/
+    title: Get started - CLI · Cloudflare Workers docs
+    accessed: "2025-11-07"
+    note: CLI workflow, C3 templates, Hello World example, and wrangler dev usage.

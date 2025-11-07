@@ -1,0 +1,177 @@
+id: log_explorer
+name: Cloudflare Log Explorer
+category: logging
+summary: Native Cloudflare observability service for storing, querying, and visualizing product logs without sending data to third-party tools.
+docs:
+  homepage: https://developers.cloudflare.com/log-explorer/
+  key_pages:
+    - title: Log Explorer overview
+      url: https://developers.cloudflare.com/log-explorer/
+    - title: Log Search
+      url: https://developers.cloudflare.com/log-explorer/log-search/
+    - title: Manage datasets
+      url: https://developers.cloudflare.com/log-explorer/manage-datasets/
+    - title: Log Explorer API
+      url: https://developers.cloudflare.com/log-explorer/api/
+capabilities:
+  - Store Cloudflare product logs directly in the dashboard or via API with retention options up to two years for contract customers.
+  - Query datasets using built-in search UI or SQL API to investigate security and performance issues with contextual Cloudflare metadata.
+  - Build custom dashboards and saved queries for continuous monitoring without forwarding data to external analytics platforms.
+how_it_works:
+  model: Log Explorer ingests selected Cloudflare datasets into account-level storage on R2, exposing dashboards, search, and APIs for retrieval.
+  architecture:
+    - Administrators enable datasets per account or zone, which starts ingestion and makes logs available for dashboard search and SQL endpoints.
+    - The service stores each customer’s data separately, similar to D1, offering eventual flexibility for retention policies and region selection.
+    - Dashboard experiences and APIs authenticate through account permissions so only authorized users can query or manage datasets.
+  execution:
+    - Users run log searches via UI filters or SQL queries submitted to API endpoints, receiving JSON responses with requested fields.
+    - Custom dashboards consume the same stored data to present charts and saved views that teams monitor for anomalies.
+    - Enabling or disabling datasets via dashboard or API adjusts ingestion streams; changes propagate within minutes before data becomes queryable.
+  consistency:
+    - Data availability begins from the moment a dataset is enabled; historical events before activation are not ingested.
+    - Query performance improves when time ranges and selected columns are constrained, preventing large scans that trigger timeouts.
+supported_languages:
+  runtimes: []
+  sdks: []
+  notes:
+    - Interactions occur through the Cloudflare dashboard, REST API, or SQL-compatible requests sent over HTTPS.
+usage_patterns:
+  webpages:
+    - pattern: Investigate HTTP anomalies directly from the dashboard.
+      steps:
+        - Enable the HTTP requests dataset for the relevant zone under Manage datasets.
+        - Use Log Search filters or custom SQL to isolate requests by Ray ID, status, or country.
+        - Save queries for reuse or export results when sharing findings with other teams.
+  one_tier_apps:
+    - pattern: Build dashboards to monitor Zero Trust and Gateway events.
+      steps:
+        - Add account-level datasets such as access_requests and gateway_http via Manage datasets.
+        - Assign Analytics Read and Logs permissions to observability teams.
+        - Create custom dashboards combining multiple datasets to watch authentication, CASB, and Secure Web Gateway activity.
+  multi_tier_apps:
+    - pattern: Automate log investigations through the API.
+      steps:
+        - Use API tokens with Logs Read or Logs Write scopes to issue SQL queries from automation scripts.
+        - Parse JSON responses to feed ticketing or incident tooling with precise log context.
+        - Combine results with Logpush streams for hybrid analytics workflows when external storage is still required.
+interactions:
+  produces_bindings: []
+  consumes_bindings: []
+  best_with:
+    - product_id: logs
+      reason: Log Explorer builds on Cloudflare Logs datasets, providing native storage and analytics without third-party pipelines.
+    - product_id: workers
+      reason: Workers can call the Log Explorer API to automate queries and integrate results into custom tooling.
+  anti_patterns:
+    - Running unbounded SQL queries without date filters, which can lead to timeouts and slow performance on large datasets.
+limits:
+  quotas:
+    - name: Contract retention
+      value: Up to 2 years
+      scope: Account
+      plan: Contract add-on
+  performance:
+    - name: Query best practice window
+      value: Narrow time ranges recommended
+      scope: Per query
+      note: Focused time windows reduce data scanned and avoid timeouts.
+  constraints:
+    - name: Dataset availability
+      value: Only enabled datasets ingest data
+      note: Logs before enabling a dataset are unavailable in Log Explorer.
+    - name: Customer Metadata Boundary
+      value: Not currently supported
+      note: Log Explorer does not yet support metadata boundary controls.
+free_tier:
+  items: []
+  notes:
+    - Storage and retention beyond default usage requires a $0.10 per GB per month contract add-on for participating customers.
+security_compliance:
+  authz:
+    - Permissions such as Logs Read, Logs Write, Analytics Read, and Logs Edit govern dataset management and query capabilities.
+  isolation:
+    - Account data is stored on Cloudflare R2 in per-customer partitions, keeping tenants isolated from each other.
+  data_residency:
+    - Future roadmap includes customer-controlled retention policies and region selection, but current data resides in Cloudflare-managed R2 locations.
+  secrets:
+    uses:
+      - API tokens or keys authenticate requests; no secrets are stored within Log Explorer artifacts.
+configuration:
+  wrangler:
+    bindings: []
+    example: ''
+  cli:
+    commands:
+      - curl https://api.cloudflare.com/client/v4/zones/{zone_id}/logs/explorer/datasets --json '{"dataset":"http_requests"}'
+      - curl https://api.cloudflare.com/client/v4/zones/{zone_id}/logs/explorer/query/sql --url-query query="SELECT * FROM http_requests LIMIT 5"
+  api:
+    endpoints:
+      - method: POST
+        path: /client/v4/zones/{zone_id}/logs/explorer/datasets
+        note: Enable zone-level datasets for ingestion.
+      - method: POST
+        path: /client/v4/accounts/{account_id}/logs/explorer/query/sql
+        note: Submit SQL queries against stored datasets.
+      - method: GET
+        path: /client/v4/accounts/{account_id}/logs/explorer/datasets
+        note: List enabled datasets and their status.
+dev_experience:
+  local_dev:
+    - Developers interact with Log Explorer through API calls or dashboard workflows; no local emulator is provided.
+  testing:
+    - Use saved queries and sample SQL calls to validate filters before integrating with automation scripts.
+  ci_cd:
+    - Automate dataset enablement and recurring queries with infrastructure scripts that authenticate using restricted API tokens.
+migration_versioning:
+  versioning:
+    - Saved queries and dashboards can be exported or documented, while dataset changes are tracked via audit controls in the dashboard.
+  migrations:
+    - Plan dataset additions or retention changes carefully because ingestion begins only after enablement; coordinate cutovers to avoid gaps.
+cost_awareness:
+  metering:
+    - Storage consumption is billed monthly based on GB retained for contract customers, so prune datasets or adjust retention to control spend.
+  design_tips:
+    - Target queries to necessary fields and time ranges to avoid unnecessary compute, and disable unused datasets to reduce storage growth.
+examples:
+  minimal:
+    description: Run a SQL query for a specific Ray ID via the API.
+    files:
+      - path: query.sh
+        lang: bash
+        code: |
+          curl https://api.cloudflare.com/client/v4/zones/{zone_id}/logs/explorer/query/sql \
+            --header "Authorization: Bearer $API_TOKEN" \
+            --url-query query="SELECT clientRequestScheme, clientRequestHost, edgeResponseStatus FROM http_requests WHERE RayID = '806c30a3cec56817' LIMIT 1"
+  advanced:
+    - description: Enable HTTP requests dataset and request account-level Access logs.
+      files:
+        - path: enable.sh
+          lang: bash
+          code: |
+            curl https://api.cloudflare.com/client/v4/zones/{zone_id}/logs/explorer/datasets \
+              --header "Authorization: Bearer $API_TOKEN" \
+              --json '{"dataset":"http_requests"}'
+            curl https://api.cloudflare.com/client/v4/accounts/{account_id}/logs/explorer/datasets \
+              --header "Authorization: Bearer $API_TOKEN" \
+              --json '{"dataset":"access_requests"}'
+glossary_refs:
+  - Log Explorer
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/log-explorer/
+    title: Log Explorer · Cloudflare Log Explorer docs
+    accessed: "2025-11-07"
+    note: Product description, benefits, pricing note, and permissions overview.
+  - url: https://developers.cloudflare.com/log-explorer/log-search/
+    title: Log Search · Cloudflare Log Explorer docs
+    accessed: "2025-11-07"
+    note: Query workflow, FAQ on data availability, storage in R2, and optimization guidance.
+  - url: https://developers.cloudflare.com/log-explorer/manage-datasets/
+    title: Manage datasets · Cloudflare Log Explorer docs
+    accessed: "2025-11-07"
+    note: Supported datasets and steps to enable ingestion via dashboard or API.
+  - url: https://developers.cloudflare.com/log-explorer/api/
+    title: Log Explorer API · Cloudflare Log Explorer docs
+    accessed: "2025-11-07"
+    note: SQL query examples, authentication methods, and API endpoints.
