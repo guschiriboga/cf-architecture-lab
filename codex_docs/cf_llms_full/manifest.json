@@ -10,5 +10,11 @@
     "fetched_at": "2025-11-07T18:28:09Z",
     "bytes": 356585,
     "sha256": "38768f345bb354bd3798ec48876581c3fedb0815de1d4eac2d0e2759300d83a5"
+  },
+  "d1": {
+    "available": true,
+    "fetched_at": "2025-11-07T18:27:44Z",
+    "bytes": 425134,
+    "sha256": "1f32eca16057ac78899594b13069b7fc7b7496a9571472ef75b14d842299e04a"
   }
 }
