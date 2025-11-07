@@ -5,6 +5,12 @@
     "bytes": 72756,
     "sha256": "d8ab0462c343bafe3cec5e143ca80c1dc5c34ce9b98a771e4b90fbced3c130ec"
   },
+  "workers": {
+    "available": true,
+    "fetched_at": "2025-11-07T18:29:03Z",
+    "bytes": 2639845,
+    "sha256": "df66d646398c60e92955715dec8c951f275a7550b91c4ee25722220b2215532a"
+  },
   "secrets-store": {
     "available": true,
     "fetched_at": "2025-11-07T18:28:55Z",
