@@ -1,0 +1,566 @@
+<page>
+---
+title: Log Explorer · Cloudflare Log Explorer docs
+description: Log Explorer is Cloudflare's native observability and forensics
+  product that enables security teams and developers to analyze, investigate,
+  and monitor issues directly from the Cloudflare dashboard, without the expense
+  and complexity of forwarding logs to third-party tools.
+lastUpdated: 2025-06-18T17:04:20.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/log-explorer/
+  md: https://developers.cloudflare.com/log-explorer/index.md
+---
+
+Store and explore your Cloudflare logs directly within the Cloudflare dashboard or API.
+
+Log Explorer is Cloudflare's native observability and forensics product that enables security teams and developers to analyze, investigate, and monitor issues directly from the Cloudflare dashboard, without the expense and complexity of forwarding logs to third-party tools.
+
+Log Explorer provides access to Cloudflare logs with all the context available within the Cloudflare platform. You can monitor security and performance issues with custom dashboards or investigate and troubleshoot issues with log search. Benefits include:
+
+* **Reduced cost and complexity**: Drastically reduce the expense and operational overhead associated with forwarding, storing, and analyzing terabytes of log data in external tools.
+* **Faster detection and triage**: Access Cloudflare-native logs directly, eliminating cumbersome data pipelines and the ingest lags that delay critical security insights.
+* **Accelerated investigations with full context**: Investigate incidents with Cloudflare's unparalleled contextual data, accelerating your analysis and understanding of "What exactly happened?" and "How did it happen?"
+* **Minimal recovery time**: Seamlessly transition from investigation to action with direct mitigation capabilities via the Cloudflare platform.
+
+## Features
+
+### Log Search
+
+Explore your Cloudflare logs directly within the Cloudflare dashboard or [API](https://developers.cloudflare.com/log-explorer/api/).
+
+[Use Log Search](https://developers.cloudflare.com/log-explorer/log-search/)
+
+### Custom dashboards
+
+Design customized views for tracking application security, performance, and usage metrics.
+
+[Use Custom dashboards](https://developers.cloudflare.com/log-explorer/custom-dashboards/)
+
+### Manage datasets
+
+Manage the data you want to store within Log Explorer.
+
+[Use Manage datasets](https://developers.cloudflare.com/log-explorer/manage-datasets/)
+
+### API
+
+Manage configuration and perform queries via the API.
+
+[Use API](https://developers.cloudflare.com/log-explorer/api/)
+
+## Related products
+
+**[Logpush](https://developers.cloudflare.com/logs/)**
+
+Forward Cloudflare logs to third-party tools for debugging, identifying configuration adjustments, and creating analytics dashboards.
+
+**[Analytics](https://developers.cloudflare.com/analytics/)**
+
+Visualize the metadata collected by our products in the Cloudflare dashboard.
+
+</page>
+
+<page>
+---
+title: 404 - Page Not Found · Cloudflare Log Explorer docs
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/log-explorer/404/
+  md: https://developers.cloudflare.com/log-explorer/404/index.md
+---
+
+# 404
+
+Check the URL, try using our [search](https://developers.cloudflare.com/search/) or try our LLM-friendly [llms.txt directory](https://developers.cloudflare.com/llms.txt).
+
+</page>
+
+<page>
+---
+title: Log Explorer API · Cloudflare Log Explorer docs
+description: Configuration and Log searches are also available via a public API.
+lastUpdated: 2025-06-18T17:04:20.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/log-explorer/api/
+  md: https://developers.cloudflare.com/log-explorer/api/index.md
+---
+
+Configuration and Log searches are also available via a public API.
+
+## Authentication
+
+Log Explorer is available to users with the following permissions:
+
+* **Logs Edit**: users with Logs Edit permissions can enable datasets.
+* **Logs Read**: users with Logs Read permissions can run queries via the UI or API.
+
+Note that these permissions exist at the account and zone level and you need the appropriate permission level for the datasets you wish to query.
+
+Authentication with the API can be done via an API token or API key with an email. Refer to [Create API token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) for further instructions.
+
+## Query data
+
+Log Explorer includes a SQL API for submitting queries.
+
+For example, to find an HTTP request with a specific [Ray ID](https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/), use the following SQL query:
+
+```bash
+curl https://api.cloudflare.com/client/v4/zones/{zone_id}/logs/explorer/query/sql \
+--header "Authorization: Bearer <API_TOKEN>" \
+--url-query query="SELECT clientRequestScheme, clientRequestHost, clientRequestMethod, edgeResponseStatus, clientRequestUserAgent FROM http_requests WHERE RayID = '806c30a3cec56817' LIMIT 1"
+```
+
+This command returns the following HTTP request details:
+
+```json
+{
+  "result": [
+    {
+      "clientrequestscheme": "https",
+      "clientrequesthost": "example.com",
+      "clientrequestmethod": "GET",
+      "clientrequestuseragent": "curl/7.88.1",
+      "edgeresponsestatus": 200
+    }
+  ],
+  "success": true,
+  "errors": [],
+  "messages": []
+}
+```
+
+As another example, you could find Cloudflare Access requests with selected columns from a specific timeframe by performing the following SQL query:
+
+```bash
+curl https://api.cloudflare.com/client/v4/account/{account_id}/logs/explorer/query/sql \
+--header "Authorization: Bearer <API_TOKEN>" \
+--url-query query="SELECT CreatedAt, AppDomain, AppUUID, Action, Allowed, Country, RayID, Email, IPAddress, UserUID FROM access_requests WHERE Date >= '2025-02-06' AND Date <= '2025-02-06' AND CreatedAt >= '2025-02-06T12:28:39Z' AND CreatedAt <= '2025-02-06T12:58:39Z'"
+```
+
+This command returns the following request details:
+
+```json
+{
+  "result": [
+    {
+      "createdat": "2025-01-14T18:17:55Z",
+      "appdomain": "example.com",
+      "appuuid": "a66b4ab0-ccdf-4d60-a6d0-54a59a827d92",
+      "action": "login",
+      "allowed": true,
+      "country": "us",
+      "rayid": "90fbb07c0b316957",
+      "email": "user@example.com",
+      "ipaddress": "1.2.3.4",
+      "useruid": "52859e81-711e-4de0-8b31-283336060e79"
+    }
+  ],
+  "success": true,
+  "errors": [],
+  "messages": []
+}
+```
+
+</page>
+
+<page>
+---
+title: Changelog · Cloudflare Log Explorer docs
+description: Log Explorer is now GA, providing native observability and
+  forensics for traffic flowing through Cloudflare.
+lastUpdated: 2025-06-27T07:53:11.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/log-explorer/changelog/
+  md: https://developers.cloudflare.com/log-explorer/changelog/index.md
+---
+
+[Subscribe to RSS](https://developers.cloudflare.com/changelog/rss/log-explorer.xml)
+
+## 2025-06-18
+
+**Log Explorer is GA**
+
+[Log Explorer](https://developers.cloudflare.com/log-explorer/) is now GA, providing native observability and forensics for traffic flowing through Cloudflare.
+
+Search and analyze your logs, natively in the Cloudflare dashboard. These logs are also stored in Cloudflare's network, eliminating many of the costs associated with other log providers.
+
+![Log Explorer dashboard](https://developers.cloudflare.com/_astro/log-explorer-dash.CJSVLZ7Y_JFAqV.webp)
+
+With Log Explorer, you can now:
+
+* **Monitor security and performance issues with custom dashboards** – use natural language to define charts for measuring response time, error rates, top statistics and more.
+* **Investigate and troubleshoot issues with Log Search** – use data type-aware search filters or custom sql to investigate detailed logs.
+* **Save time and collaborate with saved queries** – save Log Search queries for repeated use or sharing with other users in your account.
+* **Access Log Explorer at the account and zone level** – easily find Log Explorer at the account and zone level for querying any dataset.
+
+For help getting started, refer to [our documentation](https://developers.cloudflare.com/log-explorer/).
+
+</page>
+
+<page>
+---
+title: Custom dashboards · Cloudflare Log Explorer docs
+description: Custom dashboards allow you to create tailored dashboards to
+  monitor application security, performance, and usage. You can create monitors
+  for ongoing monitoring of a previous incident, use them to identify indicators
+  of suspicious activity, and access templates to help you get started.
+lastUpdated: 2025-06-19T12:30:14.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/log-explorer/custom-dashboards/
+  md: https://developers.cloudflare.com/log-explorer/custom-dashboards/index.md
+---
+
+Custom dashboards allow you to create tailored dashboards to monitor application security, performance, and usage. You can create monitors for ongoing monitoring of a previous incident, use them to identify indicators of suspicious activity, and access templates to help you get started.
+
+Note
+
+Enterprise customers can create up to 100 dashboards.
+
+Customers on Pro and Business plans can create up to 5 dashboards.
+
+Dashboards provide a visual interface that displays key metrics and analytics, helping you monitor and analyze data efficiently. Different dashboards serve different purposes. For example, a security dashboard tracks attack attempts and threats, a performance dashboard monitors API latency and uptime, and a usage dashboard analyzes traffic patterns and user behavior.
+
+Different metrics serve distinct roles in providing insights into your application's performance. For example, total HTTP requests offer an overview of traffic volume, while average response time helps assess application speed. Additionally, usage metrics such as traffic patterns and user behavior provide insight into how users interact with your application. These metrics together enable you to spot trends, identify problems, and make informed, data-driven decisions.
+
+## Create a new dashboard
+
+To create a new dashboard:
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/login) and select your account.
+2. Go to **Log Explorer** > **Dashboards**.
+
+When creating a dashboard, you have two options: building one from scratch or using a pre-designed template.
+
+* A **templates** provide a faster way to set up a dashboard with commonly used metrics and charts. They are useful for standard use cases, such as monitoring security threats, API performance, or bot traffic. Templates help you get started quickly while still allowing modifications to fit your requirements.
+* On the other hand, **from-scratch dashboard** gives you full control over its structure, allowing you to choose the exact datasets, metrics, and visualizations that fit your needs. This approach is ideal if you have specific monitoring goals or need a highly customized view of your data.
+
+Choosing between these options depends on whether you need a quick setup with predefined insights or a fully customized dashboard tailored to your unique analysis needs.
+
+### Create a dashboard from scratch
+
+When creating a dashboard from scratch, select the option **Create new**. You can follow the instructions in the following sections to start adding charts to your dashboard.
+
+#### Create a new chart
+
+To create a new chart, select **Add chart**. There are two ways to create a chart:
+
+* **Use a prompt**: Enter a query like `Compare status code ranges over time.` The AI model decides the most appropriate visualization and constructs your chart configuration.
+* **Customize your chart**: Select the chart elements manually, including the chart type, title, dataset to query, metrics, and filters. This option gives you full control over your chart's structure.
+
+Refer to the following sections for more information about the charts, datasets, fields, metrics, and filters available.
+
+##### Chart types
+
+The available chart types include:
+
+* **Timeseries**: Displays trends over time, enabling comparisons across multiple series.
+* **Categorical**: Compares proportions across different series.
+* **Stat**: Highlights a single value, showing its delta and sparkline for quick insights.
+* **Percentage**: Represents one value as a percentage of another.
+* **Top N**: Identifies the highest-ranking values for a given attribute.
+
+##### Datasets and metrics
+
+The available metrics and filters vary based on the dataset you want to use. For example, when using the HTTP Requests dataset, you can select **origin response duration** as a metric. You can then choose your preferred aggregation method for that metric, such as total, median, or quantiles. The following table outlines the datasets, fields, and available metrics:
+
+| Dataset | Field | Definition | Metrics |
+| - | - | - | - |
+| HTTP Requests | Requests | The number of requests sent by a client to a server over the HTTP protocol. | Total |
+| | DNS Response Time | The time taken for a DNS query to be resolved, measured from when a request is made to when a response is received. | Total, Average, Median, 95th percentile, 99th percentile |
+| | Time to First Byte | The duration from when a request is made to when the first byte of the response is received from the server. | Total, Average, Median, 95th percentile, 99th percentile |
+| | Bytes returned to the Client | The amount of data (in bytes) sent from the server to the client in response to requests. | Total, Average, Median, 95th percentile, 99th percentile |
+| | Number of visits | Unique visits or sessions to a website or application. | Total |
+| | Origin response duration | The time taken by the origin server to process and respond to a request. | Total, Average, Median, 95th percentile, 99th percentile |
+| Security Events | Security events | Actions taken by Application Security products such as WAF and Bot Management. | Total |
+
+##### Filters
+
+You can also adjust the scope of your analytics by entering filter conditions. This allows you to focus on the most relevant data.
+
+1. Select **Add filter**.
+2. Select a **field**, an **operator**, and a **value**. For example, to filter events by source IP address, select the *Source IP* field, select the *equals* operator, and enter the IP address.
+3. Select **Apply**.
+
+### Create a dashboard from a template
+
+Alternatively, you can choose to create your dashboard using a pre-designed dashboard template. The templates available are:
+
+* **Bot monitoring**: Allows you to identify automated traffic accessing your website.
+* **API Security**: Allows you to monitor data transfers and exceptions for API endpoints in your application.
+* **Account takeover**: Allows you to monitor login attempts, usage of leaked credentials, and account takeover attacks.
+* **API Performance**: Allows you to view timing data for API endpoints in your application, along with error rates.
+* **Performance monitoring**: Allows you to identify slow hosts and paths on your origin server, and view time to first byte metrics over time.
+
+Choose one of the templates and select **Use template**.
+
+## Edit a dashboard or chart
+
+After creating your dashboard, to view your saved dashboards, select **Back to all dashboards** to access the full list. Regardless of the way you choose to create your dashboard, you can always edit existing charts and add new ones as needed.
+
+## Further analysis
+
+For each chart, you can:
+
+* Review related traffic in [Security Analytics](https://developers.cloudflare.com/waf/analytics/security-analytics/).
+* Explore detailed logs in [Log Search](https://developers.cloudflare.com/log-explorer/log-search/).
+
+This ensures deeper insights into your application's security, performance, and usage patterns.
+
+</page>
+
+<page>
+---
+title: Log Search · Cloudflare Log Explorer docs
+description: Log Explorer enables you to store and explore your Cloudflare logs
+  directly within the Cloudflare dashboard or API, giving you visibility into
+  your logs without the need to forward them to third-party services. Logs are
+  stored on Cloudflare's global network using the R2 object storage platform and
+  can be queried via the dashboard or SQL API.
+lastUpdated: 2025-06-19T12:30:14.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/log-explorer/log-search/
+  md: https://developers.cloudflare.com/log-explorer/log-search/index.md
+---
+
+Log Explorer enables you to store and explore your Cloudflare logs directly within the Cloudflare dashboard or API, giving you visibility into your logs without the need to forward them to third-party services. Logs are stored on Cloudflare's global network using the R2 object storage platform and can be queried via the dashboard or SQL API.
+
+## SQL queries supported
+
+The diagram below displays the example sql grammar for `SELECT` statements as a railroad syntax diagram:
+
+![Supported SQL grammar](https://developers.cloudflare.com/_astro/supported-sql-grammar-graph.CuHRsGeg_1xgUkK.webp)
+
+Any path from left to right forms a valid query. There is a limit of 25 predicates in the `WHERE` clause. Predicates can be grouped using parenthesis. If the `LIMIT` clause is not specified, then the default limit of 10,000 is applied. The maximum number for the `LIMIT` clause is 10,000. Results are returned in descending order by time.
+
+Examples of queries include:
+
+* `SELECT * FROM table WHERE (a = 1 OR b = "hello") AND c < 25.89`
+* `SELECT a, b, c FROM table WHERE d >= "GB" LIMIT 10`
+
+### SELECT
+
+The `SELECT` clause specifies the columns that you want to retrieve from the database tables. It can include individual column names, expressions, or even wildcard characters to select all columns.
+
+### FROM
+
+The `FROM` clause specifies the tables from which to retrieve data. It indicates the source of the data for the `SELECT` statement.
+
+### WHERE
+
+The `WHERE` clause filters the rows returned by a query based on specified conditions. It allows you to specify conditions that must be met for a row to be included in the result set.
+
+### GROUP BY
+
+The `GROUP BY` clause is used to group rows that have the same values into summary rows.
+
+### ORDER BY
+
+The `ORDER BY` clause is used to sort the result set by one or more columns in ascending or descending order.
+
+### LIMIT
+
+The `LIMIT` clause is used to constrain the number of rows returned by a query. It is often used in conjunction with the `ORDER BY` clause to retrieve the top `N` rows or to implement pagination.
+
+Note
+
+Log Explorer does not support `JOIN`, `DDL`, `DML`, or `EXPLAIN` queries.
+
+## Use Log Explorer
+
+You can filter and view your logs via the Cloudflare dashboard or the API.
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/login) and select your account.
+2. Go to **Log Explorer** > **Log Search**.
+3. Select the **Dataset** you want to use and in **Columns** select the dataset fields. If you selected a zone scoped dataset, select the zone you would like to use.
+4. Enter a **Limit**. A limit is the maximum number of results to return, for example, 50.
+5. Select the **Time period** from which you want to query, for example, the previous 12 hours.
+6. Select **Add filter** to create your query. Select a **Field**, an **Operator**, and a **Value**, then select **Apply**.
+7. A query preview is displayed. Select **Custom SQL** to change the query.
+8. Select **Run query** when you are done. The results are displayed below within the **Query results** section.
+
+For example, to find an HTTP request with a specific [Ray ID](https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/), go to **Custom SQL**, and enter the following SQL query:
+
+```sql
+SELECT
+  clientRequestScheme,
+  clientRequestHost,
+  clientRequestMethod,
+  edgeResponseStatus,
+  clientRequestUserAgent
+FROM http_requests
+WHERE RayID = '806c30a3cec56817'
+LIMIT 1
+```
+
+As another example, to find Cloudflare Access requests with selected columns from a specific timeframe you could perform the following SQL query:
+
+```sql
+SELECT
+  CreatedAt,
+  AppDomain,
+  AppUUID,
+  Action,
+  Allowed,
+  Country,
+  RayID,
+  Email,
+  IPAddress,
+  UserUID
+FROM access_requests
+WHERE Date >= '2025-02-06' AND Date <= '2025-02-06' AND CreatedAt >= '2025-02-06T12:28:39Z' AND CreatedAt <= '2025-02-06T12:58:39Z'
+```
+
+### Save queries
+
+After selecting all the fields for your query, you can save it by selecting **Save query**. Provide a name and description to help identify it later. To view your saved and recent queries, select **Queries** — they will appear in a side panel where you can insert a new query, or delete any query.
+
+## Integration with Security Analytics
+
+You can also access the Log Explorer dashboard directly from the [Security Analytics dashboard](https://developers.cloudflare.com/waf/analytics/security-analytics/#logs). When doing so, the filters you applied in Security Analytics will automatically carry over to your query in Log Explorer.
+
+## Optimize your queries
+
+All the tables supported by Log Explorer contain a special column called `date`, which helps to narrow down the amount of data that is scanned to respond to your query, resulting in faster query response times. The value of `date` must be in the form of `YYYY-MM-DD`. For example, to query logs that occurred on October 12, 2023, add the following to your `WHERE` clause: `date = '2023-10-12'`. The column supports the standard operators of `<`, `>`, and `=`.
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/login) and select your account.
+2. Go to **Log Explorer** > **Log Search** > **Custom SQL**.
+3. Enter the following SQL query:
+
+```sql
+SELECT
+  clientip,
+  clientrequesthost,
+  clientrequestmethod,
+  clientrequesturi,
+  edgeendtimestamp,
+  edgeresponsestatus,
+  originresponsestatus,
+  edgestarttimestamp,
+  rayid,
+  clientcountry,
+  clientrequestpath,
+  date
+FROM
+  http_requests
+WHERE
+  date = '2023-10-12' LIMIT 500
+```
+
+### Additional query optimization tips
+
+* Narrow your query time frame. Focus on a smaller time window to reduce the volume of data processed. This helps avoid querying excessive amounts of data and speeds up response times.
+* Omit `ORDER BY` and `LIMIT` clauses. These clauses can slow down queries, especially when dealing with large datasets. For queries that return a large number of records, reduce the time frame instead of limiting to the newest `N` records from a broader time frame.
+* Select only necessary columns. For example, replace `SELECT *` with the list of specific columns you need. You can also use `SELECT RayId` as a first iteration and follow up with a query that filters by the Ray IDs to retrieve additional columns. Additionally, you can use `SELECT COUNT(*)` to probe for time frames with matching records without retrieving the full dataset.
+
+## FAQs
+
+### Which fields (or columns) are available for querying?
+
+All fields listed in [Log Fields](https://developers.cloudflare.com/logs/reference/log-fields/) for the [supported datasets](https://developers.cloudflare.com/log-explorer/manage-datasets/#supported-datasets) are viewable in Log Explorer.
+
+### Why does my query not complete or time out?
+
+Log Explorer performs best when query parameters focus on narrower ranges of time. You may experience query timeouts when your query would return a large quantity of data. Consider refining your query to improve performance.
+
+### Why don't I see any logs in my queries after enabling the dataset?
+
+Log Explorer starts ingesting logs from the moment you enable the dataset. It will not display logs for events that occurred before the dataset was enabled. Make sure that new events have been generated since enabling the dataset, and check again.
+
+### My query returned an error. How do I figure out what went wrong?
+
+We are actively working on improving error codes. If you receive a generic error, check your SQL syntax (if you are using the custom SQL feature), make sure you have included a date and a limit. If the query still fails it is likely timing out. Try refining your filters.
+
+### Where is the data stored?
+
+The data is stored in Cloudflare R2. Each Log Explorer dataset is stored on a per-customer level, similar to Cloudflare D1, ensuring that your data is kept separate from that of other customers. In the future, this single-tenant storage model will provide you with the flexibility to create your own retention policies and decide in which regions you want to store your data.
+
+### Does Log Explorer support Customer Metadata Boundary?
+
+Customer metadata boundary is currently not supported for Log Explorer.
+
+</page>
+
+<page>
+---
+title: Manage datasets · Cloudflare Log Explorer docs
+description: Log Explorer allows you to enable or disable which datasets are
+  available to query in Log Search.
+lastUpdated: 2025-06-19T12:30:14.000Z
+chatbotDeprioritize: false
+source_url:
+  html: https://developers.cloudflare.com/log-explorer/manage-datasets/
+  md: https://developers.cloudflare.com/log-explorer/manage-datasets/index.md
+---
+
+Log Explorer allows you to enable or disable which datasets are available to query in Log Search.
+
+## Supported datasets
+
+Log Explorer currently supports the following datasets:
+
+* [HTTP requests](https://developers.cloudflare.com/logs/reference/log-fields/zone/http_requests/) (`FROM http_requests`)
+* [Firewall events](https://developers.cloudflare.com/logs/reference/log-fields/zone/firewall_events/) (`FROM firewall_events`)
+* [Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
+* [CASB](https://developers.cloudflare.com/cloudflare-one/applications/casb/)
+* [Secure Web Gateway](https://developers.cloudflare.com/cloudflare-one/policies/gateway/)
+* [WARP](https://developers.cloudflare.com/warp-client/)
+
+## Enable Log Explorer
+
+In order for Log Explorer to begin storing logs, you need to enable the desired datasets. You can do this via the dashboard or the API.
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/login) and select your account.
+2. Go to **Log Explorer** > **Manage datasets**.
+3. Select **Add dataset** to select the datasets you want to query.
+4. Choose a dataset and then a zone. Then, select **Add**. You can always return to this page to enable more datasets or manage your existing ones.
+
+Note
+
+It may take a few minutes for the logs to become available for querying.
+
+If you are using the API, Use the Log Explorer API to enable Log Explorer for each dataset you wish to store. It may take a few minutes after a log stream is enabled before you can view the logs.
+
+The following `curl` command is an example for enabling the zone-level dataset `http_requests`, as well as the expected response when the command succeeds.
+
+```bash
+curl https://api.cloudflare.com/client/v4/zones/{zone_id}/logs/explorer/datasets \
+--header "Authorization: Bearer <API_TOKEN>" \
+--json '{
+  "dataset": "http_requests"
+}'
+```
+
+```json
+{
+  "result": {
+    "dataset": "http_requests",
+    "object_type": "zone",
+    "object_id": "<ZONE ID>",
+    "created_at": "2025-06-03T14:33:16Z",
+    "updated_at": "2025-06-03T14:33:16Z",
+    "dataset_id": "01973635f7e273a1964a02f4d4502499",
+    "enabled": true
+  },
+  "success": true,
+  "errors": [],
+  "messages": []
+}
+```
+
+To enable an account-level dataset, replace `zones/{zone_id}` with `accounts/{account_id}` in the `curl` command. For example:
+
+```bash
+curl https://api.cloudflare.com/client/v4/accounts/{account_id}/logs/explorer/datasets \
+--header "Authorization: Bearer <API_TOKEN>" \
+--json '{
+  "dataset": "access_requests"
+}'
+```
+
+</page>
+
