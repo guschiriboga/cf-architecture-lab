@@ -81,7 +81,7 @@ This **local-first, remote-verify** workflow ensures fast, consistent processing
 - Magic Cloud Networking — https://developers.cloudflare.com/magic-cloud-networking/
 - SSL/TLS — https://developers.cloudflare.com/ssl/
 - WAF — https://developers.cloudflare.com/waf/
-- DNS Firewall — https://developers.cloudflare.com/dns/dns-firewall/
+- DNS — https://developers.cloudflare.com/dns/dns/
 
 **Extra references (not products):**
 - Reference Architecture — https://developers.cloudflare.com/reference-architecture/
@@ -121,7 +121,7 @@ cf-architecture-lab/
 │  │  ├─ magic_cloud_networking.txt
 │  │  ├─ ssl_tls.txt
 │  │  ├─ waf.txt
-│  │  └─ dns_firewall.txt
+│  │  └─ dns.txt
 │  ├─ schemas_reference/
 │  │  ├─ product.schema.yaml
 │  │  ├─ interaction.schema.yaml
