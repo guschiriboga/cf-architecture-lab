@@ -1,0 +1,146 @@
+id: ssl_tls
+name: Cloudflare SSL/TLS
+category: network_security
+summary: Cloudflare SSL/TLS encrypts web traffic with automatically issued certificates and configurable TLS policies so every proxied hostname can use HTTPS.
+docs:
+  homepage: https://developers.cloudflare.com/ssl/
+  key_pages:
+    - title: Universal SSL
+      url: https://developers.cloudflare.com/ssl/edge-certificates/universal-ssl/
+    - title: Advanced Certificate Manager
+      url: https://developers.cloudflare.com/ssl/edge-certificates/advanced-certificate-manager/
+    - title: Minimum TLS Version
+      url: https://developers.cloudflare.com/ssl/edge-certificates/additional-options/minimum-tls/
+capabilities:
+  - Provide free Domain Validated certificates for every activated zone through Universal SSL.
+  - Issue customizable certificates with preferred hostnames, CAs, and validation workflows via Advanced Certificate Manager.
+  - Delegate domain control validation for partial zones so Cloudflare can complete issuance steps on your behalf.
+  - Enforce minimum TLS versions and adjust cipher suites to meet security requirements.
+how_it_works:
+  model: Cloudflare provisions and renews edge certificates, then terminates HTTPS connections at the edge before proxying traffic to origins.
+  architecture:
+    - Universal SSL automatically issues and renews DV certificates for every activated domain on Cloudflare.
+    - Advanced Certificate Manager lets customers order certificates that cover additional hostnames, choose CAs, and control validation and trust stores.
+    - Minimum TLS settings define the lowest TLS protocol version visitors must use and can be applied zone-wide or per hostname.
+  execution:
+    - Customers enable Universal SSL or request advanced certificates through the dashboard workflows.
+    - For partial setups, administrators supply DCV tokens or use Delegated DCV so Cloudflare can validate hostnames.
+    - TLS policies are configured by selecting the desired minimum version in the dashboard or via the min_tls_version API setting.
+  consistency:
+    - Cloudflare renews Universal SSL certificates automatically, keeping coverage for all proxied hostnames.
+    - Delegated DCV reduces manual validation for advanced certificates by letting Cloudflare complete the process.
+    - Per-hostname minimum TLS controls require Advanced Certificate Manager and apply consistently across specified hosts.
+supported_languages:
+  runtimes: []
+  sdks: []
+  notes:
+    - SSL/TLS features are managed in the Cloudflare dashboard or via zone settings API endpoints.
+usage_patterns:
+  webpages:
+    - pattern: Protect a new zone with Universal SSL.
+      steps:
+        - Add and activate the domain on Cloudflare.
+        - Confirm Universal SSL is enabled so certificates issue automatically.
+        - Serve traffic through Cloudflare to use the edge certificates.
+  one_tier_apps:
+    - pattern: Customize certificates for SaaS or multi-subdomain deployments.
+      steps:
+        - Purchase Advanced Certificate Manager for the zone.
+        - Order a certificate that includes required subdomains and preferred CA or validity period.
+        - Enable Total TLS or delegated DCV to keep subdomain certificates current.
+  multi_tier_apps:
+    - pattern: Enforce higher TLS standards across multiple hostnames.
+      steps:
+        - Set the minimum TLS version for the zone using the dashboard or API.
+        - For sensitive hostnames, set per-hostname minimum versions through the Advanced Certificate Manager API.
+        - Review compatibility requirements before raising protocol versions to avoid client access issues.
+interactions:
+  produces_bindings:
+    - edge_certificates
+  consumes_bindings: []
+  best_with:
+    - product_id: dns
+      reason: Cloudflare DNS works with SSL/TLS to route traffic to proxied hostnames using the issued certificates.
+    - product_id: cloudflare_for_saas
+      reason: SaaS providers extend SSL/TLS coverage to customer domains using Advanced Certificate Manager and Total TLS.
+  anti_patterns:
+    - Attempting to disable TLS 1.0 without verifying client support for newer protocols, which can block older devices.
+limits:
+  quotas: []
+  performance: []
+  constraints:
+    - name: Per-hostname minimum TLS requirement
+      value: Requires Advanced Certificate Manager
+      note: Only customers with the add-on can set host-level minimum TLS versions.
+free_tier:
+  items:
+    - name: Universal SSL coverage
+      value: Included certificates for all proxied hostnames
+      reset_window: N/A
+      scope: All plans
+  notes:
+    - Universal SSL and minimum TLS controls are available on every Cloudflare plan, while advanced options require add-ons.
+security_compliance:
+  authz: []
+  isolation: []
+  data_residency: []
+  secrets: []
+configuration:
+  wrangler:
+    bindings: []
+    example: ''
+  cli:
+    commands:
+      - curl -X PATCH "https://api.cloudflare.com/client/v4/zones/{zone_id}/settings/min_tls_version" -d '{"value":"1.2"}'
+  api:
+    endpoints:
+      - method: PATCH
+        path: /client/v4/zones/{zone_id}/settings/min_tls_version
+        note: Set the zone-wide minimum TLS version.
+      - method: POST
+        path: /client/v4/zones/{zone_id}/ssl/certificate_packs/order
+        note: Order advanced certificates for the zone.
+dev_experience:
+  local_dev: []
+  testing:
+    - Use validation dashboards to confirm DCV completion for new certificates.
+  ci_cd:
+    - Automate TLS setting changes with API calls when promoting new security baselines.
+migration_versioning:
+  versioning: []
+  migrations: []
+cost_awareness:
+  metering: []
+  design_tips: []
+examples:
+  minimal:
+    description: Raise the zone minimum TLS version using the API.
+    files:
+      - path: set-min-tls.sh
+        lang: bash
+        code: |
+          curl "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/min_tls_version" \
+            --request PATCH \
+            --header "Authorization: Bearer $API_TOKEN" \
+            --json '{"value":"1.2"}'
+  advanced: []
+glossary_refs: []
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/ssl/
+    title: Cloudflare SSL/TLS
+    accessed: 2025-11-07
+    note: Overview, Universal SSL availability, and feature list.
+  - url: https://developers.cloudflare.com/ssl/edge-certificates/universal-ssl/
+    title: Universal SSL
+    accessed: 2025-11-07
+    note: Automatic issuance, DV validation level, and plan availability.
+  - url: https://developers.cloudflare.com/ssl/edge-certificates/advanced-certificate-manager/
+    title: Advanced certificates
+    accessed: 2025-11-07
+    note: Advanced Certificate Manager capabilities, delegated DCV, and configuration options.
+  - url: https://developers.cloudflare.com/ssl/edge-certificates/additional-options/minimum-tls/
+    title: Minimum TLS Version
+    accessed: 2025-11-07
+    note: Minimum TLS behavior, availability, and API workflow.

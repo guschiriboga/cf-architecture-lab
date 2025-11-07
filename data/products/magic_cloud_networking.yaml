@@ -1,0 +1,139 @@
+id: magic_cloud_networking
+name: Magic Cloud Networking
+category: network_security
+summary: Magic Cloud Networking automates discovery of cloud networks and connects them to Cloudflare's connectivity cloud so you can manage hybrid and multi-cloud routing from one place.
+docs:
+  homepage: https://developers.cloudflare.com/magic-cloud-networking/
+  key_pages:
+    - title: Get started
+      url: https://developers.cloudflare.com/magic-cloud-networking/get-started/
+    - title: Cloud integrations
+      url: https://developers.cloudflare.com/magic-cloud-networking/get-started/#set-up-amazon-aws
+capabilities:
+  - Automatically discover cloud resources like VPCs, subnets, virtual machines, route tables, and routes.
+  - Create VPN tunnels that connect public cloud networks to Magic WAN with minimal manual configuration.
+  - Combine cloud networks with office and data center networks to grow a consistent multi-cloud architecture.
+  - Provide a dashboard catalog of discovered resources for centralized management.
+how_it_works:
+  model: Cloud integrations authorize Cloudflare to query cloud provider inventories and configure network attachments that link those resources to Magic WAN.
+  architecture:
+    - After authorization, Magic Cloud Networking builds a catalog that lists discovered VPCs, subnets, VMs, and routing tables.
+    - The service provisions VPN tunnels between cloud networks and Magic WAN so on-ramps can be created automatically.
+    - Integrations operate per provider account so customers can onboard multiple accounts for the same cloud platform.
+  execution:
+    - Administrators create a provider integration in the Cloudflare dashboard and authorize Cloudflare to access the account.
+    - Required IAM policies grant permissions for tasks such as managing transit gateway peering attachments and prefix lists.
+    - Once access is granted, discovery runs automatically and the dashboard surfaces resources to connect and manage.
+  consistency:
+    - Integrations remain scoped to the accounts you authorize, allowing multiple provider accounts to be onboarded in parallel.
+    - Magic Cloud Networking is currently in closed beta, so customers enroll via the request form before connecting environments.
+    - Resource discovery begins automatically after credentials are validated, keeping the catalog up to date.
+supported_languages:
+  runtimes: []
+  sdks: []
+  notes:
+    - The product is managed through the Cloudflare dashboard; no client SDK is required.
+usage_patterns:
+  webpages:
+    - pattern: Inventory cloud networking resources before building connectivity policies.
+      steps:
+        - Request beta access and enable Magic Cloud Networking in the Cloudflare dashboard.
+        - Add a cloud integration and authorize Cloudflare to read routing and VPC information.
+        - Review the cloud resource catalog to understand available networks and routes.
+  one_tier_apps:
+    - pattern: Connect a single public cloud environment to Magic WAN.
+      steps:
+        - Create an AWS integration from the Cloud integrations workflow.
+        - Apply the recommended IAM policy so Cloudflare can manage transit gateway peering and prefix lists.
+        - Allow Magic Cloud Networking to create the VPN tunnel to Magic WAN automatically.
+  multi_tier_apps:
+    - pattern: Manage multiple provider accounts across hybrid environments.
+      steps:
+        - Repeat the integration workflow for each cloud account that hosts application tiers.
+        - Use the catalog to align routes between office networks, data centers, and cloud VPCs.
+        - Monitor discovered changes to keep cross-cloud connectivity consistent.
+interactions:
+  produces_bindings:
+    - magic_wan_onramps
+  consumes_bindings:
+    - cloud_provider_credentials
+  best_with:
+    - product_id: magic_wan
+      reason: Magic Cloud Networking creates Magic WAN on-ramps to connect cloud networks.
+    - product_id: cloudflare_one
+      reason: Connected networks feed into Cloudflare One policies for secure access.
+  anti_patterns:
+    - Attempting to deploy without granting the required cloud permissions, which prevents discovery and tunnel creation.
+limits:
+  quotas: []
+  performance: []
+  constraints:
+    - name: Availability status
+      value: Closed beta
+      note: Customers request access before using the product.
+free_tier:
+  items: []
+  notes:
+    - Magic Cloud Networking is an Enterprise-only closed beta.
+security_compliance:
+  authz:
+    - IAM policies control how Cloudflare interacts with each authorized cloud provider account.
+  isolation: []
+  data_residency: []
+  secrets:
+    uses:
+      - Cloud provider credentials are stored to retrieve routing information and create integrations.
+configuration:
+  wrangler:
+    bindings: []
+    example: ''
+  cli:
+    commands: []
+  api:
+    endpoints: []
+dev_experience:
+  local_dev: []
+  testing:
+    - Validate integrations by reviewing discovered resources once permissions are granted.
+  ci_cd: []
+migration_versioning:
+  versioning: []
+  migrations: []
+cost_awareness:
+  metering: []
+  design_tips:
+    - Scope integrations per account so you can stage onboarding before production rollout.
+examples:
+  minimal:
+    description: Create an AWS integration for automatic discovery.
+    files:
+      - path: aws-policy.json
+        lang: json
+        code: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "ec2:DescribeRegions",
+                  "ec2:CreateTransitGatewayPeeringAttachment",
+                  "ec2:DeleteTransitGatewayPeeringAttachment"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }
+  advanced: []
+glossary_refs: []
+status: beta
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/magic-cloud-networking/
+    title: Magic Cloud Networking (beta)
+    accessed: 2025-11-07
+    note: Product overview, feature summary, and beta status.
+  - url: https://developers.cloudflare.com/magic-cloud-networking/get-started/
+    title: Get started
+    accessed: 2025-11-07
+    note: Integration workflow, IAM policy requirements, and automatic discovery details.

@@ -1,0 +1,160 @@
+id: network
+name: Cloudflare Network settings
+category: network_security
+summary: Cloudflare Network settings let you manage zone-level features like IP Geolocation, IPv6 compatibility, and WebSockets to control how Cloudflare handles traffic before it reaches your origin.
+docs:
+  homepage: https://developers.cloudflare.com/network/
+  key_pages:
+    - title: IP geolocation
+      url: https://developers.cloudflare.com/network/ip-geolocation/
+    - title: IPv6 compatibility
+      url: https://developers.cloudflare.com/network/ipv6-compatibility/
+    - title: WebSockets
+      url: https://developers.cloudflare.com/network/websockets/
+capabilities:
+  - Enable the CF-IPCountry header so origin services can see visitor country information.
+  - Automatically provide IPv6 connectivity by advertising AAAA records and preferring IPv4 only when needed.
+  - Proxy native WebSockets connections between clients and your origin without extra configuration.
+how_it_works:
+  model: Network settings toggles let you control how Cloudflare handles proxied requests without changing origin infrastructure.
+  architecture:
+    - The IP Geolocation toggle injects CF-IPCountry and other location headers through Managed Transforms.
+    - IPv6 compatibility auto-generates AAAA DNS records and routes dual-stack requests through Cloudflare proxies.
+    - WebSockets support upgrades the initial HTTP request and maintains the bidirectional session across Cloudflare edge nodes.
+  execution:
+    - Administrators enable each feature in the dashboard under Network or by sending PATCH requests to the settings API.
+    - For proxied DNS records that provide both IPv6 and IPv4 addresses, Cloudflare connects to the origin over IPv4 by default.
+    - WebSocket requests count as a single long-lived HTTP request while bandwidth reflects data sent from Cloudflare to clients.
+  consistency:
+    - Cloudflare updates the IP geolocation database multiple times per week to keep location headers accurate.
+    - IPv6 compatibility defaults to on for proxied records so every zone receives consistent AAAA advertisement.
+    - Cloudflare may restart WebSocket sessions when new edge code deploys, so applications should implement keepalive logic.
+supported_languages:
+  runtimes: []
+  sdks: []
+  notes:
+    - Settings can be configured through the Cloudflare dashboard or API endpoints for the corresponding toggles.
+usage_patterns:
+  webpages:
+    - pattern: Surface visitor country metadata to personalize content or logging.
+      steps:
+        - Enable IP Geolocation in the Network tab for the zone.
+        - Read the CF-IPCountry header on the origin to capture visitor country codes.
+        - Use the managed transform when additional city or coordinate data is required.
+  one_tier_apps:
+    - pattern: Provide IPv6 reachability for a single-origin web application.
+      steps:
+        - Leave IPv6 compatibility enabled so Cloudflare advertises AAAA records for the zone.
+        - Confirm the origin accepts IPv6 or enable Pseudo IPv4 if the origin is IPv4-only.
+        - Monitor connectivity and disable IPv6 only if enterprise-specific needs require IPv4-only routing.
+  multi_tier_apps:
+    - pattern: Maintain interactive WebSocket feeds through Cloudflare.
+      steps:
+        - Enable the WebSockets setting under Network or via the API.
+        - Upgrade clients to WebSockets and keep the connection open for bidirectional messaging.
+        - Track usage through Traffic Analytics or logs to ensure bandwidth expectations match long-lived sessions.
+interactions:
+  produces_bindings:
+    - http_request_headers
+  consumes_bindings: []
+  best_with:
+    - product_id: waf
+      reason: WAF custom rules can block unwanted IPv6 ranges or refine traffic before WebSocket upgrades complete.
+    - product_id: dns
+      reason: Cloudflare DNS works with IPv6 compatibility to advertise AAAA records and route dual-stack clients.
+  anti_patterns:
+    - Disabling IPv6 compatibility while still expecting Cloudflare to serve AAAA records for proxied hostnames.
+limits:
+  quotas: []
+  performance:
+    - name: WebSocket request counting
+      value: One HTTP upgrade request per WebSocket connection
+      scope: Per connection
+      note: Cloudflare measures WebSocket bandwidth as data sent from Cloudflare to the client during the session.
+  constraints:
+    - name: IPv4 preference for origin connections
+      value: IPv4 origin selected when both IPv4 and IPv6 are configured
+      note: Cloudflare prefers IPv4 origin addresses when dual-stack records are proxied.
+free_tier:
+  items:
+    - name: IP Geolocation availability
+      value: Included
+      reset_window: N/A
+      scope: All plans
+  notes:
+    - IP Geolocation, IPv6 compatibility, and WebSockets are available across every Cloudflare plan tier.
+security_compliance:
+  authz: []
+  isolation: []
+  data_residency: []
+  secrets:
+    uses: []
+configuration:
+  wrangler:
+    bindings: []
+    example: ''
+  cli:
+    commands:
+      - curl -X PATCH "https://api.cloudflare.com/client/v4/zones/{zone_id}/settings/ip_geolocation" -d '{"value":"on"}'
+      - curl -X PATCH "https://api.cloudflare.com/client/v4/zones/{zone_id}/settings/ipv6" -d '{"value":"on"}'
+      - curl -X PATCH "https://api.cloudflare.com/client/v4/zones/{zone_id}/settings/websockets" -d '{"value":"on"}'
+  api:
+    endpoints:
+      - method: PATCH
+        path: /client/v4/zones/{zone_id}/settings/ip_geolocation
+        note: Toggle IP Geolocation for a zone.
+      - method: PATCH
+        path: /client/v4/zones/{zone_id}/settings/ipv6
+        note: Control IPv6 compatibility status.
+      - method: PATCH
+        path: /client/v4/zones/{zone_id}/settings/websockets
+        note: Enable or disable WebSocket support.
+dev_experience:
+  local_dev:
+    - Use zone-level dashboard toggles to test settings changes before automating API updates.
+  testing:
+    - Validate headers or connection behavior from a staging host after enabling each network feature.
+  ci_cd:
+    - Script API toggles in deployment pipelines so network settings remain consistent across environments.
+migration_versioning:
+  versioning: []
+  migrations: []
+cost_awareness:
+  metering:
+    - WebSocket bandwidth usage reflects traffic sent from Cloudflare to clients, so plan for long-lived sessions accordingly.
+  design_tips: []
+examples:
+  minimal:
+    description: Enable IP Geolocation and log the CF-IPCountry header at your origin.
+    files:
+      - path: nginx.conf
+        lang: nginx
+        code: |
+          server {
+            listen 443 ssl;
+            location / {
+              proxy_set_header X-Visitor-Country $http_cf_ipcountry;
+              access_log /var/log/nginx/access.log main;
+            }
+          }
+  advanced: []
+glossary_refs: []
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/network/
+    title: Network settings
+    accessed: 2025-11-07
+    note: Overview, feature list, plan availability, and positioning of network toggles.
+  - url: https://developers.cloudflare.com/network/ip-geolocation/
+    title: IP geolocation
+    accessed: 2025-11-07
+    note: CF-IPCountry header behavior, managed transforms, and database update cadence.
+  - url: https://developers.cloudflare.com/network/ipv6-compatibility/
+    title: IPv6 compatibility
+    accessed: 2025-11-07
+    note: AAAA record generation, default behavior, and origin fallbacks.
+  - url: https://developers.cloudflare.com/network/websockets/
+    title: WebSockets
+    accessed: 2025-11-07
+    note: WebSocket enablement, compatibility, counting, and best practices.
