@@ -1,0 +1,233 @@
+id: kv
+name: Cloudflare Workers KV
+category: database
+summary: Workers KV is a globally replicated key-value database that delivers low-latency reads and asynchronous writes for Workers applications and external clients.
+docs:
+  homepage: https://developers.cloudflare.com/kv/
+  key_pages:
+    - title: Getting started
+      url: https://developers.cloudflare.com/kv/get-started/
+    - title: Limits
+      url: https://developers.cloudflare.com/kv/platform/limits/
+    - title: Pricing
+      url: https://developers.cloudflare.com/kv/platform/pricing/
+capabilities:
+  - Store key-value pairs in namespaces replicated across Cloudflare's global network for low-latency reads at the edge.
+  - Bind namespaces to Workers to perform put, get, list, and delete operations with minimal configuration through Wrangler or the dashboard.
+  - Provide REST API and SDK access so external systems can manage values, metadata, and bulk operations securely.
+how_it_works:
+  model: KV namespaces replicate data worldwide, servicing reads from the nearest point of presence while propagating writes asynchronously.
+  architecture:
+    - Each namespace is identified by an account-scoped ID and binding that Workers use to route operations to the correct dataset.
+    - Writes are accepted at the edge and asynchronously replicated, while reads hit the closest data center cache for sub-millisecond access.
+    - Wrangler and dashboard tooling manage namespace creation, bindings, and configuration, bridging Worker deployments with storage.
+  execution:
+    - Developers create namespaces via Wrangler CLI or the Cloudflare dashboard before binding them to Worker environments.
+    - Worker code invokes KV methods such as put, get, list, and delete using the bound namespace to persist or retrieve state.
+    - External clients call the Cloudflare API with authenticated requests to read or write values outside of Workers when needed.
+  consistency:
+    - Reads are eventually consistent across global replicas, so applications should tolerate propagation delay on freshly written keys.
+    - List operations return pagination cursors and optional metadata to synchronize state across deployments.
+    - Preview namespaces isolate dev and production data by using separate IDs in Wrangler configuration.
+supported_languages:
+  runtimes:
+    - Cloudflare Workers runtime for direct bindings to KV namespaces.
+    - Any HTTPS client capable of calling Cloudflare's REST API endpoints.
+  sdks:
+    - name: Cloudflare API clients (TypeScript, Python, Go)
+      url: https://developers.cloudflare.com/api/resources/kv/
+  notes:
+    - Wrangler generates TypeScript bindings when scaffolding Workers so KV methods are available in typed projects.
+usage_patterns:
+  webpages:
+    - pattern: Personalize content via cached configuration values.
+      steps:
+        - Bind a KV namespace to the Worker powering the site.
+        - Store configuration or user preference keys via put operations.
+        - Read keys during the fetch handler to customize responses at the edge.
+  one_tier_apps:
+    - pattern: Cache API responses for rate-limited upstream services.
+      steps:
+        - Attempt to read the cached response from KV before hitting the upstream API.
+        - Fetch and store fresh data with an expiration when the cache miss occurs.
+        - Serve the cached payload to subsequent requests until it expires.
+  multi_tier_apps:
+    - pattern: Share feature flags between Workers and external services.
+      steps:
+        - Maintain flag state in KV via Workers tooling or REST API scripts.
+        - Poll or fetch flag values from client services using authenticated API calls.
+        - Coordinate rollouts by updating keys centrally and letting consumers react to changes.
+interactions:
+  produces_bindings:
+    - kv
+  consumes_bindings:
+    - workers
+    - durable_objects
+  best_with:
+    - product_id: workers
+      reason: Workers bindings expose KV methods directly inside fetch handlers for low-latency storage access.
+    - product_id: durable_objects
+      reason: Durable Objects can coordinate high-write workloads and persist state back into KV for fan-out distribution.
+  anti_patterns:
+    - Performing high-frequency writes to the same key, which exceeds the one-write-per-second limit and risks throttling.
+limits:
+  quotas:
+    - name: Reads per day (Free plan)
+      value: 100,000
+      scope: Per account
+      plan: Workers Free
+    - name: Writes per day (Free plan)
+      value: 1,000
+      scope: Per account
+      plan: Workers Free
+    - name: Operations per invocation
+      value: 1000 external calls
+      scope: Per Worker invocation
+      plan: All plans
+  performance:
+    - name: Value size ceiling
+      value: 25 MiB
+      scope: Per key
+      note: Individual values stored in KV cannot exceed 25 MiB.
+    - name: Minimum cacheTtl
+      value: 60 seconds
+      scope: Read cache
+      note: cacheTtl parameters shorter than 60 seconds are not permitted.
+  constraints:
+    - name: Storage per account (Free)
+      value: 1 GB
+      note: Free plan accounts are capped at 1 GB of total KV storage.
+    - name: Writes to the same key
+      value: 1 per second
+      note: Each key can be updated at most once per second across plans.
+    - name: Metadata size
+      value: 1024 bytes
+      note: Metadata attached to keys must remain within the documented limit.
+free_tier:
+  items:
+    - name: Included reads
+      value: 100000 per day
+      reset_window: Daily
+      scope: Per account
+    - name: Included writes
+      value: 1000 per day
+      reset_window: Daily
+      scope: Per account
+  notes:
+    - Exceeding free tier quotas returns errors for that operation type until the next UTC reset or a plan upgrade.
+security_compliance:
+  authz:
+    - REST API usage requires account authentication headers like X-Auth-Email and X-Auth-Key or API tokens.
+    - Worker bindings enforce namespace-level access tied to the deployed script configuration.
+  isolation:
+    - Namespaces provide account-scoped isolation so bindings only reach the intended dataset.
+  data_residency:
+    - Data replicates to Cloudflare's global network, keeping reads close to end users while respecting asynchronous propagation.
+  secrets:
+    uses:
+      - API keys or tokens supplied to Wrangler and REST clients authorize namespace creation and mutations.
+configuration:
+  wrangler:
+    bindings:
+      - type: kv
+        key: KV
+        note: Add the namespace binding to kv_namespaces for Worker access.
+    example: |
+      {
+        "$schema": "./node_modules/wrangler/config-schema.json",
+        "kv_namespaces": [
+          {
+            "binding": "KV",
+            "id": "<KV_NAMESPACE_ID>"
+          }
+        ]
+      }
+  cli:
+    commands:
+      - npx wrangler kv namespace create <BINDING_NAME>
+      - npx wrangler kv key put --binding=<BINDING_NAME> KEY VALUE
+  api:
+    endpoints:
+      - method: PUT
+        path: /client/v4/accounts/{account_id}/storage/kv/namespaces/{namespace_id}/values/{key}
+        note: Write or update a key-value pair via REST.
+      - method: GET
+        path: /client/v4/accounts/{account_id}/storage/kv/namespaces/{namespace_id}/values/{key}
+        note: Retrieve a value directly through the API.
+dev_experience:
+  local_dev:
+    - Use preview_id bindings in Wrangler to separate development data from production namespaces.
+  testing:
+    - Validate namespace connectivity with wrangler kv commands before deploying new Workers.
+  ci_cd:
+    - Automate namespace creation and seeding scripts in pipelines to keep environments in sync.
+migration_versioning:
+  versioning:
+    - Track binding names and namespace IDs in configuration files to manage environment-specific versions.
+  migrations:
+    - Script bulk copies or exports when reorganizing namespaces to avoid downtime.
+cost_awareness:
+  metering:
+    - Paid plans meter operations per million requests and charge for additional storage beyond the included quota.
+  design_tips:
+    - Batch writes, cache reads, and use metadata to minimize billable operations and stay within plan budgets.
+examples:
+  minimal:
+    description: Bind a KV namespace in a Worker and read/write a value.
+    files:
+      - path: src/index.ts
+        lang: typescript
+        code: |
+          export default {
+            async fetch(request, env): Promise<Response> {
+              await env.KV.put('greeting', 'hello world');
+              const value = await env.KV.get('greeting');
+              return new Response(value ?? 'missing');
+            },
+          } satisfies ExportedHandler<{ KV: KVNamespace }>;
+  advanced:
+    - description: Invoke the REST API with curl to update and read a key from outside Workers.
+      files:
+        - path: put.sh
+          lang: bash
+          code: |
+            curl https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$KEY_NAME \
+              -X PUT \
+              -H 'Content-Type: multipart/form-data' \
+              -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
+              -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
+              -d '{"value":"Some Value"}'
+        - path: get.sh
+          lang: bash
+          code: |
+            curl https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$KEY_NAME \
+              -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
+              -H "X-Auth-Key: $CLOUDFLARE_API_KEY"
+glossary_refs: []
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/kv/
+    title: Cloudflare Workers KV · Cloudflare Workers KV docs
+    accessed: "2025-11-07"
+    note: Overview, use cases, CLI scaffolding, and REST API examples.
+  - url: https://developers.cloudflare.com/kv/get-started/
+    title: Getting started · Cloudflare Workers KV docs
+    accessed: "2025-11-07"
+    note: Namespace creation workflow, Wrangler commands, and binding setup.
+  - url: https://developers.cloudflare.com/kv/concepts/kv-namespaces/
+    title: KV namespaces · Cloudflare Workers KV docs
+    accessed: "2025-11-07"
+    note: Namespace replication model, binding objects, and preview configuration.
+  - url: https://developers.cloudflare.com/kv/platform/limits/
+    title: Limits · Cloudflare Workers KV docs
+    accessed: "2025-11-07"
+    note: Operational quotas, value size, metadata limits, and per-key write throttles.
+  - url: https://developers.cloudflare.com/kv/platform/pricing/
+    title: Pricing · Cloudflare Workers KV docs
+    accessed: "2025-11-07"
+    note: Free plan allowances, paid metering rates, and reset behavior.
+  - url: https://developers.cloudflare.com/api/resources/kv/
+    title: Workers KV API reference · Cloudflare API docs
+    accessed: "2025-11-07"
+    note: REST endpoints, authentication headers, and SDK usage for managing namespaces.

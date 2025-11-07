@@ -1,0 +1,224 @@
+id: pages
+name: Cloudflare Pages
+category: platform
+summary: Cloudflare Pages builds and deploys full-stack sites by combining automated Git or direct uploads with Pages Functions on Cloudflare's global edge.
+docs:
+  homepage: https://developers.cloudflare.com/pages/
+  key_pages:
+    - title: Git integration guide
+      url: https://developers.cloudflare.com/pages/get-started/git-integration/
+    - title: Direct Upload
+      url: https://developers.cloudflare.com/pages/get-started/direct-upload/
+    - title: Functions
+      url: https://developers.cloudflare.com/pages/functions/
+capabilities:
+  - Connect GitHub or GitLab repositories to run builds, preview deployments, and automatic production releases on every push.
+  - Upload prebuilt assets from local or CI pipelines via Wrangler or dashboard drag and drop, deploying globally in minutes.
+  - Extend sites with Pages Functions that run on the Workers runtime and integrate with platform resources through bindings.
+how_it_works:
+  model: Pages ingests source code or build artifacts, runs configurable build steps, and serves static assets plus edge functions from Cloudflare's network.
+  architecture:
+    - Git-integrated projects trigger builds from the configured production branch and create preview deployments for every other branch.
+    - Direct Upload projects use Wrangler or dashboard uploads to create deployments without relying on a Git provider.
+    - Pages Functions run alongside static content, using the Workers runtime with compatibility flags and middleware support.
+  execution:
+    - Teams authenticate with a Git provider or Wrangler, create a project, and configure build commands and output directories.
+    - Build pipelines produce assets that Pages deploys to the `pages.dev` domain or custom domains with optional rollbacks and previews.
+    - Functions folders or `_worker.js` files add dynamic routes that execute on Cloudflare's edge and can call bound services.
+  consistency:
+    - Rollbacks let operators instantly restore any successful production deployment from the dashboard.
+    - Preview deployments give each branch an isolated URL so changes can be reviewed before promotion.
+    - Environment bindings support separate production and preview credentials to keep integrations consistent across releases.
+supported_languages:
+  runtimes:
+    - Static asset hosting for any framework output supported by the build pipeline.
+    - Cloudflare Workers runtime powering Pages Functions with Node.js API compatibility.
+  sdks:
+    - name: Create Cloudflare (C3) CLI
+      url: https://developers.cloudflare.com/pages/get-started/c3/
+  notes:
+    - The C3 CLI scaffolds framework starters and can deploy directly to Pages with the `--platform=pages` argument.
+usage_patterns:
+  webpages:
+    - pattern: Continuous deployment from a Git repository.
+      steps:
+        - Connect the repository through the Git integration workflow.
+        - Configure build commands and output directories in the dashboard.
+        - Push commits to trigger preview builds and merge into the production branch for live releases.
+  one_tier_apps:
+    - pattern: Ship static assets from a custom build pipeline.
+      steps:
+        - Generate a build artifact in external CI.
+        - Use `wrangler pages deploy <dir>` to upload the output directory.
+        - Promote preview or production deployments and use rollbacks if an issue is detected.
+  multi_tier_apps:
+    - pattern: Add serverless logic and platform resources with Pages Functions.
+      steps:
+        - Create a `functions/` directory or `_worker.js` to define routes that run on the Workers runtime.
+        - Configure bindings for KV, R2, Durable Objects, or D1 to access shared services.
+        - Apply middleware like the Cloudflare Access plugin to validate requests before serving content.
+interactions:
+  produces_bindings: []
+  consumes_bindings:
+    - kv
+    - r2
+    - durable_objects
+    - d1
+  best_with:
+    - product_id: workers
+      reason: Pages Functions reuse the Workers runtime to add server-side logic, middleware, and compatibility flags.
+    - product_id: kv
+      reason: Official bindings documentation highlights KV as a common storage option for Pages Functions.
+    - product_id: cloudflare_one
+      reason: The Pages plugin validates Access JWTs to secure protected routes.
+  anti_patterns:
+    - Attempting to switch a project between Git integration and Direct Upload workflows after creation, which requires recreating the project.
+limits:
+  quotas:
+    - name: Builds per month (Free plan)
+      value: 500
+      scope: Per account
+      plan: Free
+    - name: Custom domains per project (Free)
+      value: 100
+      scope: Per project
+      plan: Free
+  performance:
+    - name: Build timeout
+      value: 20 minutes
+      scope: Each build
+      note: Git-integrated builds terminate after 20 minutes of execution.
+  constraints:
+    - name: Files per deployment (Direct Upload Wrangler)
+      value: 20,000 files, 25 MiB each
+      note: Wrangler uploads support up to 20,000 assets with a 25 MiB per-file limit.
+    - name: Drag and drop limits
+      value: 1,000 files, 25 MiB each
+      note: Dashboard uploads cap file count and size as documented.
+    - name: Function usage model
+      value: Standard Workers usage
+      note: Functions requests count against Workers plan quotas.
+free_tier:
+  items:
+    - name: Included monthly builds
+      value: 500
+      reset_window: Monthly
+      scope: Per account
+    - name: Included custom domains
+      value: 100
+      reset_window: Continuous
+      scope: Per project
+  notes:
+    - Exceeding build or domain limits requires upgrading to higher plans or requesting limit adjustments.
+security_compliance:
+  authz:
+    - The Cloudflare Access Pages plugin validates Access JWTs before allowing protected requests to proceed.
+    - Wrangler CLI commands require authentication before creating or deploying projects.
+  isolation:
+    - Preview deployments isolate branch-specific builds with unique URLs to keep testing traffic separated from production.
+  data_residency:
+    - Assets and functions run on Cloudflare's global network, minimizing latency worldwide.
+  secrets:
+    uses:
+      - Environment variables and bindings store credentials for builds and runtime integrations across environments.
+configuration:
+  wrangler:
+    bindings:
+      - type: pages_project
+        key: pages
+        note: Wrangler caches project identifiers after `pages project create` for subsequent deploys.
+    example: |
+      npx wrangler pages project create
+  cli:
+    commands:
+      - npm create cloudflare@latest -- --platform=pages
+      - npx wrangler pages deploy <BUILD_OUTPUT_DIRECTORY>
+      - npx wrangler pages project list
+  api:
+    endpoints:
+      - method: PATCH
+        path: /client/v4/accounts/{account_id}/pages/projects/{project_name}
+        note: Update project settings such as the production branch.
+dev_experience:
+  local_dev:
+    - Run `wrangler pages dev` to serve local builds with function bindings and preview environment variables.
+  testing:
+    - Use preview deployment URLs generated for each branch or pull request to validate changes before release.
+  ci_cd:
+    - Integrate Direct Upload commands into CI pipelines to push artifacts without manual dashboard steps.
+migration_versioning:
+  versioning:
+    - Track build commands, root directories, and environment variables in repository configuration for reproducible builds.
+  migrations:
+    - Use rollbacks or redeploy previous commits when reverting breaking changes, ensuring instant production recovery.
+cost_awareness:
+  metering:
+    - Functions consumption follows Workers plan billing while static hosting remains included in Pages plans.
+  design_tips:
+    - Optimize build pipelines to stay within time limits and prune unnecessary assets to respect file caps.
+examples:
+  minimal:
+    description: Scaffold and deploy a starter site with the C3 CLI.
+    files:
+      - path: create.sh
+        lang: bash
+        code: |
+          npm create cloudflare@latest -- --platform=pages my-site
+          cd my-site
+          npm run deploy
+  advanced:
+    - description: Deploy a prebuilt directory and secure routes with the Access plugin.
+      files:
+        - path: deploy.sh
+          lang: bash
+          code: |
+            npx wrangler pages deploy dist
+        - path: functions/_middleware.ts
+          lang: typescript
+          code: |
+            import cloudflareAccessPlugin from "@cloudflare/pages-plugin-cloudflare-access";
+
+            export const onRequest = cloudflareAccessPlugin({
+              domain: "https://example.cloudflareaccess.com",
+              aud: ["<ACCESS_AUDIENCE_ID>"]
+            });
+glossary_refs: []
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/pages/
+    title: Overview · Cloudflare Pages docs
+    accessed: "2025-11-07"
+    note: Platform summary, feature list, and related product context.
+  - url: https://developers.cloudflare.com/pages/get-started/git-integration/
+    title: Git integration guide · Cloudflare Pages docs
+    accessed: "2025-11-07"
+    note: Git workflow, build configuration, and preview deployments.
+  - url: https://developers.cloudflare.com/pages/get-started/direct-upload/
+    title: Direct Upload · Cloudflare Pages docs
+    accessed: "2025-11-07"
+    note: Wrangler deploy commands, file limits, and drag-and-drop workflow.
+  - url: https://developers.cloudflare.com/pages/functions/
+    title: Functions · Cloudflare Pages docs
+    accessed: "2025-11-07"
+    note: Functions overview, Workers runtime usage, and middleware capabilities.
+  - url: https://developers.cloudflare.com/pages/functions/bindings/
+    title: Bindings · Cloudflare Pages docs
+    accessed: "2025-11-07"
+    note: Supported bindings for KV, Durable Objects, R2, and D1 across environments.
+  - url: https://developers.cloudflare.com/pages/configuration/rollbacks/
+    title: Rollbacks · Cloudflare Pages docs
+    accessed: "2025-11-07"
+    note: Rollback workflow and deployment management guidance.
+  - url: https://developers.cloudflare.com/pages/get-started/c3/
+    title: Create projects with C3 CLI · Cloudflare Pages docs
+    accessed: "2025-11-07"
+    note: CLI scaffolding commands and framework starter support.
+  - url: https://developers.cloudflare.com/pages/functions/plugins/cloudflare-access/
+    title: Cloudflare Access · Cloudflare Pages docs
+    accessed: "2025-11-07"
+    note: Access plugin installation and JWT validation middleware example.
+  - url: https://developers.cloudflare.com/pages/platform/limits/
+    title: Limits · Cloudflare Pages docs
+    accessed: "2025-11-07"
+    note: Build quotas, custom domain caps, and file size restrictions.

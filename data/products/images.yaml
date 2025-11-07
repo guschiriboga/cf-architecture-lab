@@ -1,0 +1,236 @@
+id: images
+name: Cloudflare Images
+category: media
+summary: Cloudflare Images stores originals, applies on-demand transformations, and delivers optimized variants globally from the imagedelivery.net service.
+docs:
+  homepage: https://developers.cloudflare.com/images/
+  key_pages:
+    - title: Getting started
+      url: https://developers.cloudflare.com/images/get-started/
+    - title: Transform images
+      url: https://developers.cloudflare.com/images/transform-images/
+    - title: Pricing
+      url: https://developers.cloudflare.com/images/pricing/
+capabilities:
+  - Upload, store, and serve images directly from Cloudflare's global network while defining up to 100 named variants per asset for responsive delivery.
+  - Optimize remote images with transformation URLs or Workers integrations that apply resizing, format conversion, and caching without copying originals.
+  - Accept end-user uploads securely through one-time direct upload URLs and enforce access with signed delivery tokens.
+how_it_works:
+  model: Cloudflare Images keeps a canonical original in Cloudflare storage or a remote origin, generates transformed variants on demand, and serves them via the imagedelivery.net CDN.
+  architecture:
+    - Upload APIs and direct creator uploads create image records that reference the original asset and expose variant identifiers for delivery.
+    - Edge transformations run when a variant or transformation URL is requested, pulling the original, applying requested operations, and caching the output across Cloudflare's network.
+    - Access control layers rely on signed URL tokens and optional Worker logic to gate retrieval of private assets while still serving public variants efficiently.
+  execution:
+    - Clients or Workers call the Images API to upload files, either directly or through one-time direct upload endpoints that produce expiring URLs for browsers.
+    - Transformation URLs embed directives like width, format, and fit, allowing the Images service to transform the requested asset and cache the result for subsequent requests.
+    - Workers can intercept unsigned requests, generate signed delivery URLs with configurable expirations, and redirect clients to authorized variants.
+  consistency:
+    - Cached transformations are counted once per 30-day window, ensuring the same variant request reuses existing renders and billing records.
+    - Direct upload drafts can be inspected through the API until the creator completes an upload, providing clear state transitions for asynchronous workflows.
+    - Variant definitions stored with each image apply globally, so updating a variant instantly changes the transformation applied for every request.
+supported_languages:
+  runtimes:
+    - Cloudflare Workers runtime for server-side image orchestration and signed URL generation.
+    - Any HTTPS-capable client for invoking the Images REST API endpoints.
+  sdks:
+    - name: Cloudflare Images API (REST)
+      url: https://developers.cloudflare.com/api/resources/images/
+  notes:
+    - Delivery URLs use the imagedelivery.net domain structure, which can be generated server-side or stored as links in applications.
+usage_patterns:
+  webpages:
+    - pattern: Serve responsive images from existing origins with transformation URLs.
+      steps:
+        - Enable transformations for the target zone in the dashboard.
+        - Construct URLs that include width, format, or other directives to request optimized variants.
+        - Embed the transformation URLs in page markup so Cloudflare caches and serves each variant globally.
+  one_tier_apps:
+    - pattern: Accept user uploads without exposing API tokens.
+      steps:
+        - Request a direct upload URL from the Images API with requireSignedURLs enabled.
+        - Return the upload URL to the browser to post the selected file directly to Cloudflare.
+        - Monitor the image draft status via the API and publish signed delivery URLs after upload completion.
+  multi_tier_apps:
+    - pattern: Pipeline user uploads through Workers, Images, and R2 storage.
+      steps:
+        - Bind Images, R2, and Assets to a Worker project via wrangler configuration.
+        - Stream uploaded files through the Worker, applying Images transformations such as overlays or format conversion.
+        - Store the transformed result in R2 and surface the delivery URL or stored object to downstream systems.
+interactions:
+  produces_bindings:
+    - images
+  consumes_bindings:
+    - workers
+    - r2
+  best_with:
+    - product_id: workers
+      reason: Workers supply transformation logic, signed URL generation, and routing control for delivering private or custom image flows.
+    - product_id: r2
+      reason: Images tutorials highlight storing transformed assets in R2 buckets while Images handles optimization and delivery.
+  anti_patterns:
+    - Attempting to deliver large binary assets above the 25 MiB site asset limit without offloading to storage products like R2.
+limits:
+  quotas:
+    - name: Included unique transformations
+      value: 5000 per month
+      scope: Per account
+      plan: Images Free
+  performance:
+    - name: Transformation caching window
+      value: 30 days per unique transformation
+      scope: Global cache
+      note: Images counts each transformation once in a rolling 30-day period before billing again.
+  constraints:
+    - name: Stored image file size
+      value: 10 MB maximum per upload
+      note: Uploaded images kept in the Images storage bucket cannot exceed 10 MB.
+    - name: Transformation input size
+      value: 70 MB input, 100 megapixel area limit
+      note: Remote transformation requests must stay under the size and area limits enforced by Images.
+    - name: Variant count per image
+      value: Up to 100 named variants
+      note: Each image can define 100 variants describing target resizing or formatting behaviors.
+    - name: Direct upload URL expiry
+      value: 30 minutes default, up to 6 hours
+      note: One-time upload URLs expire after 30 minutes unless extended to a six-hour maximum.
+free_tier:
+  items:
+    - name: Included unique transformations
+      value: 5000
+      reset_window: Monthly
+      scope: Per account
+  notes:
+    - Cached variants continue serving after the free quota is reached, but new transformations return error 9422 until you upgrade or the window resets.
+security_compliance:
+  authz:
+    - Signed URL tokens restrict access to private images, preventing downloads without a valid signature.
+    - Direct creator uploads rely on one-time URLs that keep API tokens and credentials off client devices.
+  isolation:
+    - Cloudflare sanitizes SVG files before delivery to remove scripting, hyperlinks, and cross-origin references.
+  data_residency:
+    - Images are delivered from Cloudflare's global network, minimizing latency regardless of viewer geography.
+  secrets:
+    uses:
+      - API tokens generated in the dashboard authenticate upload, variant, and management requests.
+configuration:
+  wrangler:
+    bindings:
+      - type: images
+        key: IMAGES
+        note: Bind the Images API to Workers when transforming or delivering assets in code.
+    example: |
+      {
+        "$schema": "./node_modules/wrangler/config-schema.json",
+        "images": {
+          "binding": "IMAGES"
+        },
+        "r2_buckets": [
+          {
+            "binding": "R2",
+            "bucket_name": "<BUCKET>"
+          }
+        ],
+        "assets": {
+          "directory": "./<DIRECTORY>",
+          "binding": "ASSETS"
+        }
+      }
+  cli:
+    commands:
+      - "curl --request POST https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/images/v1 --header 'Authorization: Bearer <API_TOKEN>' --header 'Content-Type: multipart/form-data' --form file=@./<YOUR_IMAGE.IMG>"
+  api:
+    endpoints:
+      - method: POST
+        path: /client/v4/accounts/{account_id}/images/v1
+        note: Upload an image to Cloudflare Images.
+      - method: POST
+        path: /client/v4/accounts/{account_id}/images/v2/direct_upload
+        note: Create a one-time direct upload URL for browsers.
+dev_experience:
+  local_dev:
+    - Use Workers locally to generate signed URLs and preview transformation logic before deploying.
+  testing:
+    - Query direct upload drafts via the API to confirm that creator uploads completed successfully.
+  ci_cd:
+    - Include Images API calls in deployment pipelines to seed or update required variants alongside application releases.
+migration_versioning:
+  versioning:
+    - Maintain variant definitions in configuration so updates change every delivery URL consistently.
+  migrations:
+    - Update or recreate variants via the API whenever image sizing requirements evolve to refresh cached content.
+cost_awareness:
+  metering:
+    - Unique transformations are counted once within a 30-day rolling window and incur charges beyond the included quota on paid plans.
+  design_tips:
+    - Reuse named variants across pages and assets to reduce redundant transformations and control costs.
+examples:
+  minimal:
+    description: Upload an image asset via the Images API using curl.
+    files:
+      - path: upload.sh
+        lang: bash
+        code: |
+          curl --request POST \
+            --url https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/images/v1 \
+            --header 'Authorization: Bearer <API_TOKEN>' \
+            --header 'Content-Type: multipart/form-data' \
+            --form file=@./<YOUR_IMAGE.IMG>
+  advanced:
+    - description: Issue a direct creator upload URL and accept browser uploads without exposing credentials.
+      files:
+        - path: request.sh
+          lang: bash
+          code: |
+            curl --request POST \
+              https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v2/direct_upload \
+              --header "Authorization: Bearer <API_TOKEN>" \
+              --form 'requireSignedURLs=true'
+        - path: upload.html
+          lang: html
+          code: |
+            <!DOCTYPE html>
+            <html>
+              <body>
+                <form action="INSERT_UPLOAD_URL_HERE" method="post" enctype="multipart/form-data">
+                  <input type="file" id="myFile" name="file" />
+                  <input type="submit" />
+                </form>
+              </body>
+            </html>
+glossary_refs: []
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/images/
+    title: Overview · Cloudflare Images docs
+    accessed: "2025-11-07"
+    note: Summary, network delivery model, and variant features.
+  - url: https://developers.cloudflare.com/images/get-started/
+    title: Getting started · Cloudflare Images docs
+    accessed: "2025-11-07"
+    note: API prerequisites, initial upload command, and transformation enablement steps.
+  - url: https://developers.cloudflare.com/images/transform-images/
+    title: Transform images · Cloudflare Images docs
+    accessed: "2025-11-07"
+    note: Transformation workflow, caching window, format limits, and SVG sanitization.
+  - url: https://developers.cloudflare.com/images/pricing/
+    title: Pricing · Cloudflare Images docs
+    accessed: "2025-11-07"
+    note: Free plan quotas, billing metrics, and rolling 30-day counting.
+  - url: https://developers.cloudflare.com/images/upload-images/
+    title: Upload images · Cloudflare Images docs
+    accessed: "2025-11-07"
+    note: Supported formats, upload size limits, and metadata constraints.
+  - url: https://developers.cloudflare.com/images/upload-images/direct-creator-upload/
+    title: Accept user-uploaded images · Cloudflare Images docs
+    accessed: "2025-11-07"
+    note: Direct creator upload flow, expiring URL behavior, and credential handling.
+  - url: https://developers.cloudflare.com/images/manage-images/serve-images/serve-private-images/
+    title: Serve private images · Cloudflare Images docs
+    accessed: "2025-11-07"
+    note: Signed URL generation with Workers and private delivery considerations.
+  - url: https://developers.cloudflare.com/images/tutorials/optimize-user-uploaded-image/
+    title: Transform user-uploaded images before uploading to R2 · Cloudflare Images docs
+    accessed: "2025-11-07"
+    note: Multi-service binding example integrating Images, Workers, R2, and Assets.
