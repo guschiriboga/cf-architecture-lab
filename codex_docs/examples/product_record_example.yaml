@@ -1,0 +1,105 @@
+id: workers
+name: Workers
+category: compute
+summary: Serverless edge runtime for building APIs and web apps.
+docs:
+  homepage: https://developers.cloudflare.com/workers/
+  key_pages:
+    - { title: "Limits", url: "https://developers.cloudflare.com/workers/platform/limits/" }
+capabilities:
+  - HTTP request handling at the edge
+how_it_works:
+  model: Event-driven edge runtime
+  architecture:
+    - Global Anycast network, isolates per request
+  execution:
+    - Short-lived execution with CPU time semantics
+  consistency:
+    - Stateless per request; state via KV/D1/Durable Objects
+supported_languages:
+  runtimes: [ "Workers Runtime (JavaScript/TypeScript)" ]
+  sdks: [ { name: "wrangler", url: "https://developers.cloudflare.com/workers/wrangler/" } ]
+  notes: [ "Node.js API compatibility subset" ]
+usage_patterns:
+  webpages:
+    - { pattern: "Edge transforms", steps: ["Route requests", "Fetch origin", "Modify response"] }
+  one_tier_apps:
+    - { pattern: "Edge API", steps: ["Define fetch()", "Add bindings", "Deploy via wrangler"] }
+  multi_tier_apps:
+    - { pattern: "API + DB", steps: ["Bind D1", "Use prepared statements", "Return JSON"] }
+interactions:
+  produces_bindings: [ "KV", "D1", "R2", "Vectorize", "Durable Objects" ]
+  consumes_bindings: [ "Secrets Store" ]
+  best_with:
+    - { product_id: d1, reason: "Low-latency serverless SQL" }
+  anti_patterns: [ "Long-running compute" ]
+limits:
+  quotas:
+    - { name: "Requests/day (Free)", value: "100,000", scope: "account", plan: "Free" }
+  performance:
+    - { name: "CPU time per invocation", value: "see docs", scope: "invocation", note: "Subject to change" }
+  constraints:
+    - { name: "Ephemeral compute", value: "No background threads", note: "Use Workflows or DO Alarms instead" }
+free_tier:
+  items:
+    - { name: "Requests/day", value: "100,000", reset_window: "00:00 UTC", scope: "account" }
+  notes: [ "Behavior on exceed can be configured at route level" ]
+security_compliance:
+  authz: [ "Bindings scoped by wrangler.toml" ]
+  isolation: [ "V8 isolates per request" ]
+  data_residency: [ "Edge distributed" ]
+  secrets:
+    uses: [ "Secrets Store" ]
+configuration:
+  wrangler:
+    bindings: [ { type: "d1_database", key: "DB", note: "Bind to D1 database" } ]
+    example: |
+      [[d1_databases]]
+      binding = "DB"
+      database_name = "app_db"
+      database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  cli:
+    commands: [ "wrangler dev", "wrangler deploy" ]
+  api:
+    endpoints: [ { method: "POST", path: "/api/*", note: "Handled in fetch()" } ]
+dev_experience:
+  local_dev: [ "wrangler dev", "miniflare (where applicable)" ]
+  testing: [ "Fetch-based unit tests" ]
+  ci_cd: [ "GitHub Actions with wrangler" ]
+migration_versioning:
+  versioning: [ "compatibility_date in wrangler.toml" ]
+  migrations: [ "Update date to opt into latest runtime changes" ]
+cost_awareness:
+  metering: [ "Invocations" ]
+  design_tips: [ "Minimize subrequests; cache aggressively" ]
+examples:
+  minimal:
+    description: Minimal JSON response
+    files:
+      - path: src/index.js
+        lang: javascript
+        code: |
+          export default {
+            async fetch(request, env, ctx) {
+              return new Response(JSON.stringify({ ok: true }), {
+                headers: { "content-type": "application/json" }
+              });
+            }
+          };
+  advanced:
+    - description: D1-backed API
+      files:
+        - path: src/index.js
+          lang: javascript
+          code: |
+            export default {
+              async fetch(req, env) {
+                const result = await env.DB.prepare("SELECT 1 as ok").first();
+                return new Response(JSON.stringify(result));
+              }
+            };
+glossary_refs: [ "Workers Runtime", "wrangler" ]
+status: ga
+changelog_highlights: []
+sources:
+  - { url: "https://developers.cloudflare.com/workers/", title: "Workers Docs", accessed: "2025-11-07", note: "Homepage" }

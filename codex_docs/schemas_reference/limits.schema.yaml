@@ -1,0 +1,10 @@
+product_id: string
+category: enum[quota, performance, constraint]
+name: string
+value: string
+scope: string
+plan: string
+reset_window: string
+note: string
+source_url: string
+accessed: string

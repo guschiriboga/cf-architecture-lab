@@ -1,0 +1,10 @@
+product_id: workers
+category: quota
+name: Requests/day (Free)
+value: "100,000"
+scope: account
+plan: Free
+reset_window: "00:00 UTC"
+note: "Behavior on exceed can be configured at route level."
+source_url: https://developers.cloudflare.com/workers/platform/limits/
+accessed: 2025-11-07

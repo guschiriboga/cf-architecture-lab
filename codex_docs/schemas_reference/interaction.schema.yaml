@@ -1,0 +1,7 @@
+from: string
+to: string
+capability: string
+direction: enum[uses, provides]
+notes: string
+source_url: string
+accessed: string

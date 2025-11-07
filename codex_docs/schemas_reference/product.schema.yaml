@@ -1,0 +1,79 @@
+id: string
+name: string
+category: enum[compute, storage, database, platform, orchestration, media, logging, network_security]
+summary: string
+docs:
+  homepage: string
+  key_pages:
+    - { title: string, url: string }
+capabilities:
+  - string
+how_it_works:
+  model: string
+  architecture:
+    - string
+  execution:
+    - string
+  consistency:
+    - string
+supported_languages:
+  runtimes: [ string ]
+  sdks: [ { name: string, url: string } ]
+  notes: [ string ]
+usage_patterns:
+  webpages:
+    - { pattern: string, steps: [string] }
+  one_tier_apps:
+    - { pattern: string, steps: [string] }
+  multi_tier_apps:
+    - { pattern: string, steps: [string] }
+interactions:
+  produces_bindings: [ string ]
+  consumes_bindings: [ string ]
+  best_with: [ { product_id: string, reason: string } ]
+  anti_patterns: [ string ]
+limits:
+  quotas:
+    - { name: string, value: string, scope: string, plan: string }
+  performance:
+    - { name: string, value: string, scope: string, note: string }
+  constraints:
+    - { name: string, value: string, note: string }
+free_tier:
+  items:
+    - { name: string, value: string, reset_window: string, scope: string }
+  notes: [ string ]
+security_compliance:
+  authz: [ string ]
+  isolation: [ string ]
+  data_residency: [ string ]
+  secrets:
+    uses: [ string ]
+configuration:
+  wrangler:
+    bindings: [ { type: string, key: string, note: string } ]
+    example: string
+  cli:
+    commands: [ string ]
+  api:
+    endpoints: [ { method: string, path: string, note: string } ]
+dev_experience:
+  local_dev: [ string ]
+  testing: [ string ]
+  ci_cd: [ string ]
+migration_versioning:
+  versioning: [ string ]
+  migrations: [ string ]
+cost_awareness:
+  metering: [ string ]
+  design_tips: [ string ]
+examples:
+  minimal:
+    description: string
+    files: [ { path: string, lang: string, code: string } ]
+  advanced:
+    - { description: string, files: [ { path, lang, code } ] }
+glossary_refs: [ string ]
+status: enum[ga, beta, open_beta, closed_beta, preview]
+changelog_highlights: [ { date: string, change: string, source: string } ]
+sources: [ { url: string, title: string, accessed: string, note: string } ]

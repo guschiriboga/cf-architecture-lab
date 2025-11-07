@@ -1,0 +1,7 @@
+from: workers
+to: d1
+capability: binding
+direction: uses
+notes: "Workers can connect to D1 via wrangler bindings."
+source_url: https://developers.cloudflare.com/d1/
+accessed: 2025-11-07
