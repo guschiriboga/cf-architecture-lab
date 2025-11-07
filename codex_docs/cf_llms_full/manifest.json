@@ -1,110 +1,116 @@
 {
   "containers": {
     "available": true,
-    "fetched_at": "2025-11-07T17:41:49Z",
     "bytes": 72756,
+    "fetched_at": "2025-11-07T17:41:49Z",
     "sha256": "d8ab0462c343bafe3cec5e143ca80c1dc5c34ce9b98a771e4b90fbced3c130ec"
-  },
-  "workers": {
-    "available": true,
-    "fetched_at": "2025-11-07T18:29:03Z",
-    "bytes": 2639845,
-    "sha256": "df66d646398c60e92955715dec8c951f275a7550b91c4ee25722220b2215532a"
-  },
-  "secrets-store": {
-    "available": true,
-    "fetched_at": "2025-11-07T18:28:55Z",
-    "bytes": 21853,
-    "sha256": "fe3c1c91f4a4c238ade4c7015ef28e702216645db1169c766b98b413bc4c535b"
-  },
-  "r2": {
-    "available": true,
-    "fetched_at": "2025-11-07T18:28:25Z",
-    "bytes": 435205,
-    "sha256": "c182fb059db0207eac6f421d3c111587dd919c2a9a35f63a48fff486394163cf"
-  },
-  "pages": {
-    "available": true,
-    "fetched_at": "2025-11-07T18:28:26Z",
-    "bytes": 766053,
-    "sha256": "0fa6882af134ee4ff24489957db6698d0911e612d8ed9b9b454b29ba56ff931c"
-  },
-  "kv": {
-    "available": true,
-    "fetched_at": "2025-11-07T18:33:51Z",
-    "bytes": 165247,
-    "sha256": "3e8c8e571d07165029fee2ef68517f6366c6e833bb79aa14b7e737bdc7e34294"
-  },
-  "images": {
-    "available": true,
-    "fetched_at": "2025-11-07T18:28:03Z",
-    "bytes": 205756,
-    "sha256": "d6c6812799337efb38518fcfa05ff5496d4e215043a58814b95fc1f7e3c1eea2"
-  },
-  "durable_objects": {
-    "available": true,
-    "fetched_at": "2025-11-07T18:28:09Z",
-    "bytes": 356585,
-    "sha256": "38768f345bb354bd3798ec48876581c3fedb0815de1d4eac2d0e2759300d83a5"
   },
   "d1": {
     "available": true,
-    "fetched_at": "2025-11-07T18:27:44Z",
     "bytes": 425134,
+    "fetched_at": "2025-11-07T18:27:44Z",
     "sha256": "1f32eca16057ac78899594b13069b7fc7b7496a9571472ef75b14d842299e04a"
+  },
+  "dns": {
+    "available": true,
+    "bytes": 0,
+    "fetched_at": "2025-11-07T19:24:22Z",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "durable_objects": {
+    "available": true,
+    "bytes": 356585,
+    "fetched_at": "2025-11-07T18:28:09Z",
+    "sha256": "38768f345bb354bd3798ec48876581c3fedb0815de1d4eac2d0e2759300d83a5"
   },
   "gateway": {
     "available": true,
-    "fetched_at": "2025-11-07T19:24:22Z",
     "bytes": 0,
+    "fetched_at": "2025-11-07T19:24:22Z",
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "images": {
+    "available": true,
+    "bytes": 205756,
+    "fetched_at": "2025-11-07T18:28:03Z",
+    "sha256": "d6c6812799337efb38518fcfa05ff5496d4e215043a58814b95fc1f7e3c1eea2"
+  },
+  "kv": {
+    "available": true,
+    "bytes": 165247,
+    "fetched_at": "2025-11-07T18:33:51Z",
+    "sha256": "3e8c8e571d07165029fee2ef68517f6366c6e833bb79aa14b7e737bdc7e34294"
   },
   "load_balancing": {
     "available": true,
-    "fetched_at": "2025-11-07T19:24:22Z",
     "bytes": 290825,
+    "fetched_at": "2025-11-07T19:24:22Z",
     "sha256": "f6954f797488f1fa554d3110e427b9a777fb27c2a90c859cb376cc1089d1920b"
+  },
+  "log-explorer": {
+    "available": true,
+    "bytes": 27607,
+    "fetched_at": "2025-11-07T19:52:59Z",
+    "sha256": "23ede7779bb8489c7cd28b31cb6596595ef1bfc157a474fcf3b3c6fb4062d57a"
+  },
+  "logs": {
+    "available": true,
+    "bytes": 348008,
+    "fetched_at": "2025-11-07T20:00:18Z",
+    "sha256": "6f0729068754c8e74d996270cb861fa7dc94c5f7b2ee35de3571693b88787046"
   },
   "magic_cloud_networking": {
     "available": true,
-    "fetched_at": "2025-11-07T19:24:22Z",
     "bytes": 42013,
+    "fetched_at": "2025-11-07T19:24:22Z",
     "sha256": "213218f0b3f988ae0b14143f58c7e8919892514dcdb82bc3577deb2664b80e89"
+  },
+  "pages": {
+    "available": true,
+    "bytes": 766053,
+    "fetched_at": "2025-11-07T18:28:26Z",
+    "sha256": "0fa6882af134ee4ff24489957db6698d0911e612d8ed9b9b454b29ba56ff931c"
+  },
+  "r2": {
+    "available": true,
+    "bytes": 435205,
+    "fetched_at": "2025-11-07T18:28:25Z",
+    "sha256": "c182fb059db0207eac6f421d3c111587dd919c2a9a35f63a48fff486394163cf"
+  },
+  "r2-sql": {
+    "available": true,
+    "bytes": 0,
+    "fetched_at": "2025-11-07T19:52:25Z",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "secrets-store": {
+    "available": true,
+    "bytes": 21853,
+    "fetched_at": "2025-11-07T18:28:55Z",
+    "sha256": "fe3c1c91f4a4c238ade4c7015ef28e702216645db1169c766b98b413bc4c535b"
   },
   "ssl_tls": {
     "available": true,
-    "fetched_at": "2025-11-07T19:24:22Z",
     "bytes": 546220,
+    "fetched_at": "2025-11-07T19:24:22Z",
     "sha256": "935d2a13a186a30a5b3f3485a12a5290d3cb3c401f294779e219f8c044676d1d"
   },
   "waf": {
     "available": true,
-    "fetched_at": "2025-11-07T19:24:22Z",
     "bytes": 883727,
+    "fetched_at": "2025-11-07T19:24:22Z",
     "sha256": "27dc270c850eb42d022e37f7478afc382dc2c5dd7746ebaac4535167bbb54cf1"
   },
-  "dns": {
+  "workers": {
     "available": true,
-    "fetched_at": "2025-11-07T19:24:22Z",
-    "bytes": 0,
-    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-  },
-  "r2-sql": {
-    "available": true,
-    "fetched_at": "2025-11-07T19:52:25Z",
-    "bytes": 0,
-    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "bytes": 2639845,
+    "fetched_at": "2025-11-07T18:29:03Z",
+    "sha256": "df66d646398c60e92955715dec8c951f275a7550b91c4ee25722220b2215532a"
   },
   "workflows": {
     "available": true,
-    "fetched_at": "2025-11-07T19:52:59Z",
     "bytes": 178477,
-    "sha256": "e2f60e771492df60658babbf5be0932bfe307b9592eaf0887450abb3a2777597"
-  },
-  "log-explorer": {
-    "available": true,
     "fetched_at": "2025-11-07T19:52:59Z",
-    "bytes": 27607,
-    "sha256": "23ede7779bb8489c7cd28b31cb6596595ef1bfc157a474fcf3b3c6fb4062d57a"
+    "sha256": "e2f60e771492df60658babbf5be0932bfe307b9592eaf0887450abb3a2777597"
   }
 }
