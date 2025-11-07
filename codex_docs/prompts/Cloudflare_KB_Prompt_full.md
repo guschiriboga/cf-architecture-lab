@@ -28,7 +28,7 @@ Before any analysis, **fetch and save** the large-model reference dumps (when av
 - Logging:
   log-explorer · logs
 - Network Security:
-  network · cloudflare-one · cloudflare-one/traffic-policies (Gateway) · load-balancing · magic-cloud-networking · ssl · waf · dns/dns-firewall
+  network · cloudflare-one · cloudflare-one/traffic-policies (Gateway) · load-balancing · magic-cloud-networking · ssl · waf · dns
 
 > Note: For **Gateway**, use the Traffic Policies docs root: `cloudflare-one/traffic-policies/llms-full.txt`.
 
@@ -81,7 +81,7 @@ This **local-first, remote-verify** workflow ensures fast, consistent processing
 - Magic Cloud Networking — https://developers.cloudflare.com/magic-cloud-networking/
 - SSL/TLS — https://developers.cloudflare.com/ssl/
 - WAF — https://developers.cloudflare.com/waf/
-- DNS — https://developers.cloudflare.com/dns/dns/
+- DNS — https://developers.cloudflare.com/dns/
 
 **Extra references (not products):**
 - Reference Architecture — https://developers.cloudflare.com/reference-architecture/
@@ -345,7 +345,7 @@ Each product YAML must include, at minimum:
 | Load Balancing | Workers/Pages/Origins | Traffic mgmt | Global routing and failover |
 | Gateway | Workers/Devices | Policy | Egress filtering and traffic policies |
 | Cloudflare One | Users/Apps | Zero Trust | SSO, device posture, ZTNA |
-| DNS Firewall | DNS Resolvers | DNS Security | Domain filtering and threat feeds |
+| DNS | DNS Resolvers | DNS Security | Domain filtering and threat feeds |
 | Network | All Edge Services | Delivery | Anycast, peering, routing |
 | Logs/Log Explorer | All | Observability | Export and exploration of logs |
 
@@ -387,7 +387,7 @@ Expand this list using Cloudflare docs as the authoritative source.
 - **R2 SQL:** querying model, formats supported, cost and data scan metrics.
 - **Secrets Store:** usage within Workers, binding model, encryption and rotation mechanisms.
 - **Logging (Logs & Log Explorer):** export formats, destinations, retention, sampling, query/filter capabilities.
-- **Network Security:** WAF rule model, DDoS layers, SSL/TLS modes, Load Balancing health checks, Gateway traffic policies, Cloudflare One posture, DNS Firewall data sources, Magic Cloud Networking primitives, global network features.
+- **Network Security:** WAF rule model, DDoS layers, SSL/TLS modes, Load Balancing health checks, Gateway traffic policies, Cloudflare One posture, DNS data sources, Magic Cloud Networking primitives, global network features.
 
 ---
 
