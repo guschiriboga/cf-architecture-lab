@@ -1,0 +1,218 @@
+id: gateway
+name: Cloudflare Gateway
+category: network_security
+summary: Cloudflare Gateway is the Secure Web Gateway service in Cloudflare One that inspects DNS, network, HTTP, and egress traffic with policy-driven controls backed by Cloudflare's threat intelligence.
+docs:
+  homepage: https://developers.cloudflare.com/cloudflare-one/traffic-policies/
+  key_pages:
+    - title: DNS policies
+      url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/dns-policies/
+    - title: HTTP policies
+      url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/http-policies/
+    - title: Egress policies
+      url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/egress-policies/
+capabilities:
+  - Create DNS policies that apply security and content categories or selectors to allow, block, override, or inspect queries across devices and locations.
+  - Intercept HTTP and HTTPS requests at Layer 7 to allow, block, override elements, decrypt TLS, or scan files before traffic reaches destinations.
+  - Enforce identity-aware network policies on non-HTTP protocols using IP, port, application, and user selectors tied to Zero Trust identities.
+  - Assign and orchestrate dedicated egress IPs or default egress behavior so traffic exits from predictable Cloudflare data centers.
+how_it_works:
+  model: Devices and locations forward traffic through Cloudflare Gateway, where ordered DNS, network, HTTP, and egress policies evaluate selectors and actions before routing to destinations.
+  architecture:
+    - WARP clients or configured DNS locations onboard traffic to Gateway so policies can apply uniformly to users and offices.
+    - Policy builders let administrators combine selectors, operators, and logical joins to match traffic attributes before applying single actions.
+    - Egress policies choose between shared or dedicated Cloudflare egress IPs and default to the closest data center when no explicit match exists.
+  execution:
+    - Install the Cloudflare root certificate when needed, deploy the WARP client, authenticate to the organization, enable the Gateway proxy, and optionally turn on TLS decryption or antivirus scanning for HTTP inspection.
+    - Build DNS or HTTP firewall policies in the Cloudflare One dashboard by defining logical expressions and selecting allow, block, or bypass-style actions based on security categories or applications.
+    - Automate policy management through the Zero Trust Gateway rules API by sending authenticated POST requests that define precedence, filters, and actions for DNS or HTTP traffic.
+  consistency:
+    - Gateway policies evaluate in order, so administrators keep catch-all entries last to preserve precedence and reliable policy outcomes.
+    - Traffic logs within Cloudflare One allow teams to verify that DNS and HTTP requests from devices match expected policy results after onboarding.
+    - Cloudflare advises upgrading Terraform provider integrations to maintain predictable policy precedence calculations during automation.
+supported_languages:
+  runtimes: []
+  sdks: []
+  notes:
+    - Gateway is a managed security service and does not expose runtime environments or SDK bindings beyond policy APIs.
+usage_patterns:
+  webpages:
+    - pattern: Enforce DNS filtering for roaming and on-site users.
+      steps:
+        - Deploy the WARP client to devices or forward location DNS queries to Cloudflare Gateway resolvers.
+        - Enable DNS activity logging and confirm queries appear in Gateway insights for the onboarded identities or locations.
+        - Create DNS policies that block all default security risk categories or allow required domains.
+  one_tier_apps:
+    - pattern: Inspect SaaS traffic with HTTP policies.
+      steps:
+        - Install the Cloudflare certificate, deploy WARP, and enable the Gateway proxy for TCP and optional UDP traffic.
+        - Configure TLS decryption and optional antivirus scanning for uploads and downloads that need inspection.
+        - Add HTTP policies that bypass unsupported applications while blocking known threat categories or restricting file actions.
+  multi_tier_apps:
+    - pattern: Control non-HTTP access to internal services with identity-aware rules.
+      steps:
+        - Require users to authenticate through Cloudflare One so Gateway receives identity attributes alongside traffic.
+        - Define network policies using selectors like destination IP, port, or application combined with user or group filters.
+        - Apply allow actions for approved resources and block or restrict all other network traffic leaving the endpoints.
+interactions:
+  produces_bindings: []
+  consumes_bindings: []
+  best_with: []
+  anti_patterns:
+    - Relying on policy ordering without catch-all entries can unintentionally route unmatched traffic through undesired egress paths.
+limits:
+  quotas:
+    - name: Dedicated egress IP availability
+      value: Enterprise-only
+      scope: Per account
+      plan: Enterprise
+  performance:
+    - name: Default egress routing
+      value: Uses nearest Cloudflare data center when no egress policy matches
+      scope: Traffic without explicit dedicated egress selection
+      note: Load balancing retains user selection when multiple data centers are equally close.
+  constraints:
+    - name: WARP shared egress IPs
+      value: Default egress IP addresses are shared across all WARP users without Enterprise entitlement
+      note: Cloudflare does not publish shared WARP egress ranges, so allowlists require dedicated IP purchases.
+free_tier:
+  items: []
+  notes:
+    - Organizations without dedicated egress entitlements use shared Cloudflare Gateway IPs provided by default service tiers.
+security_compliance:
+  authz:
+    - Gateway integrates with configured identity providers so network and HTTP policies can scope decisions per user or group.
+    - API automation requires Zero Trust write tokens scoped to the account before policy changes are accepted.
+  isolation:
+    - Policy precedence and catch-all guidance ensure segregation between specific matches and broader fallback rules during evaluation.
+  data_residency:
+    - Gateway egress defaults to the closest Cloudflare data center, keeping traffic within nearby regions unless policies choose specific egress locations.
+  secrets:
+    uses:
+      - Installing Cloudflare-managed root certificates on devices enables TLS inspection without exposing private keys from upstream services.
+configuration:
+  wrangler:
+    bindings: []
+    example: ""
+  cli:
+    commands: []
+  api:
+    endpoints:
+      - method: POST
+        path: /client/v4/accounts/{account_id}/gateway/rules
+        note: Create Zero Trust Gateway rules with specified precedence, filters, and actions.
+dev_experience:
+  local_dev:
+    - Use Gateway insights dashboards to confirm onboarding success before rolling policies to wider device groups.
+  testing:
+    - Generate test requests after enabling logging to verify DNS or HTTP policies are applied as expected in Cloudflare One logs.
+  ci_cd:
+    - Integrate authenticated API calls into automation pipelines to manage Gateway policy lifecycles alongside infrastructure code.
+migration_versioning:
+  versioning:
+    - Track policy precedence values and selector logic in configuration management to avoid Terraform precedence recalculations.
+  migrations:
+    - Upgrade Cloudflare Terraform provider deployments to version 5 to prevent hashed precedence conflicts when reordering policies.
+cost_awareness:
+  metering:
+    - Dedicated egress IPs require Enterprise entitlements, so teams can default to shared IPs when predictable addresses are unnecessary.
+  design_tips:
+    - Keep catch-all policies at the bottom of policy stacks to minimize accidental use of costlier dedicated egress paths.
+examples:
+  minimal:
+    description: Create a DNS policy that blocks all default security risk categories via API.
+    files:
+      - path: examples/gateway/block-security-categories.sh
+        lang: bash
+        code: |
+          curl "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/gateway/rules" \
+            --request POST \
+            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            --json '{
+              "name": "Block security threats",
+              "description": "Block all default Cloudflare DNS security categories",
+              "precedence": 0,
+              "enabled": true,
+              "action": "block",
+              "filters": [
+                  "dns"
+              ],
+              "traffic": "any(dns.security_category[*] in {68 178 80 83 176 175 117 131 134 151 153})",
+              "identity": ""
+            }'
+  advanced:
+    - description: Bypass TLS inspection for unsupported applications while blocking known threats through HTTP policies.
+      files:
+        - path: examples/gateway/http-policy-management.sh
+          lang: bash
+          code: |
+            curl "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/gateway/rules" \
+              --request POST \
+              --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              --json '{
+                "name": "Do not inspect applications",
+                "description": "Bypass TLS decryption for unsupported applications",
+                "precedence": 0,
+                "enabled": true,
+                "action": "off",
+                "filters": [
+                    "http"
+                ],
+                "traffic": "any(app.type.ids[*] in {16})",
+                "identity": "",
+                "device_posture": ""
+              }'
+            curl "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/gateway/rules" \
+              --request POST \
+              --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              --json '{
+                "name": "Block known risks",
+                "description": "Block all default Cloudflare HTTP security categories",
+                "precedence": 1,
+                "enabled": true,
+                "action": "block",
+                "filters": [
+                    "http"
+                ],
+                "traffic": "any(http.request.uri.security_category[*] in {68 178 80 83 176 175 117 131 134 151 153})",
+                "identity": "",
+                "device_posture": ""
+              }'
+  glossary_refs:
+    - Cloudflare WARP client
+    - Zero Trust Gateway policy
+status: ga
+changelog_highlights: []
+sources:
+  - url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/
+    title: Traffic policies · Cloudflare One docs
+    accessed: 2025-11-07
+    note: Product overview of Gateway policy types and inspection coverage.
+  - url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/dns-policies/
+    title: DNS policies · Cloudflare One docs
+    accessed: 2025-11-07
+    note: Describes DNS selectors, actions, and policy creation guidance.
+  - url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/http-policies/
+    title: HTTP policies · Cloudflare One docs
+    accessed: 2025-11-07
+    note: Explains HTTP inspection capabilities, selectors, and TLS considerations.
+  - url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/network-policies/
+    title: Network policies · Cloudflare One docs
+    accessed: 2025-11-07
+    note: Covers identity-based network selectors and actions for non-HTTP traffic.
+  - url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/egress-policies/
+    title: Egress policies · Cloudflare One docs
+    accessed: 2025-11-07
+    note: Details dedicated egress IP controls, load balancing, and policy ordering guidance.
+  - url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/initial-setup/dns/
+    title: Set up DNS filtering · Cloudflare One docs
+    accessed: 2025-11-07
+    note: Provides onboarding steps for devices and locations plus DNS policy workflow.
+  - url: https://developers.cloudflare.com/cloudflare-one/traffic-policies/initial-setup/http/
+    title: Set up HTTP filtering · Cloudflare One docs
+    accessed: 2025-11-07
+    note: Covers enabling WARP proxy, TLS decryption, antivirus, and sample HTTP policies.
+  - url: https://developers.cloudflare.com/cloudflare-one/team-and-resources/devices/warp/deployment/
+    title: Deploy WARP to your organization · Cloudflare One docs
+    accessed: 2025-11-07
+    note: Lists manual and managed deployment options for rolling out the WARP client.
