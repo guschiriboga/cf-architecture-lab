@@ -5,7 +5,7 @@
 - Build tooling relies on Vite (`vite.config.ts`) with TypeScript dependencies captured in `package.json`.
 
 ## Frontend deployment
-### Option A – Cloudflare Pages (final choice)
+### Cloudflare Pages
 - **Why**: Native support for static frontends built with Vite/React. Automatic builds from Git or direct uploads keep the workflow simple.
 - **Build settings**: `npm install`, `npm run build`, output directory `dist/`.
 - **Runtime model**: Ship the compiled assets to Pages and expose any server-side logic via a dedicated Workers API (`api.pfmp.example.com`) or Pages Functions if colocated in the same repo.
@@ -43,7 +43,7 @@
 - **Routing**: Attach the Worker to `api.<domain>` or `/api/*` path on the main domain through Cloudflare’s Worker routes. Update the frontend to reference this API base URL via environment variables.
 
 ## Final architecture summary
-1. **Frontend**: Vite/React bundle deployed on Cloudflare Pages (Option A). Build artifacts served globally from Pages CDN with automatic previews.
+1. **Frontend**: Vite/React bundle deployed on Cloudflare Pages. Build artifacts served globally from Pages CDN with automatic previews.
 2. **Backend**: Dedicated Cloudflare Worker written in TypeScript, exposing REST endpoints and connected to a D1 database for relational persistence.
 3. **Migrations**: Drizzle ORM manages schema definitions and migrations, executed through Wrangler in CI/CD before each deploy.
 4. **Observability & ops**: Use Wrangler for deployments, `wrangler tail` for live logs, and D1 dashboards for query inspection. No additional Cloudflare products (KV, Durable Objects, Cron, Queues, Webhooks) are required at this stage, reducing operational complexity while leaving room to extend later.
