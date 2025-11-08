@@ -20,7 +20,9 @@
 - **ORM & migrations**: Use Drizzle ORM with its D1 adapter to model tables and emit SQL migrations (`drizzle-kit generate`). Apply migrations through `wrangler d1 migrations apply` in CI/CD.
 
 ### API design
-- Prefer a REST-style JSON API using a lightweight framework such as Hono or itty-router for routing and validation.
+- Prefer a REST-style JSON API using a lightweight framework such as Hono for routing and validation.
+   - Hono Docs https://hono.dev/docs/
+   - Hono Examples https://hono.dev/examples/
 - Implement authentication middleware (e.g., session token verification) directly in the Worker; integrate with Cloudflare Turnstile only if bot mitigation becomes necessary.
 - Add structured error handling and logging via `wrangler tail`/Workers Logs for observability.
 
