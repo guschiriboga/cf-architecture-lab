@@ -4,49 +4,48 @@
 - The uploaded project (`pfmp-figma-frontend`) is a Vite + React application written entirely in TypeScript/TSX (`App.tsx`, `main.tsx`, plus component files under `src/components`).
 - Build tooling relies on Vite (`vite.config.ts`) with TypeScript dependencies captured in `package.json`.
 
-## Frontend deployment options
-### Option A – Cloudflare Pages (recommended)
-- **Why**: Native support for static frontends built with Vite/React. Automatic builds from Git or direct uploads. Seamless integration with Pages Functions for per-route serverless logic using the same repository.
+## Frontend deployment
+### Cloudflare Pages
+- **Why**: Native support for static frontends built with Vite/React. Automatic builds from Git or direct uploads keep the workflow simple.
 - **Build settings**: `npm install`, `npm run build`, output directory `dist/`.
-- **Runtime capabilities**: Can call backend APIs hosted on Workers or Pages Functions using the same domain (e.g., `/api/*`). Supports environment variables, KV/D1 bindings, and access to R2 assets when paired with functions.
+- **Runtime model**: Ship the compiled assets to Pages and expose any server-side logic via a dedicated Workers API (`api.pfmp.example.com`) or Pages Functions if colocated in the same repo.
 
-### Option B – Cloudflare Workers + Assets
-- **Why**: If you need full control over request handling, custom caching rules, or streaming SSR, deploy the built assets with Workers using `wrangler` and Workers Sites/`@cloudflare/kv-asset-handler` or the new Assets module.
-- **Build**: Same Vite build step. Upload the `dist/` bundle to KV or Assets, and serve via a Worker script written in TypeScript.
-- **Trade-offs**: Slightly more operational work than Pages (need to manage KV namespace & deploy workflow), but offers unified codebase if backend logic must sit in a single Worker.
+## Backend architecture (Cloudflare Workers + D1)
+### Core runtime
+- Author the API in TypeScript and deploy with Wrangler as a standalone Worker (`pfmp-api`).
+- Map `/api/*` routes from Pages to the Worker via Cloudflare routing rules or a custom subdomain.
 
-## Backend architecture (Cloudflare-native)
-### Core runtime: **Cloudflare Workers** (TypeScript via Wrangler)
-- Author the backend in TypeScript; compile/transpile with Wrangler during deploy.
-- Workers deliver sub-10ms cold starts globally and integrate with Cloudflare data stores.
+### Data layer
+- **Database**: Cloudflare D1 (SQLite-compatible) for all relational data.
+- **ORM & migrations**: Use Drizzle ORM with its D1 adapter to model tables and emit SQL migrations (`drizzle-kit generate`). Apply migrations through `wrangler d1 migrations apply` in CI/CD.
 
-### API surface design
-- REST or JSON-RPC endpoints exposed via Workers routes (e.g., `/api/*`). Use `itty-router`, Hono, or native `Request` handling.
-- Protect authenticated routes with Cloudflare Access JWTs, Turnstile, or custom token logic.
-
-### Data & state options
-- **Cloudflare D1**: Managed SQLite for relational data (budgets, transactions, users). Use Workers + Drizzle ORM/TypeScript bindings. Enable database migrations via Wrangler.
-- **Cloudflare KV**: For caching, user preference blobs, feature flags.
-- **Durable Objects**: For real-time collaboration or per-user session/stateful workflows (e.g., budgeting sessions, notification fan-out).
-- **R2**: Store receipts or document uploads; serve via signed URLs.
-
-### Background & integrations
-- **Cron Triggers**: Schedule Workers to sync financial data, send reminders, or refresh analytics.
-- **Queues**: Reliable asynchronous processing (e.g., ingest bank transaction webhooks) using Workers + Cloudflare Queues.
-- **Webhooks**: Publish Worker endpoints to receive third-party events.
+### API design
+- Prefer a REST-style JSON API using a lightweight framework such as Hono or itty-router for routing and validation.
+- Implement authentication middleware (e.g., session token verification) directly in the Worker; integrate with Cloudflare Turnstile only if bot mitigation becomes necessary.
+- Add structured error handling and logging via `wrangler tail`/Workers Logs for observability.
 
 ### Local development workflow
-1. Use `npm create cloudflare@latest` to scaffold a Worker project with TypeScript support.
-2. Configure `wrangler.toml` with D1/KV/Durable Objects bindings. Bind the Pages project if sharing repo (`[[d1_databases]]`, `[[kv_namespaces]]`).
-3. Develop against `wrangler dev`, optionally proxying the Vite frontend (`npm run dev`) and Worker dev server together via Pages Functions or local reverse proxy.
+1. Scaffold the Worker with `npm create cloudflare@latest` (select “Hello World” Worker + TypeScript).
+2. Install project dependencies: `wrangler`, `hono` (or chosen router), `drizzle-orm`, `drizzle-kit`.
+3. Define the D1 binding in `wrangler.toml`:
+   ```toml
+   [[d1_databases]]
+   binding = "DB"
+   database_name = "pfmp"
+   database_id = "<generated-id>"
+   ```
+4. Create Drizzle schema files (e.g., `src/db/schema.ts`) and generate migrations. Use `wrangler d1 execute` to seed sample data during development.
+5. Run `wrangler dev --local` to simulate the Worker and connect the Vite dev server via a proxy (Pages dev server or Vite proxy configuration for `/api`).
 
-### Deployment strategy
-- **Single repo approach**: Host frontend and backend together in one Git repository. Cloudflare Pages handles the Vite build, while `functions/` directory contains Pages Functions (Workers under the hood) for API routes. Bind D1/KV/R2 via Pages project settings.
-- **Split repo approach**: Frontend stays on Pages; backend Worker lives in separate repo deployed with Wrangler GitHub Action. Use custom domain or subdomain (`api.example.com`).
+### Deployment pipeline
+- **Frontend**: Connect the GitHub repo to Cloudflare Pages; configure build command (`npm run build`) and `dist/` output. Enable preview deploys per branch.
+- **Backend**: Use GitHub Actions with `cloudflare/wrangler-action` to run Drizzle migrations and publish the Worker on merges to main. Bind the D1 database in the production environment within Cloudflare dashboard or via `wrangler secret put`/`wrangler d1` commands.
+- **Routing**: Attach the Worker to `api.<domain>` or `/api/*` path on the main domain through Cloudflare’s Worker routes. Update the frontend to reference this API base URL via environment variables.
 
-## Recommended solution
-1. **Deploy frontend to Cloudflare Pages** for minimal operational overhead, enabling zero-config Vite builds, preview deployments, and integration with Pages Functions for simple APIs.
-2. **Implement backend APIs as Cloudflare Workers (or Pages Functions)** written in TypeScript, leveraging D1 for relational data and KV/Durable Objects for caching/state.
-3. **Unify infrastructure via Wrangler**: manage environment bindings, migrations, and CI/CD (GitHub Action `cloudflare/pages-action` for frontend, `cloudflare/wrangler-action` for backend).
+## Final architecture summary
+1. **Frontend**: Vite/React bundle deployed on Cloudflare Pages. Build artifacts served globally from Pages CDN with automatic previews.
+2. **Backend**: Dedicated Cloudflare Worker written in TypeScript, exposing REST endpoints and connected to a D1 database for relational persistence.
+3. **Migrations**: Drizzle ORM manages schema definitions and migrations, executed through Wrangler in CI/CD before each deploy.
+4. **Observability & ops**: Use Wrangler for deployments, `wrangler tail` for live logs, and D1 dashboards for query inspection. No additional Cloudflare products (KV, Durable Objects, Cron, Queues, Webhooks) are required at this stage, reducing operational complexity while leaving room to extend later.
 
-This design keeps the entire stack in TypeScript, aligns with Cloudflare-native services, and provides a clear growth path from MVP (Pages + Functions) to more advanced capabilities (standalone Workers with Durable Objects, Queues, and R2).
+This streamlined setup matches the current requirements—TypeScript everywhere, Cloudflare-native hosting, and a relational SQLite backend—while keeping optional services on standby until the product needs them.
